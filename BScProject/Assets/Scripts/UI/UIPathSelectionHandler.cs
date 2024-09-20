@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,10 +8,12 @@ public class UIPathSelectionHandler : MonoBehaviour
     [SerializeField] private List<Toggle> _pathOptionToggles = new();
 
 
-    // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
+    // ---------- Unity Methods --------------------------------------------------------------------------------------------------------------------------------
+
     private void OnEnable() 
     {
         _confirmButton.onClick.AddListener(OnPathSelectionConfirmed);
+        _confirmButton.interactable = false;
 
         foreach (var toggle in _pathOptionToggles)
         {
@@ -21,8 +22,7 @@ public class UIPathSelectionHandler : MonoBehaviour
                 if (state)
                 {
                     PathData path = toggle.GetComponent<PathOption>().PathData;
-                    EvaluationManager.Instance.SelectedPath = path;
-                    Debug.Log($"Set selected path ID to {path.PathID}.");
+                    AssessmentManager.Instance.SelectedPath = path;
                     _confirmButton.interactable = state;
                 }
             });
@@ -38,7 +38,7 @@ public class UIPathSelectionHandler : MonoBehaviour
 
     private void OnPathSelectionConfirmed()
     {
-        EvaluationManager.Instance.ProceedToNextEvaluationStep();
+        AssessmentManager.Instance.ProceedToNextAssessmentStep();
     }
 
 }

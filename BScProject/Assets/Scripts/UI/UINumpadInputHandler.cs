@@ -1,4 +1,5 @@
 using System.Text;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,6 +7,7 @@ public class UINumpadInputHandler : MonoBehaviour
 {    
     public delegate void OnInputChanged(string newInput);
     public event OnInputChanged InputChangedEvent;
+    public TMP_Text SelectionIndicator;
     
     [Header("Numpad Buttons")]
     [SerializeField] private Button _buttonZero;
@@ -26,7 +28,7 @@ public class UINumpadInputHandler : MonoBehaviour
     private bool _isDecimal = false;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
-    
+
     private void OnEnable() 
     {
         _buttonComma.onClick.AddListener(HandleButtonCommaClick);
@@ -150,22 +152,21 @@ public class UINumpadInputHandler : MonoBehaviour
         NotifyInputChanged();
     }
 
-public void AddDecimalPoint()
-{
-    if (!_isDecimal && _inputBuffer.Length > 0)
+    public void AddDecimalPoint()
     {
-        _inputBuffer.Append(System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator);
-        _isDecimal = true;
-    }
-    else if (_inputBuffer.Length == 0)
-    {
-        _inputBuffer.Append("0" + System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator);
-        _isDecimal = true;
-    }
+        if (!_isDecimal && _inputBuffer.Length > 0)
+        {
+            _inputBuffer.Append(System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator);
+            _isDecimal = true;
+        }
+        else if (_inputBuffer.Length == 0)
+        {
+            _inputBuffer.Append("0" + System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator);
+            _isDecimal = true;
+        }
 
-    NotifyInputChanged();
-}
-
+        NotifyInputChanged();
+    }
 
     public void RemoveLastInput()
     {
@@ -186,13 +187,14 @@ public void AddDecimalPoint()
     {
         _inputBuffer.Clear();
         _isDecimal = false;
-        NotifyInputChanged();
+        AddNumber(0);
     }
 
     public void ResetInput()
     {
         _inputBuffer.Clear();
         _isDecimal = false;
+        SelectionIndicator.color = Color.white;
     }
 
     private void NotifyInputChanged()

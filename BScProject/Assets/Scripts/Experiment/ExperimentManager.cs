@@ -5,8 +5,6 @@ using UnityEngine;
 using UnityEngine.Events;
 
 public enum ExperimentState {IDLE, LOADPATH, RUNNING, EVALUATION, FINISHED};
-public enum ExperimentType {STANDARD, EXTENDED}
-public enum ExperimentFloorType {NORMAL, OMNIDECK}
 
 public class ExperimentManager : MonoBehaviour
 {
@@ -73,14 +71,13 @@ public class ExperimentManager : MonoBehaviour
         {
             case ExperimentState.IDLE:
                 break;
-            case ExperimentState.LOADPATH:
-                LoadNextPath();
+            // case ExperimentState.LOADPATH:
+            //     LoadNextPath();
 				break;
             case ExperimentState.RUNNING:
                 break;
             case ExperimentState.EVALUATION:
-                TeleportToEvaluationArea();
-                StartEvaluation();
+                StartAssessment();
 				break;
             case ExperimentState.FINISHED:
                 _UIExperimentPanelManager.ShowFinishPanel();
@@ -125,14 +122,10 @@ public class ExperimentManager : MonoBehaviour
         ExperimentState = ExperimentState.RUNNING;
     }
 
-    private void TeleportToEvaluationArea()
+    private void StartAssessment()
     {
+        AssessmentManager.Instance.StartPathAssessment(PathManager.Instance.CurrentPath.GetPathData());
         _XROrigin.SetLocalPositionAndRotation(_evaluationRoomSpawnPoint.position, _evaluationRoomSpawnPoint.rotation);
-    }
-
-    private void StartEvaluation()
-    {
-        EvaluationManager.Instance.ProceedToNextEvaluationStep();
     }
 
     internal void StopExperiment()

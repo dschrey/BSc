@@ -5,6 +5,9 @@ using UnityEngine;
 public class PathSegmentData 
 {
     public int SegmentID;
+    public Color SegmentColor;
+    public Sprite ObjectiveObjectSprite;
+    public Sprite SegmentObjectSprite;
     public Vector3 relativeSegmentPosition;
-    public float RelativeDistanceToPreviousSegment = 0;
+    public float DistanceToPreviousSegment = 0;
 }

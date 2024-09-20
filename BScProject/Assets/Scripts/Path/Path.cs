@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -57,10 +56,15 @@ public class Path : MonoBehaviour
             segment.PathSegmentData = pathSegment;
             Segments.Add(segment);
             lastSegment = segment.gameObject;
-            pathSegment.RelativeDistanceToPreviousSegment = segmentDistance;
-            segment.PathSegmentData.RelativeDistanceToPreviousSegment = segmentDistance;
+            pathSegment.DistanceToPreviousSegment = segmentDistance;
+            segment.PathSegmentData.DistanceToPreviousSegment = segmentDistance;
             segment.gameObject.SetActive(false);
         }
+    }
+
+    public PathData GetPathData()
+    {
+        return _pathData;
     }
 
 }

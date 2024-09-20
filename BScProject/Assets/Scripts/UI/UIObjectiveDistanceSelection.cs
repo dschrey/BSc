@@ -1,16 +1,18 @@
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UIItemDistanceSelection : MonoBehaviour
+public class UIObjectiveDistanceSelection : MonoBehaviour
 {
-    [SerializeField] private List<Toggle> _segmentDistanceToggles = new();
-    [SerializeField] private TMP_Text _selectionDisplay;
+
+    [SerializeField] private GameObject _segmentDistanceTogglePrefab;
+    [SerializeField] private Transform _segmentDistanceToggleParent;
     [SerializeField] private Button _confirmButton;
+    [SerializeField] private Image _selectedPathImage;
     [SerializeField] private UINumpadInputHandler _numpadInput;
     public UnityEvent<PathSegmentOption> SelectedSegmentChanged = new();
+    private List<PathSegmentOption> _segmentDistanceToggles = new();
     private PathSegmentOption _selectedSegment;
 
 
@@ -20,68 +22,74 @@ public class UIItemDistanceSelection : MonoBehaviour
     {
         SelectedSegmentChanged.AddListener(OnSelectedSegmentChanged);
         _confirmButton.onClick.AddListener(OnDistanceSelectionConfirmed);
-        _numpadInput.InputChangedEvent += OnNumpadInputChanged;
-    }
+        _confirmButton.interactable = false;
+        
 
+        foreach (PathSegmentData segmentData in AssessmentManager.Instance.SelectedPath.Segments)
+        {
+            PathSegmentOption segmentOption = Instantiate(_segmentDistanceTogglePrefab, _segmentDistanceToggleParent).GetComponent<PathSegmentOption>();
+            segmentOption.SetSegmentLabel(segmentData.SegmentID, segmentData.SegmentColor);
+            _segmentDistanceToggles.Add(segmentOption);
+        }
+
+        _numpadInput.InputChangedEvent += OnNumpadInputChanged;
+        _selectedPathImage.sprite = AssessmentManager.Instance.SelectedPath.pathTexture;
+    }
 
     private void OnDisable() 
     {
         SelectedSegmentChanged.RemoveListener(OnSelectedSegmentChanged);
         _confirmButton.onClick.RemoveListener(OnDistanceSelectionConfirmed);
+        _numpadInput.InputChangedEvent -= OnNumpadInputChanged;
     }
+
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
 
     private void OnDistanceSelectionConfirmed()
     {
-        EvaluationManager.Instance.ProceedToNextEvaluationStep();
+        _numpadInput.ResetInput();
+        _numpadInput.gameObject.SetActive(false);
+        AssessmentManager.Instance.ProceedToNextAssessmentStep();
     }
 
     private void OnSelectedSegmentChanged(PathSegmentOption segment)
     {
         _selectedSegment = segment;
-        _selectionDisplay.color = segment.color;
         _confirmButton.interactable = CheckAllSegmentsVisited();
-        if (_numpadInput != null)
-            _numpadInput.ResetInput();
+        if (!_numpadInput.gameObject.activeSelf)
+            _numpadInput.gameObject.SetActive(true);
+        _numpadInput.ResetInput();
+        _numpadInput.SelectionIndicator.color = _selectedSegment.Color;
     }
 
     private void OnNumpadInputChanged(string numpadInput)
     {
         if (_selectedSegment == null)
-            return;
-        _selectedSegment.distanceText.text = numpadInput + "m";
-        EvaluationManager.Instance.SelectedPath.Segments.ForEach(segment =>
         {
-            if (segment.SegmentID == _selectedSegment.SegmentID)
-            {
-                if (! float.TryParse(numpadInput, out float floatInput))
-                {
-                    Debug.LogError($"Could not parse numpard input into float.");
-                    return;
-                }
-                // if (EvaluationManager.Instance.EvaluationSettings.EvaluationType == EvaluationType.STANDARD)
-                // {
-                //     segment.DistanceDefault = floatInput;
-                // }
-                // else if (EvaluationManager.Instance.EvaluationSettings.EvaluationType == EvaluationType.EXTENDED)
-                // {
-                //     segment.DistanceExtended = floatInput;
-                // }
-            }
-        });
+            _numpadInput.ResetInput();
+            return;
+        }
+        
+        _selectedSegment.distanceText.text = numpadInput + "m";
+
+        if (! float.TryParse(numpadInput, out float distanceValue))
+        {
+            Debug.LogError($"Could not parse numpad input into float.");
+            return;
+        }
+        _selectedSegment.DistanceValue = distanceValue;
+        AssessmentManager.Instance.SetPathSegmentDistance(_selectedSegment.SegmentID, _selectedSegment.DistanceValue);
     }
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
     private bool CheckAllSegmentsVisited()
     {
-        foreach (Toggle toggle in _segmentDistanceToggles)
+        foreach (PathSegmentOption pathSegmentOption in _segmentDistanceToggles)
         {
-            if (! toggle.isOn)
+            if (pathSegmentOption.DistanceValue == -1f)
                 return false;
         }
         return true;
     }
-
-
 }
