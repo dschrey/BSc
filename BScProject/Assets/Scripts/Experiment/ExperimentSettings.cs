@@ -6,6 +6,9 @@ using UnityEngine;
 public class ExperimentSettings : ScriptableObject
 {
     [Header("Experiment Settings")]
+    [Tooltip("Size of the movement area")]
+    public Vector2 MovementArea = new Vector2(10f, 6f);
+    
     [Tooltip("Iteration of the experiment")]
     public int Iterations = 3;
     [Tooltip("Paths to be played per iteration.")]

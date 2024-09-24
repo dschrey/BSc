@@ -415,7 +415,8 @@ PrefabInstance:
       propertyPath: _panelManager
       value: 
       objectReference: {fileID: 9084379310323130093}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8303236256527206526, guid: a9e7b5cd409e0f64eabe559d327ddc89, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -546,7 +547,8 @@ PrefabInstance:
       propertyPath: m_AnchorMin.x
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1913408513822276441, guid: 54e7aaaf839dbae44ae5c3d569d0332d, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
