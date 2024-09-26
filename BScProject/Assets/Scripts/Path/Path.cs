@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Path : MonoBehaviour
 {
-    private PathData _pathData;
+    public PathData PathData { get; private set;  }
     [SerializeField] private Color _pathColor;
     [SerializeField] private GameObject _pathSegmentPrefab;
     public List<PathSegment> Segments = new();
@@ -35,20 +35,21 @@ public class Path : MonoBehaviour
 
     public void SetupPathSegments(PathData pathData)
     {
-        _pathData = pathData;
+        PathData = pathData;
         GameObject lastSegment = null;
-        float segmentDistance = 0;
         foreach (PathSegmentData pathSegment in pathData.Segments)
         {
             Vector3 segmentSpawnpoint;
+            float segmentDistance;
             if (lastSegment == null)
             {
-                segmentSpawnpoint = transform.position + pathSegment.relativeSegmentPosition;
+                // First segment
+                segmentSpawnpoint = transform.position + pathSegment.RelativeSegmentPosition;
                 segmentDistance = Vector3.Distance(transform.position, segmentSpawnpoint);
             }
             else
             {
-                segmentSpawnpoint = lastSegment.transform.position + pathSegment.relativeSegmentPosition;
+                segmentSpawnpoint = lastSegment.transform.position + pathSegment.RelativeSegmentPosition;
                 segmentDistance = Vector3.Distance(lastSegment.transform.position, segmentSpawnpoint);
             }
 
@@ -60,11 +61,6 @@ public class Path : MonoBehaviour
             segment.PathSegmentData.DistanceToPreviousSegment = segmentDistance;
             segment.gameObject.SetActive(false);
         }
-    }
-
-    public PathData GetPathData()
-    {
-        return _pathData;
     }
 
 }

@@ -1,19 +1,20 @@
 using System;
 using UnityEngine;
 
-[System.Serializable]
+[Serializable]
 public class PathSegmentAssessment
 {
     private PathSegmentData _pathSegment;
     public float SelectedDistanceToPreviousSegment;
     public Sprite SelectedObjectiveObjectSprite;
+    public float SelectedDistanceOfObjectToObjective;
 
     public PathSegmentAssessment(PathSegmentData pathSegment)
     {
         _pathSegment = pathSegment;
     }
 
-    public PathSegmentData GetCorrectPathSegment()
+    public PathSegmentData GetSegmentData()
     {
         return _pathSegment;
     }

@@ -124,7 +124,7 @@ public class ExperimentManager : MonoBehaviour
 
     private void StartAssessment()
     {
-        AssessmentManager.Instance.StartPathAssessment(PathManager.Instance.CurrentPath.GetPathData());
+        AssessmentManager.Instance.StartPathAssessment(PathManager.Instance.CurrentPath.PathData);
         _XROrigin.SetLocalPositionAndRotation(_evaluationRoomSpawnPoint.position, _evaluationRoomSpawnPoint.rotation);
     }
 

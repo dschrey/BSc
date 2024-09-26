@@ -5,13 +5,16 @@ public class PathSegment : MonoBehaviour
 {
     public PathSegmentData PathSegmentData;
     public event Action SegmentCompleted;
-    private Objective _objective;
+    public Objective Objective { get; private set; }
+    public GameObject SegmentObject { get; private set; }
     private MovementDetection _movementDetection;
     
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------------
 
     private void OnEnable() 
     {
+        SegmentObject = null;
+        
         _movementDetection = GetComponent<MovementDetection>();
         if (_movementDetection == null)
         {
@@ -19,13 +22,15 @@ public class PathSegment : MonoBehaviour
             return;
         }
         _movementDetection.ExitedDectectionZone += OnExitedDectectionZone;
-        _objective = GetComponentInChildren<Objective>();
-        if (_objective == null)
+        Objective = GetComponentInChildren<Objective>();
+        if (Objective == null)
         {
             Debug.LogError($"Could not find objective for {this} path segment.");
             return;
         }
-        _objective.ObjectiveCaptured += OnObjectiveCaptured;
+        Objective.ObjectiveCaptured += OnObjectiveCaptured;
+
+        SpawnSegmentObject();
 
     }
 
@@ -45,16 +50,31 @@ public class PathSegment : MonoBehaviour
 
     public void SetObjectiveInvisible()
     {
-        _objective.HideObjective();
+        Objective.HideObjective();
     }
 
     public void ShowSegmentObjective()
     {
-        _objective.ShowObjective();
+        Objective.ShowObjective();
     }
 
     public void PlaySegmentObjectiveHint()
     {
-        _objective.ShowObjectiveHint();
+        Objective.ShowObjectiveHint();
     }
+
+    private void SpawnSegmentObject()
+    {
+        Path path = transform.parent.GetComponent<Path>();
+        if (path.PathData.Type != PathType.EXTENDED)
+        {
+            return;
+        }
+
+
+        Vector3 objectSpawnpoint = transform.position + PathSegmentData.RelativeObjectPositionToObjective;
+        
+        SegmentObject = Instantiate(PathSegmentData.ObjectPrefab, objectSpawnpoint, PathSegmentData.ObjectRotation, transform);
+        PathSegmentData.ObjectDistanceToObjective = Vector3.Distance(transform.position, objectSpawnpoint);
+    } 
 }

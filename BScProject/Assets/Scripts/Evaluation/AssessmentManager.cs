@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public enum AssessmentStep {IDLE, PATHSELECTION, OBJECTIVEDISTANCE, OBSTACLELOCATION, OBSTACLEDISTANCE, OBJECTIVEOBJECT, COMPLETED }
+public enum AssessmentStep {IDLE, PATHSELECTION, OBJECTIVEDISTANCE, OBJECTSELECTION, OBJECTDISTANCE, OBJECTIVEOBJECT, COMPLETED }
 
 public class AssessmentManager : MonoBehaviour
 {
@@ -19,8 +19,8 @@ public class AssessmentManager : MonoBehaviour
     }
     [SerializeField] private GameObject _pathSelectionPanel;
     [SerializeField] private GameObject _itemDistancePanel;
-    [SerializeField] private GameObject _obstacleLocationPanel;
-    [SerializeField] private GameObject _obstacleDistancePanel;
+    [SerializeField] private GameObject _objectSelectionPanel;
+    [SerializeField] private GameObject _objectDistancePanel;
     [SerializeField] private GameObject _objectiveObjectPanel;
     private GameObject _activePanel;
     private int _currentAssessmentStep;
@@ -70,11 +70,11 @@ public class AssessmentManager : MonoBehaviour
             case AssessmentStep.OBJECTIVEDISTANCE:
                 _activePanel = _itemDistancePanel;
 				break;
-            case AssessmentStep.OBSTACLELOCATION:
-                _activePanel = _obstacleLocationPanel;
+            case AssessmentStep.OBJECTSELECTION:
+                _activePanel = _objectSelectionPanel;
 				break;
-            case AssessmentStep.OBSTACLEDISTANCE:
-                _activePanel = _obstacleDistancePanel;
+            case AssessmentStep.OBJECTDISTANCE:
+                _activePanel = _objectDistancePanel;
 				break;
             case AssessmentStep.COMPLETED:
                 _activePanel = null;
@@ -123,10 +123,10 @@ public class AssessmentManager : MonoBehaviour
                         break;
                     case 1:
                         PathAssessmentData.SelectedPath = SelectedPath;
-                        AssessmentStep = AssessmentStep.OBSTACLEDISTANCE;
+                        AssessmentStep = AssessmentStep.OBJECTDISTANCE;
                         break;
                     case 2:
-                        AssessmentStep = AssessmentStep.OBSTACLELOCATION;
+                        AssessmentStep = AssessmentStep.OBJECTSELECTION;
                         break;
                     case 3:
                         AssessmentStep = AssessmentStep.OBJECTIVEOBJECT;
@@ -164,6 +164,22 @@ public class AssessmentManager : MonoBehaviour
                 continue;
 
             segmentAssessment.SelectedDistanceToPreviousSegment = distanceValue;
+        }
+    }
+
+    /// <summary>
+    /// Assigns the selected distance of the object distance to the objective for the specified segment for assessment. 
+    /// </summary>
+    /// <param name="segmentID"></param>
+    /// <param name="distanceValue"></param>
+    public void SetPathSegmentObjectDistance(int segmentID, float distanceValue)
+    {
+        foreach (PathSegmentAssessment segmentAssessment in PathAssessmentData.PathSegmentAssessments)
+        {
+            if (segmentAssessment.GetSegmentID() != segmentID)
+                continue;
+
+            segmentAssessment.SelectedDistanceOfObjectToObjective = distanceValue;
         }
     }
      
