@@ -10,7 +10,6 @@ public class PathManager : MonoBehaviour
     public PathSegment CurrentSegment;
     public PathSegment LastSegment;
     public List<PathSegment> UnlockedSegments;
-
     [SerializeField] private MovementDetection _experimentSpawnMovementDetection;
 
     private int _unlockedSegments;
@@ -39,6 +38,11 @@ public class PathManager : MonoBehaviour
             return;
         }
         _experimentSpawnMovementDetection.ExitedDectectionZone += OnExitedDectectionZoneSpawn;
+
+        CurrentSegment = null;
+        LastSegment = null;
+        UnlockedSegments.Clear();
+        _unlockedSegments = 0;
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
@@ -49,8 +53,11 @@ public class PathManager : MonoBehaviour
             return;
         
         _unlockedSegments++;
+        Debug.Log($"{_unlockedSegments} - {CurrentPath.Segments.Count}");
         if (_unlockedSegments == CurrentPath.Segments.Count)
         {
+            Debug.Log($"Path {CurrentPath.PathData.PathID} completed.");
+
             ExperimentManager.Instance.PathCompletion?.Invoke();
             return;
         }
@@ -81,14 +88,19 @@ public class PathManager : MonoBehaviour
         if (CurrentPath != null)
         {
             Destroy(CurrentPath.gameObject);
+            CurrentPath = null;
+            CurrentSegment = null;
+            LastSegment = null;
+            UnlockedSegments.Clear();
+            _unlockedSegments = 0;
         }
         
         CurrentPath = Instantiate(_pathPrefab, ExperimentManager.Instance.ExperimentSpawn.position, ExperimentManager.Instance.ExperimentSpawn.rotation).GetComponent<Path>();
         
         CurrentPath.SetupPathSegments(pathData);
 
-        _unlockedSegments = 0;
-        TeleportPlayerToPathStart();
+        TeleportPlayerToStart();
+        ObjectRenderManager.Instance.ClearSegmentObjectRenderTextures();
         RevealNextPathSegment();
     }
 
@@ -105,11 +117,13 @@ public class PathManager : MonoBehaviour
         CurrentSegment = CurrentPath.Segments[_unlockedSegments];
         CurrentSegment.SegmentCompleted += OnSegmentCompleted;
         CurrentSegment.gameObject.SetActive(true);
+        if (CurrentPath == null)    
+            ExperimentManager.Instance._XROrigin.LookAt(CurrentSegment.gameObject.transform);
     }
 
     public void RestartSegment()
     {
-        if (CurrentSegment != null)
+        if (LastSegment != null)
         {
             ExperimentManager.Instance._XROrigin.SetPositionAndRotation(LastSegment.gameObject.transform.position, LastSegment.gameObject.transform.rotation);
         }
@@ -131,7 +145,7 @@ public class PathManager : MonoBehaviour
         CurrentSegment.PlaySegmentObjectiveHint();
     }
 
-    private void TeleportPlayerToPathStart()
+    private void TeleportPlayerToStart()
     {
         ExperimentManager.Instance._XROrigin.SetPositionAndRotation(ExperimentManager.Instance.ExperimentSpawn.position, ExperimentManager.Instance.ExperimentSpawn.rotation);
     }

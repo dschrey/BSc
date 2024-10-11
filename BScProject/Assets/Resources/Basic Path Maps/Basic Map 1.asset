@@ -12,15 +12,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65adc9aaa9d7bce49bfd2f0b5a84c077, type: 3}
   m_Name: Basic Map 1
   m_EditorClassIdentifier: 
-  PathID: 1
-  pathTexture: {fileID: 21300000, guid: d08603424fc10894a98aab32c771465b, type: 3}
+  PathID: 0
+  Type: 0
+  PathImage: {fileID: 21300000, guid: d08603424fc10894a98aab32c771465b, type: 3}
+  PathImageSelection:
+  - {fileID: 21300000, guid: d08603424fc10894a98aab32c771465b, type: 3}
+  - {fileID: 21300000, guid: d08603424fc10894a98aab32c771465b, type: 3}
+  - {fileID: 21300000, guid: d08603424fc10894a98aab32c771465b, type: 3}
+  - {fileID: 21300000, guid: d08603424fc10894a98aab32c771465b, type: 3}
   Segments:
   - SegmentID: 0
-    relativeSegmentPosition: {x: 3, y: 0, z: 0}
-    RelativeDistanceToPreviousSegment: 0
-  - SegmentID: 1
-    relativeSegmentPosition: {x: 0, y: 0, z: -5}
-    RelativeDistanceToPreviousSegment: 0
-  - SegmentID: 2
-    relativeSegmentPosition: {x: -2, y: 0, z: 0}
-    RelativeDistanceToPreviousSegment: 0
+    SegmentColor: {r: 0.9056604, g: 0.22497015, b: 0.06407974, a: 1}
+    RelativeSegmentPosition: {x: 3, y: 0, z: 2}
+    DistanceToPreviousSegment: 3.6055512
+    ObjectiveObjectRenderTexture: {fileID: 0}
+    ObjectiveObjectPrefab: {fileID: 0}
+    ObjectPrefab: {fileID: 0}
+    SegmentObjectRenderTexture: {fileID: 0}
+    RelativeObjectPositionToObjective: {x: 0, y: 0, z: 0}
+    ObjectDistanceToObjective: 0
+    ObjectRotation: {x: 0, y: 0, z: 0, w: 0}
+    SegmentObstaclePrefab: {fileID: 0}

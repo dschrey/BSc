@@ -5,12 +5,13 @@ public class DataManager : MonoBehaviour
 {
 
     public static DataManager Instance { get; private set; }
-//     // [SerializeField] private ExperimentSettings _experimentData;
-//     // [SerializeField] private PlayerSettings _playerSettings;
-//     private string _experimentFilePath;
-//     private string _playerSettingsFilePath;
+    [SerializeField] private ExperimentSettings _experimentData;
+    private string _experimentSettingsPath;
+    private string _experimentResultsPath;
 
-//     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
+
+   // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
+    
     void Awake()
     {
         if (Instance == null)
@@ -23,94 +24,63 @@ public class DataManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-//         _experimentFilePath = Application.persistentDataPath + "/ExperimentSettings.json";
-//         _playerSettingsFilePath = Application.persistentDataPath + "/PlayerSettings.json";
+        _experimentSettingsPath = Application.persistentDataPath + "experimentSettings.json";
+        _experimentResultsPath = Application.persistentDataPath + "Results";
     }
 
-//     private void Start() 
-//     {
-//         LoadExperimentSettings();
-//         LoadPlayerSettings();
-//     }
+    private void Start() 
+    {
+        LoadExperimentSettings();
+    }
 
-//     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
+   // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
+
+    public void SaveExperimentSettings()
+    {
+        ExperimentSettingsData data = new()
+        {
+            CompletedAssessments = _experimentData.CompletedAssessments,
+            PlayerDetectionRadius = _experimentData.PlayerDetectionRadius,
+            ObjectiveRevealTime = _experimentData.ObjectiveRevealTime,
+            MovementSpeedMultiplier = _experimentData.MovementSpeedMultiplier
+        };
+
+        string json = JsonUtility.ToJson(data, true);
+        File.WriteAllText(_experimentSettingsPath, json);
+    }
 
 
+    public void LoadExperimentSettings()
+    {
+        if (File.Exists(_experimentSettingsPath))
+        {
+            string json = File.ReadAllText(_experimentSettingsPath);
 
-//     public void SaveExperimentSettings()
-//     {
-//         ExperimentSettingsData data = new()
-//         {
-//             UseFixedSpawningSphere = _experimentData.UseGlobalSpawningSphere,
-//             SpawnRadius = _experimentData.SpawnRadius,
-//             MinSpawnDistance = _experimentData.MinSpawnDistance,
-//             UseLifeSpanTimer = _experimentData.UsePickupTimer,
-//             PickupDuration = _experimentData.PickupTime,
-//             UseVisibilityTimer = _experimentData.UseVisibilityTimer,
-//             ItemVisibilityDuration = _experimentData.ItemVisibilityDuration,
-//             UseItemProximity = _experimentData.UseItemProximityDisplay,
-//             ItemProximityDistance = _experimentData.ItemProximityDistance
-//         };
+            ExperimentSettingsData data = JsonUtility.FromJson<ExperimentSettingsData>(json);
 
-//         string json = JsonUtility.ToJson(data, true);
-//         File.WriteAllText(_experimentFilePath, json);
+            _experimentData.PlayerDetectionRadius = data.PlayerDetectionRadius;
+            _experimentData.ObjectiveRevealTime = data.ObjectiveRevealTime;
+            _experimentData.MovementSpeedMultiplier = data.MovementSpeedMultiplier;
+            _experimentData.CompletedAssessments = data.CompletedAssessments;
+        } 
+        else
+        {
+            SaveExperimentSettings();
+        }
+    }
 
-//     }
+    public void SaveAssessmentData(AssessmentData data)
+    {
+        if (! Directory.Exists(_experimentResultsPath))
+        {
+            Directory.CreateDirectory(_experimentResultsPath);
+        }
 
-//     public void LoadExperimentSettings()
-//     {
-//         if (File.Exists(_experimentFilePath))
-//         {
-//             string json = File.ReadAllText(_experimentFilePath);
+        string jsonData = JsonUtility.ToJson(data, true);
+        string filePath = _experimentResultsPath + "/" + $"Assessment_{data.DateTime}.json";;
+        File.WriteAllText(filePath, jsonData);
 
-//             ExperimentSettingsData data = JsonUtility.FromJson<ExperimentSettingsData>(json);
+        Debug.Log($"Assessment data saved to: {filePath}");
+    }
 
-//             _experimentData.UseGlobalSpawningSphere = data.UseFixedSpawningSphere;
-//             _experimentData.SpawnRadius = data.SpawnRadius;
-//             _experimentData.MinSpawnDistance = data.MinSpawnDistance;
-//             _experimentData.UsePickupTimer = data.UseLifeSpanTimer;
-//             _experimentData.PickupTime = data.PickupDuration;
-//             _experimentData.UseVisibilityTimer = data.UseVisibilityTimer;
-//             _experimentData.ItemVisibilityDuration = data.ItemVisibilityDuration;
-//             _experimentData.UseItemProximityDisplay = data.UseItemProximity;
-//             _experimentData.ItemProximityDistance = data.ItemProximityDistance;
-//         } 
-//         else
-//         {
-//             SaveExperimentSettings();
-//         }
-//     }
-//     public void SavePlayerSettings()
-//     {
-//         PlayerSettingsData data = new()
-//         {
-//             MasterVolume = _playerSettings.MasterVolume,
-//             EffectsVolume = _playerSettings.EffectsVolume,
-//             AmbientVolume = _playerSettings.AmbientVolume,
-//             UIVolume = _playerSettings.AmbientVolume
-//         };
-
-//         string json = JsonUtility.ToJson(data, true);
-//         File.WriteAllText(_playerSettingsFilePath, json);
-
-//     }
-
-//     public void LoadPlayerSettings()
-//     {
-//         if (File.Exists(_playerSettingsFilePath))
-//         {
-//             string json = File.ReadAllText(_playerSettingsFilePath);
-
-//             PlayerSettingsData data = JsonUtility.FromJson<PlayerSettingsData>(json);
-
-//             _playerSettings.MasterVolume = data.MasterVolume;
-//             _playerSettings.EffectsVolume = data.EffectsVolume;
-//             _playerSettings.AmbientVolume = data.AmbientVolume;
-//             _playerSettings.UIVolume = data.UIVolume;
-//         } 
-//         else
-//         {
-//             SavePlayerSettings();
-//         }
-//     }
 }

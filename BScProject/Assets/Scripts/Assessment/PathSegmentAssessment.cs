@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
@@ -6,8 +7,9 @@ public class PathSegmentAssessment
 {
     private PathSegmentData _pathSegment;
     public float SelectedDistanceToPreviousSegment;
-    public Sprite SelectedObjectiveObjectSprite;
+    public RenderTexture SelectedObjectiveObjectRenderTexture;
     public float SelectedDistanceOfObjectToObjective;
+    public RenderTexture SelectedSegmentObjectRenderTexture;
 
     public PathSegmentAssessment(PathSegmentData pathSegment)
     {
@@ -24,11 +26,17 @@ public class PathSegmentAssessment
         return Vector3.Distance(previousSegmentPosition, nextSegmentPosition);
     }
 
-    public bool EvaluateObjectAssignment()
+    public bool EvaluateSegmentObjectAssignment()
     {
-        if (SelectedObjectiveObjectSprite.name == _pathSegment.ObjectiveObjectSprite.name)
+        foreach (KeyValuePair<PathSegmentData, ObjectRenderer> entry in ObjectRenderManager.Instance.ActiveRenderTextures)
         {
-            return true;
+            if (entry.Key.SegmentID != _pathSegment.SegmentID)
+                continue;
+
+            if (entry.Value.GetRenderTexture() == _pathSegment.SegmentObjectRenderTexture)
+            {
+                return true;
+            }
         }
         return false;
     }

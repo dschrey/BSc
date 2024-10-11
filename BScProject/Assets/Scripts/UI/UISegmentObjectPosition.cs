@@ -48,7 +48,7 @@ public class UISegmentObjectPosition : MonoBehaviour
         {
             SegmentObjectPositionOption segmentObjectPosition = Instantiate(_segmentObjectPositionOptionPrefab, _segmentSelectionParent).GetComponent<SegmentObjectPositionOption>();
             segmentObjectPosition.InitializeSegment(i, _currentPath.Segments[i].PathSegmentData.ObjectPrefab, 
-                AssessmentManager.Instance.PathAssessmentData.PathSegmentAssessments[i].SelectedObjectiveObjectSprite,
+                AssessmentManager.Instance.PathAssessmentData.PathSegmentAssessments[i].SelectedObjectiveObjectRenderTexture,
                 _currentPath.Segments[i].Objective.gameObject,  this);
 
             _segmentObjects.Add(segmentObjectPosition);

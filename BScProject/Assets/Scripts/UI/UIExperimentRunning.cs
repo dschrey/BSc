@@ -22,13 +22,13 @@ public class UIExperimentRunning : MonoBehaviour
 
     private void OnRestartSegmentButtonClicked()
     {
-        PathManager.Instance.DisplaySegmentHint();
+        PathManager.Instance.RestartSegment();
         gameObject.SetActive(false);
     }
 
     private void OnShowObjectiveHintButtonClicked()
     {
-        PathManager.Instance.RestartSegment();
+        PathManager.Instance.DisplaySegmentHint();
         gameObject.SetActive(false);
     }
 

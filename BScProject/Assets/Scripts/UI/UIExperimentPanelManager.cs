@@ -40,4 +40,10 @@ public class UIExperimentPanelManager : MonoBehaviour
     {
         _experimentFinishedPanel.SetActive(true);
     }
+
+    public void ToggleRunningPanel(bool state)
+    {
+        _experimentRunningPanel.SetActive(state);
+    }
+
 }

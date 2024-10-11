@@ -18,16 +18,16 @@ public class UISegmentObjectSelection : MonoBehaviour
         _confirmButton.onClick.AddListener(OnSegmentObjectAssigned);
         _confirmButton.interactable = false;
 
-        for(int i = 0; i < AssessmentManager.Instance.SelectedPath.Segments.Count; i++)
+        for(int i = 0; i < AssessmentManager.Instance.CurrentPath.Segments.Count; i++)
         {
             SegmentObjectSelection segmentObjectSelection = Instantiate(_segmentObjectSelectionPrefab, _segmentSelectionParent).GetComponent<SegmentObjectSelection>();
-            segmentObjectSelection.SetSegmentLabel(i, AssessmentManager.Instance.SelectedPath.Segments[i].SegmentColor);
-            segmentObjectSelection.AddObjectChoise(AssessmentManager.Instance.SelectedPath.Segments[i].SegmentObjectSprite);
+            segmentObjectSelection.SetSegmentLabel(i, AssessmentManager.Instance.CurrentPath.Segments[i].SegmentColor);
+            segmentObjectSelection.AddObjectChoise(AssessmentManager.Instance.CurrentPath.Segments[i].SegmentObjectRenderTexture);
             segmentObjectSelection.SelectedObjectChanged += OnSegmentObjectChanged;
             _segmentObjects.Add(segmentObjectSelection);
         }
 
-        _selectedPathImage.sprite = AssessmentManager.Instance.SelectedPath.pathTexture;
+        _selectedPathImage.sprite = AssessmentManager.Instance.CurrentPath.PathImage;
     }
 
     private void OnDisable() 
@@ -36,7 +36,7 @@ public class UISegmentObjectSelection : MonoBehaviour
 
         for(int i = 0; i < _segmentObjects.Count; i++)
         {
-            if (i < AssessmentManager.Instance.SelectedPath.Segments.Count)
+            if (i < AssessmentManager.Instance.CurrentPath.Segments.Count)
             {
                 _segmentObjects[i].SelectedObjectChanged -= OnSegmentObjectChanged;
             }
@@ -52,11 +52,11 @@ public class UISegmentObjectSelection : MonoBehaviour
 
     private void OnSegmentObjectChanged(int segmentID)
     {
-        AssessmentManager.Instance.AssignPathSegmentObjectiveObject(segmentID, _segmentObjects[segmentID].GetSelectedSprite());
+        AssessmentManager.Instance.AssignPathSegmentObject(segmentID, _segmentObjects[segmentID].GetSelectedRenderTexture());
         
         foreach (SegmentObjectSelection segmentObjectSelection in _segmentObjects)
         {
-            if (segmentObjectSelection.GetSelectedSprite() == null)
+            if (segmentObjectSelection.GetSelectedRenderTexture() == null)
                 return;
         }
 

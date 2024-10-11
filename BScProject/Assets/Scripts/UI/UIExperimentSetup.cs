@@ -1,31 +1,35 @@
 using TMPro;
-using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UIExperimentSetup : MonoBehaviour
 {
-
     [SerializeField] private Button _buttonSetSpawn;
     [SerializeField] private Button _buttonStart;
     [SerializeField] private Slider _sliderMovementSpeed;
     [SerializeField] private TMP_Text _textMovementSpeed;
-    [SerializeField] private GameObject _experimentStartPoint;
-    private ExperimentStartPointHandler _startPointHandler;
-
+    [SerializeField] private ExperimentStartPointHandler _startPointHandler;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
     void OnEnable()
     {
+
         _buttonSetSpawn.onClick.AddListener(OnSetSpawnButtonClicked);
-        _buttonSetSpawn.onClick.AddListener(OnStartButtonClicked);
+        _buttonStart.onClick.AddListener(OnStartButtonClicked);
         _sliderMovementSpeed.onValueChanged.AddListener(OnMovementSpeedChanged);
         SetSliderSettings(_sliderMovementSpeed, ExperimentManager.Instance.ExperimentSettings.MinMovementSpeedMultiplier, 
             ExperimentManager.Instance.ExperimentSettings.MaxMovementSpeedMultiplier, ExperimentManager.Instance.ExperimentSettings.MovementSpeedMultiplier);
         _textMovementSpeed.text = GetSliderStepValue(ExperimentManager.Instance.ExperimentSettings.MovementSpeedMultiplier, 
             ExperimentManager.Instance.ExperimentSettings.MovementSpeedStepSize).ToString();
-    }        
+    }  
+
+    private void OnDisable()
+    {
+        _buttonSetSpawn.onClick.RemoveListener(OnSetSpawnButtonClicked);
+        _buttonStart.onClick.RemoveListener(OnStartButtonClicked);
+        _sliderMovementSpeed.onValueChanged.RemoveListener(OnMovementSpeedChanged);
+    }      
 
 
     private void Update() 
@@ -53,7 +57,7 @@ public class UIExperimentSetup : MonoBehaviour
 
     private void OnSetSpawnButtonClicked()
     {
-        _startPointHandler.SetExperimentStartPosition(FindObjectOfType<XROrigin>().transform);
+        _startPointHandler.SetExperimentStartPosition(ExperimentManager.Instance._XROrigin.transform);
     }
 
     private void OnMovementSpeedChanged(float value)

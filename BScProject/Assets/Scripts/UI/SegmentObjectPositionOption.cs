@@ -1,11 +1,10 @@
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SegmentObjectPositionOption : MonoBehaviour
 {
-    [SerializeField] private Image _segmentObjectImage;
+    [SerializeField] private RawImage _segmentObjectImage;
     [SerializeField] private Toggle _segmentToggle;
     [SerializeField] private TMP_Text _distanceText;
     public int SegmentID;
@@ -52,7 +51,7 @@ public class SegmentObjectPositionOption : MonoBehaviour
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
-    public void InitializeSegment(int segmentID, GameObject segmentObjectPrefab, Sprite objectSprite, GameObject segmentObjective, UISegmentObjectPosition parent)
+    public void InitializeSegment(int segmentID, GameObject segmentObjectPrefab, RenderTexture objectRenderTexture, GameObject segmentObjective, UISegmentObjectPosition parent)
     {
         SegmentID = segmentID;
         if (segmentID == 0)
@@ -61,7 +60,7 @@ public class SegmentObjectPositionOption : MonoBehaviour
         }
         _segmentObjectPrefab = segmentObjectPrefab;
         SegmentObjective = segmentObjective;
-        _segmentObjectImage.sprite = objectSprite;
+        _segmentObjectImage.texture = objectRenderTexture;
         _parentObject = parent;
         _segmentToggle.group = parent.ToggleGroup;
     }

@@ -292,12 +292,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8031004902142249112}
-  - component: {fileID: 184663207371713088}
   - component: {fileID: 2295694603556450107}
+  - component: {fileID: 184663207371713088}
   - component: {fileID: 8710439183644401278}
   - component: {fileID: 2062307659006595013}
   m_Layer: 5
-  m_Name: Path
+  m_Name: PathSelectionPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -324,6 +324,23 @@ RectTransform:
   m_AnchoredPosition: {x: 200, y: -100}
   m_SizeDelta: {x: 289.89, y: 186.6}
   m_Pivot: {x: 0.5, y: 1}
+--- !u!114 &2295694603556450107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1504607090945638937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2aa2ad661deac6a418ce41b4561c8e48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _image: {fileID: 5041166634537543991}
+  _toggle: {fileID: 184663207371713088}
+  PathSelectionChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &184663207371713088
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -372,20 +389,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_IsOn: 0
---- !u!114 &2295694603556450107
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1504607090945638937}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2aa2ad661deac6a418ce41b4561c8e48, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PathData: {fileID: 0}
-  _image: {fileID: 5041166634537543991}
 --- !u!82 &8710439183644401278
 AudioSource:
   m_ObjectHideFlags: 0

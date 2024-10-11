@@ -5,20 +5,17 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource)), RequireComponent(typeof(CapsuleCollider))]
 public class Objective : MonoBehaviour
 {
-    public float ProximityRadius = 0.5f;
-    public float RevealTimeSec = 1.5f;
+    public GameObject ObjectiveObject;
     public GameObject CapturedParticles;
     public GameObject HintParticles;
     public GameObject LockedParticles;
     public AudioClip HintAudio;
     public AudioClip CapturedAudio;
-    private AudioSource _audioSource;
-    private CapsuleCollider _collider;
-    public Vector3 Spawnpoint => transform.position;
-    [SerializeField] private GameObject objectiveShape;
-    [SerializeField] private GameObject objectiveShapeSpawnpoint;
     public event Action ObjectiveCaptured;
     private Coroutine _collectionCoroutine;
+    [SerializeField] private Transform _objectiveObjectSpawnpoint;
+    private AudioSource _audioSource;
+    private CapsuleCollider _collider;
     private bool _objectiveCaptured = false;
 
 
@@ -28,14 +25,13 @@ public class Objective : MonoBehaviour
     {
         _audioSource = GetComponent<AudioSource>();
         _collider = GetComponent<CapsuleCollider>();
-        _collider.radius = ProximityRadius;
+        _collider.radius = ExperimentManager.Instance.ExperimentSettings.PlayerDetectionRadius;
     }
 
     void OnDrawGizmos()
     {
         Gizmos.color = Color.magenta;
-        Gizmos.DrawWireSphere(transform.position, ProximityRadius);
-
+        Gizmos.DrawWireSphere(transform.position, ExperimentManager.Instance.ExperimentSettings.PlayerDetectionRadius);
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------------
@@ -49,7 +45,7 @@ public class Objective : MonoBehaviour
 
         if (collider.CompareTag("Player"))
         {
-            StartCollectingObjetive();
+            StartCollectingObjective();
         }
     }
 
@@ -68,7 +64,7 @@ public class Objective : MonoBehaviour
 
     // ---------- Start Methods ------------------------------------------------------------------------------------------------------------------------------
 
-    private void StartCollectingObjetive()
+    private void StartCollectingObjective()
     {
         if (_collectionCoroutine != null)
         {
@@ -92,13 +88,13 @@ public class Objective : MonoBehaviour
 
     private IEnumerator CaptureObjective()
     {
-        yield return new WaitForSeconds(RevealTimeSec);
+        yield return new WaitForSeconds(ExperimentManager.Instance.ExperimentSettings.ObjectiveRevealTime);
         SetObjectiveCaptured();
     }
 
     private void SetObjectiveCaptured()
     {
-        Debug.Log($"Objective.cs :: SetObjectiveCaptured() : Item at spawnpoint {this} collected!");
+        Debug.Log($"Objective.cs :: SetObjectiveCaptured() : Captured {this}!");
         _objectiveCaptured = true;
         LockedParticles.SetActive(false);
         CapturedParticles.SetActive(true);
@@ -137,5 +133,10 @@ public class Objective : MonoBehaviour
             return;    
         }
         _audioSource.PlayOneShot(clip);
+    }
+
+    public void SpawnObject(GameObject prefab)
+    {
+        ObjectiveObject = Instantiate(prefab, _objectiveObjectSpawnpoint);
     }
 }

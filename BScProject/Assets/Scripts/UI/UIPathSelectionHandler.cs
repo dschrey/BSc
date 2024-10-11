@@ -5,8 +5,9 @@ using UnityEngine.UI;
 public class UIPathSelectionHandler : MonoBehaviour
 {
     [SerializeField] private Button _confirmButton;
-    [SerializeField] private List<Toggle> _pathOptionToggles = new();
-
+    [SerializeField] private GameObject _pathSelectionPrefab;
+    [SerializeField] private GameObject _selectionParent;
+    private List<PathSelectionOption> _pathOptions = new();
 
     // ---------- Unity Methods --------------------------------------------------------------------------------------------------------------------------------
 
@@ -15,26 +16,41 @@ public class UIPathSelectionHandler : MonoBehaviour
         _confirmButton.onClick.AddListener(OnPathSelectionConfirmed);
         _confirmButton.interactable = false;
 
-        foreach (var toggle in _pathOptionToggles)
+        foreach (Sprite spite in AssessmentManager.Instance.CurrentPath.PathImageSelection)
         {
-            toggle.onValueChanged.AddListener(state =>
-            {
-                if (state)
-                {
-                    PathData path = toggle.GetComponent<PathOption>().PathData;
-                    AssessmentManager.Instance.SelectedPath = path;
-                    _confirmButton.interactable = state;
-                }
-            });
+            PathSelectionOption pathOption = Instantiate(_pathSelectionPrefab, _selectionParent.transform).GetComponent<PathSelectionOption>();
+            pathOption.Initialize(spite, _selectionParent.GetComponent<ToggleGroup>());
+            pathOption.PathSelectionChanged.AddListener(OnSelectedPathChanged);
+            _pathOptions.Add(pathOption);
         }
+
     }
 
     private void OnDisable() 
     {
         _confirmButton.onClick.RemoveListener(OnPathSelectionConfirmed);
 
+        foreach (PathSelectionOption pathOption in _pathOptions)
+        {
+            pathOption.PathSelectionChanged.RemoveListener(OnSelectedPathChanged);
+        }
+
     }
-        // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
+
+    // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
+
+    private void OnSelectedPathChanged(Sprite selectedPathImage)
+    {
+        if (selectedPathImage != null)
+        {
+            _confirmButton.interactable = true;
+        }
+        else
+        {
+            _confirmButton.interactable = false;
+        }
+        AssessmentManager.Instance.SetSelectedPathImage(selectedPathImage);
+    }
 
     private void OnPathSelectionConfirmed()
     {

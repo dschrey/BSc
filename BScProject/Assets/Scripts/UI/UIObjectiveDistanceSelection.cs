@@ -21,31 +21,30 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
     private void OnEnable() 
     {
         SelectedSegmentChanged.AddListener(OnSelectedSegmentChanged);
-        _confirmButton.onClick.AddListener(OnDistanceSelectionConfirmed);
+        _confirmButton.onClick.AddListener(OnConfirmButtonClicked);
         _confirmButton.interactable = false;
         
-
-        foreach (PathSegmentData segmentData in AssessmentManager.Instance.SelectedPath.Segments)
+        foreach (PathSegmentData segmentData in AssessmentManager.Instance.CurrentPath.Segments)
         {
             PathSegmentOption segmentOption = Instantiate(_segmentDistanceTogglePrefab, _segmentDistanceToggleParent).GetComponent<PathSegmentOption>();
-            segmentOption.SetSegmentLabel(segmentData.SegmentID, segmentData.SegmentColor);
+            segmentOption.Initialize(segmentData.SegmentID, segmentData.SegmentColor, this);
             _segmentDistanceToggles.Add(segmentOption);
         }
 
         _numpadInput.InputChangedEvent += OnNumpadInputChanged;
-        _selectedPathImage.sprite = AssessmentManager.Instance.SelectedPath.pathTexture;
+        _selectedPathImage.sprite = AssessmentManager.Instance.CurrentPath.PathImage;
     }
 
     private void OnDisable() 
     {
         SelectedSegmentChanged.RemoveListener(OnSelectedSegmentChanged);
-        _confirmButton.onClick.RemoveListener(OnDistanceSelectionConfirmed);
+        _confirmButton.onClick.RemoveListener(OnConfirmButtonClicked);
         _numpadInput.InputChangedEvent -= OnNumpadInputChanged;
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
 
-    private void OnDistanceSelectionConfirmed()
+    private void OnConfirmButtonClicked()
     {
         _numpadInput.ResetInput();
         _numpadInput.gameObject.SetActive(false);
@@ -55,7 +54,6 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
     private void OnSelectedSegmentChanged(PathSegmentOption segment)
     {
         _selectedSegment = segment;
-        _confirmButton.interactable = CheckAllSegmentsVisited();
         if (!_numpadInput.gameObject.activeSelf)
             _numpadInput.gameObject.SetActive(true);
         _numpadInput.ResetInput();
@@ -69,16 +67,29 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
             _numpadInput.ResetInput();
             return;
         }
-        
-        _selectedSegment.distanceText.text = numpadInput + "m";
+
+        _selectedSegment.DistanceText.text = numpadInput + "m";
 
         if (! float.TryParse(numpadInput, out float distanceValue))
         {
             Debug.LogError($"Could not parse numpad input into float.");
             return;
         }
+
+        if (distanceValue > 0)
+        {
+            _selectedSegment.HasDistanceValue = true;
+            _selectedSegment.Checkmark.gameObject.SetActive(true);
+        }
+        else
+        {
+            _selectedSegment.HasDistanceValue = false;
+            _selectedSegment.Checkmark.gameObject.SetActive(false);
+        }
+
         _selectedSegment.DistanceValue = distanceValue;
         AssessmentManager.Instance.SetPathSegmentDistance(_selectedSegment.SegmentID, _selectedSegment.DistanceValue);
+        _confirmButton.interactable = CheckAllSegmentsVisited();
     }
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
@@ -87,7 +98,7 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
     {
         foreach (PathSegmentOption pathSegmentOption in _segmentDistanceToggles)
         {
-            if (pathSegmentOption.DistanceValue == -1f)
+            if (! pathSegmentOption.HasDistanceValue)
                 return false;
         }
         return true;

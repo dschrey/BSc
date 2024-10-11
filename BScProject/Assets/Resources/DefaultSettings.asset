@@ -12,7 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 100f3ec79643803448528201b5ad4fc9, type: 3}
   m_Name: DefaultSettings
   m_EditorClassIdentifier: 
-  Iterations: 3
-  PathsPerIteration: 5
-  EvaluationType: 0
-  EvaluationSteps: 2
+  MovementArea: {x: 10, y: 6}
+  PlayerDetectionRadius: 0.35
+  ObjectiveRevealTime: 1.5
+  Iterations: 68
+  paths: []
+  MaxEvaluationSteps: 3
+  MovementSpeedStepSize: 0.25
+  MovementSpeedMultiplier: 1
+  MinMovementSpeedMultiplier: 0.25
+  MaxMovementSpeedMultiplier: 3

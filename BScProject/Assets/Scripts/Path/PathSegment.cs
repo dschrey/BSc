@@ -31,7 +31,16 @@ public class PathSegment : MonoBehaviour
         Objective.ObjectiveCaptured += OnObjectiveCaptured;
 
         SpawnSegmentObject();
+        SpawnObjectivetObject();
 
+    }
+
+    private void OnDestroy()
+    {
+        if (PathSegmentData.SegmentObjectRenderTexture != null)
+        {
+            PathSegmentData.SegmentObjectRenderTexture.Release();
+        }
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------------
@@ -40,6 +49,7 @@ public class PathSegment : MonoBehaviour
     {
         SegmentCompleted?.Invoke();
     }
+    
     private void OnExitedDectectionZone()
     {
         _movementDetection.enabled = false;
@@ -63,6 +73,21 @@ public class PathSegment : MonoBehaviour
         Objective.ShowObjectiveHint();
     }
 
+    private void SpawnObjectivetObject()
+    {
+        Path path = transform.parent.GetComponent<Path>();
+        if (path.PathData.Type != PathType.EXTENDED)
+        {
+            return;
+        }
+
+        Objective.SpawnObject(PathSegmentData.ObjectiveObjectPrefab);
+
+        RenderTexture renderTexture = new(256, 256, 24);
+        PathSegmentData.SegmentObjectRenderTexture = renderTexture;
+        ObjectRenderManager.Instance.CreateNewSegmentObject(PathSegmentData);
+    }
+
     private void SpawnSegmentObject()
     {
         Path path = transform.parent.GetComponent<Path>();
@@ -71,10 +96,14 @@ public class PathSegment : MonoBehaviour
             return;
         }
 
-
         Vector3 objectSpawnpoint = transform.position + PathSegmentData.RelativeObjectPositionToObjective;
         
         SegmentObject = Instantiate(PathSegmentData.ObjectPrefab, objectSpawnpoint, PathSegmentData.ObjectRotation, transform);
         PathSegmentData.ObjectDistanceToObjective = Vector3.Distance(transform.position, objectSpawnpoint);
+
+        RenderTexture renderTexture = new(256, 256, 24);
+        PathSegmentData.SegmentObjectRenderTexture = renderTexture;
+        ObjectRenderManager.Instance.CreateNewSegmentObject(PathSegmentData);
     } 
+
 }

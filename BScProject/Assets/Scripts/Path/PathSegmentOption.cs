@@ -3,24 +3,24 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Toggle)), RequireComponent(typeof(TMP_Text))]
+[RequireComponent(typeof(Toggle))]
 public class PathSegmentOption : MonoBehaviour
 {
     public int SegmentID { get; private set;  }
     public Color Color { get; private set;  }
-    public Image CheckmarkText;
-    public TMP_Text distanceText;
+    public Image Checkmark;
+    public TMP_Text DistanceText;
     public float DistanceValue;
     [SerializeField] private Image _segmentIndicator;
-    [SerializeField] private UIObjectiveDistanceSelection _parentPanel;
+    public bool HasDistanceValue = false;
+    private UIObjectiveDistanceSelection _parentPanel;
     private Toggle _toggle;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
     
     private void OnEnable() 
     {
-        DistanceValue = -1f;
-        distanceText = GetComponent<TMP_Text>();
+        DistanceValue = 0f;
         _toggle = GetComponent<Toggle>();
     
         if (_toggle == null)
@@ -30,7 +30,7 @@ public class PathSegmentOption : MonoBehaviour
         }
         _toggle.onValueChanged.AddListener(OnToggleStateChanged);
 
-        CheckmarkText.gameObject.SetActive(false);
+        Checkmark.gameObject.SetActive(false);
     }
 
     private void OnDisable()
@@ -57,11 +57,12 @@ public class PathSegmentOption : MonoBehaviour
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
-    public void SetSegmentLabel(int segmentID, Color color)
+    public void Initialize(int segmentID, Color color, UIObjectiveDistanceSelection parent)
     {
         SegmentID = segmentID;
         Color = color;
         _segmentIndicator.color = Color;
+        _parentPanel = parent;
     }
 
 }

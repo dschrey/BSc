@@ -3,10 +3,9 @@ using UnityEngine;
 public class ExperimentStartPointHandler : MonoBehaviour
 {
     [SerializeField] private MovementDetection _experimentSpawnMovementDetection;
-
+    [SerializeField] private GameObject _startPositionHighlights;
+    [SerializeField] private GameObject _experimentArea;
     public bool ExperimentReadyToStart = false;
-
-    [SerializeField] private ParticleSystem StartPositionHighlights;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
@@ -19,14 +18,20 @@ public class ExperimentStartPointHandler : MonoBehaviour
         }
     }
 
+    private void OnDrawGizmos() 
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireCube(transform.position, new Vector3(6, 3, 10));
+    }
+
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
 
-    private void HandleNotReadyToStart()
+    private void HandleReadyToStart()
     {
         ExperimentReadyToStart = true;
     }
 
-    private void HandleReadyToStart()
+    private void HandleNotReadyToStart()
     {
         ExperimentReadyToStart = false;
     }
@@ -37,13 +42,13 @@ public class ExperimentStartPointHandler : MonoBehaviour
     {
         Vector3 newPosition = newTransform.position;
         newPosition.y = 0;
-        transform.SetLocalPositionAndRotation(newPosition, newTransform.rotation);
+        _experimentArea.transform.SetLocalPositionAndRotation(newPosition, newTransform.rotation);
 
     }
 
     public void ToggleStartPositionHighlight(bool state)
     {
-        StartPositionHighlights.gameObject.SetActive(state);
+        _startPositionHighlights.SetActive(state);
     }
 }
 

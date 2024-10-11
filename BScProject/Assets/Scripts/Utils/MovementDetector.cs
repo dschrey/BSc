@@ -5,24 +5,24 @@ using UnityEngine;
 [RequireComponent(typeof(SphereCollider))]
 public class MovementDetection : MonoBehaviour
 {
-    [SerializeField] private float _detectionRadius;
-    [SerializeField] private SphereCollider _collider;
     public event Action ExitedDectectionZone;
     public event Action EnteredDectectionZone;
+    private SphereCollider _collider;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------------
 
     private void OnEnable() 
     {
         _collider = GetComponent<SphereCollider>();
-        _collider.radius = _detectionRadius;
+        _collider.radius = ExperimentManager.Instance.ExperimentSettings.PlayerDetectionRadius;
     }
 
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, _detectionRadius);
-    }
+    // void OnDrawGizmos()
+    // {
+    //     Gizmos.color = Color.blue;
+    //     Gizmos.DrawWireSphere(transform.position, ExperimentManager.Instance.ExperimentSettings.PlayerDetectionRadius);
+    // }
+
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------------
 

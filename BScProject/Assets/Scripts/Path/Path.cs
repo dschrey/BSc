@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -27,10 +28,6 @@ public class Path : MonoBehaviour
         }
     }
 
-    // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------------
-
-
-
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------------
 
     public void SetupPathSegments(PathData pathData)
@@ -59,8 +56,15 @@ public class Path : MonoBehaviour
             lastSegment = segment.gameObject;
             pathSegment.DistanceToPreviousSegment = segmentDistance;
             segment.PathSegmentData.DistanceToPreviousSegment = segmentDistance;
+            if (pathData.Type == PathType.EXTENDED)
+                Instantiate(pathSegment.SegmentObstaclePrefab, pathSegment.SegmentObstaclePrefab.transform.position, 
+                    pathSegment.SegmentObstaclePrefab.transform.rotation, segment.transform);
             segment.gameObject.SetActive(false);
         }
     }
 
+    internal static object Combine(string persistentDataPath, string v)
+    {
+        throw new NotImplementedException();
+    }
 }

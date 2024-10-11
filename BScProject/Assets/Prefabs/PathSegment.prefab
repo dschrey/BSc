@@ -49,8 +49,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PathSegmentData:
     SegmentID: 0
-    relativeSegmentPosition: {x: 0, y: 0, z: 0}
-    RelativeDistanceToPreviousSegment: 0
+    SegmentColor: {r: 0, g: 0, b: 0, a: 0}
+    RelativeSegmentPosition: {x: 0, y: 0, z: 0}
+    DistanceToPreviousSegment: 0
+    ObjectiveObjectRenderTexture: {fileID: 0}
+    ObjectiveObjectPrefab: {fileID: 0}
+    ObjectPrefab: {fileID: 0}
+    SegmentObjectRenderTexture: {fileID: 0}
+    RelativeObjectPositionToObjective: {x: 0, y: 0, z: 0}
+    ObjectDistanceToObjective: 0
+    ObjectRotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!135 &5382759789044711661
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -86,7 +94,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _detectionRadius: 0.35
   _collider: {fileID: 0}
-  InDectectionZone: 0
 --- !u!1001 &4474015137834642286
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -139,11 +146,20 @@ PrefabInstance:
       propertyPath: m_Name
       value: Objective
       objectReference: {fileID: 0}
+    - target: {fileID: 6266508837659422805, guid: 457d66fc87b378740b8cda370dd3d637, type: 3}
+      propertyPath: _objectiveObjectSpawnpoint
+      value: 
+      objectReference: {fileID: 1917096564417719755}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 457d66fc87b378740b8cda370dd3d637, type: 3}
+--- !u!4 &1917096564417719755 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2633480136722728613, guid: 457d66fc87b378740b8cda370dd3d637, type: 3}
+  m_PrefabInstance: {fileID: 4474015137834642286}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3701579991328264599 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 957087985332534009, guid: 457d66fc87b378740b8cda370dd3d637, type: 3}

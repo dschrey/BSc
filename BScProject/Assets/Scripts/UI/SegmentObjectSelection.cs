@@ -10,11 +10,11 @@ public class SegmentObjectSelection : MonoBehaviour
     [SerializeField] private TMP_Text _segmentLabelText;
     [SerializeField] private Button _buttonPrevious;
     [SerializeField] private Button _buttonNext;
-    [SerializeField] private Image _selectedObjectImage;
+    [SerializeField] private RawImage _selectedObjectImage;
     public event Action<int> SelectedObjectChanged;
-    private List<Sprite> _objectChoises = new();
+    private List<RenderTexture> _objectRenderChoises = new();
     private int _segmentID;
-    private int _selectedSpriteID;
+    private int _selectedRenderTextureID;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
@@ -23,22 +23,22 @@ public class SegmentObjectSelection : MonoBehaviour
         _buttonPrevious.onClick.AddListener(OnPreviousButtonClick);
         _buttonNext.onClick.AddListener(OnNextButtonClick);
 
-        _selectedSpriteID = -1;
+        _selectedRenderTextureID = -1;
         _selectedObjectImage = null;
-        _objectChoises.Clear();
+        _objectRenderChoises.Clear();
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
 
     private void OnNextButtonClick()
     {
-        _selectedSpriteID = (_selectedSpriteID + 1) % _objectChoises.Count;
+        _selectedRenderTextureID = (_selectedRenderTextureID + 1) % _objectRenderChoises.Count;
         UpdateObjectImage();
     }
 
     private void OnPreviousButtonClick()
     {
-        _selectedSpriteID = (_selectedSpriteID - 1 + _objectChoises.Count) % _objectChoises.Count;
+        _selectedRenderTextureID = (_selectedRenderTextureID - 1 + _objectRenderChoises.Count) % _objectRenderChoises.Count;
         UpdateObjectImage();
     }
 
@@ -55,19 +55,19 @@ public class SegmentObjectSelection : MonoBehaviour
         }
     }
 
-    public void AddObjectChoise(Sprite choise)
+    public void AddObjectChoise(RenderTexture choice)
     {
-        _objectChoises.Add(choise);
+        _objectRenderChoises.Add(choice);
     }
 
     private void UpdateObjectImage()
     {
-        _selectedObjectImage.sprite = _objectChoises[_selectedSpriteID];
+        _selectedObjectImage.texture = _objectRenderChoises[_selectedRenderTextureID];
         SelectedObjectChanged?.Invoke(_segmentID);
     }
 
-    public Sprite GetSelectedSprite()
+    public RenderTexture GetSelectedRenderTexture()
     {
-        return _selectedObjectImage.sprite;
+        return _objectRenderChoises[_selectedRenderTextureID];
     }
 }

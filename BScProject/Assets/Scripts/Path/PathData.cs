@@ -8,7 +8,9 @@ public class PathData : ScriptableObject
 {
     public int PathID;
     public PathType Type = PathType.DEFAULT;
-    public Sprite pathTexture;
+    public Sprite PathImage;
+    [Header("Path image selection options (at least 4)")]
+    public List<Sprite> PathImageSelection;
     public List<PathSegmentData> Segments = new();
 
 }

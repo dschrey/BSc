@@ -71,29 +71,21 @@ public class ExperimentManager : MonoBehaviour
         {
             case ExperimentState.IDLE:
                 break;
-            // case ExperimentState.LOADPATH:
-            //     LoadNextPath();
-				break;
             case ExperimentState.RUNNING:
                 break;
             case ExperimentState.EVALUATION:
                 StartAssessment();
 				break;
             case ExperimentState.FINISHED:
-                _UIExperimentPanelManager.ShowFinishPanel();
+                StopExperiment();
+                ExperimentState = ExperimentState.IDLE;
 				break;
 		}
     }
 
     private void OnPathCompletion()
-    {    
+    {   
         ExperimentState = ExperimentState.EVALUATION;
-    }
-
-    private void OnPathEvaluationCompleted()
-    {
-        // ExperimentState = ExperimentState.LOADPATH;
-        LoadNextPath();
     }
 
     
@@ -113,6 +105,7 @@ public class ExperimentManager : MonoBehaviour
         _pathCount++;
         if (! PathAvailable)
         {
+            Debug.Log($"");
             ExperimentState = ExperimentState.FINISHED;
             return;
         }
@@ -124,13 +117,23 @@ public class ExperimentManager : MonoBehaviour
 
     private void StartAssessment()
     {
+        Debug.Log($"Starting assessment for path ID: {PathManager.Instance.CurrentPath.PathData.PathID}");
         AssessmentManager.Instance.StartPathAssessment(PathManager.Instance.CurrentPath.PathData);
         _XROrigin.SetLocalPositionAndRotation(_evaluationRoomSpawnPoint.position, _evaluationRoomSpawnPoint.rotation);
     }
 
-    internal void StopExperiment()
+    public void StopExperiment()
     {
-        // TODO 
-        throw new NotImplementedException();
+        _pathCount = 0;
+        _XROrigin.SetPositionAndRotation(ExperimentSpawn.position, ExperimentSpawn.rotation);
+        _UIExperimentPanelManager.ToggleRunningPanel(false);
+        _UIExperimentPanelManager.OpenSetupPanel();
+
+    }
+
+    public void PathAssessmentCompleted()
+    {
+        ExperimentState = ExperimentState.IDLE;
+        LoadNextPath();
     }
 }
