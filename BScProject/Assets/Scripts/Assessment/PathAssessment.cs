@@ -19,7 +19,7 @@ public class PathAssessment
         }
     }
 
-    public bool AssessSelectedPathImage()
+    public bool EvaluateSelectedPathImage()
     {
         return PathData.PathImage == SelectedPathSprite;
     }

@@ -1,4 +1,5 @@
 using System.IO;
+using Unity.Tutorials.Core.Editor;
 using UnityEngine;
 
 public class DataManager : MonoBehaviour
@@ -8,6 +9,7 @@ public class DataManager : MonoBehaviour
     [SerializeField] private ExperimentSettings _experimentData;
     private string _experimentSettingsPath;
     private string _experimentResultsPath;
+    public string AssessmentFile;
 
 
    // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
@@ -30,6 +32,7 @@ public class DataManager : MonoBehaviour
 
     private void Start() 
     {
+        AssessmentFile = null;
         LoadExperimentSettings();
     }
 
@@ -77,8 +80,17 @@ public class DataManager : MonoBehaviour
         }
 
         string jsonData = JsonUtility.ToJson(data, true);
-        string filePath = _experimentResultsPath + "/" + $"Assessment_{data.DateTime}.json";;
-        File.WriteAllText(filePath, jsonData);
+        string filePath = _experimentResultsPath + "/" + $"Assessment_{data.DateTime}.json";
+        AssessmentFile = filePath;
+        if (!AssessmentFile.IsNullOrEmpty())
+        {
+            File.WriteAllText(AssessmentFile, jsonData);
+        }
+        else
+        {
+            File.WriteAllText(filePath, jsonData);
+            AssessmentFile = filePath;
+        }
 
         Debug.Log($"Assessment data saved to: {filePath}");
     }

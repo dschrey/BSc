@@ -44,11 +44,11 @@ public class UISegmentObjectPosition : MonoBehaviour
         SetSliderSettings(_sliderhorizontalPosition, -ExperimentManager.Instance.ExperimentSettings.MovementArea.x * 50, ExperimentManager.Instance.ExperimentSettings.MovementArea.x *50, 0f);
         SetSliderSettings(_sliderverticalPosition, -ExperimentManager.Instance.ExperimentSettings.MovementArea.y*50, ExperimentManager.Instance.ExperimentSettings.MovementArea.y*50, 0f);
 
-        for (int i = 0; i < AssessmentManager.Instance.PathAssessmentData.PathSegmentAssessments.Count; i++)
+        for (int i = 0; i < AssessmentManager.Instance.PathAssessment.PathSegmentAssessments.Count; i++)
         {
             SegmentObjectPositionOption segmentObjectPosition = Instantiate(_segmentObjectPositionOptionPrefab, _segmentSelectionParent).GetComponent<SegmentObjectPositionOption>();
             segmentObjectPosition.InitializeSegment(i, _currentPath.Segments[i].PathSegmentData.ObjectPrefab, 
-                AssessmentManager.Instance.PathAssessmentData.PathSegmentAssessments[i].SelectedObjectiveObjectRenderTexture,
+                AssessmentManager.Instance.PathAssessment.PathSegmentAssessments[i].SelectedObjectiveObjectRenderTexture,
                 _currentPath.Segments[i].Objective.gameObject,  this);
 
             _segmentObjects.Add(segmentObjectPosition);

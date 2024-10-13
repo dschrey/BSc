@@ -4,7 +4,7 @@ using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.Events;
 
-public enum ExperimentState {IDLE, LOADPATH, RUNNING, EVALUATION, FINISHED};
+public enum ExperimentState {IDLE, LOADPATH, RUNNING, EVALUATION, FINISHED, CANCELLED };
 
 public class ExperimentManager : MonoBehaviour
 {
@@ -77,9 +77,12 @@ public class ExperimentManager : MonoBehaviour
                 StartAssessment();
 				break;
             case ExperimentState.FINISHED:
+                AssessmentManager.Instance.Assessment.Completed = true;
+                DataManager.Instance.SaveAssessmentData(AssessmentManager.Instance.Assessment);
+                AssessmentManager.Instance.Assessment = null;
+                DataManager.Instance.AssessmentFile = null;
                 StopExperiment();
-                ExperimentState = ExperimentState.IDLE;
-				break;
+                break;
 		}
     }
 
@@ -105,7 +108,6 @@ public class ExperimentManager : MonoBehaviour
         _pathCount++;
         if (! PathAvailable)
         {
-            Debug.Log($"");
             ExperimentState = ExperimentState.FINISHED;
             return;
         }
@@ -128,7 +130,7 @@ public class ExperimentManager : MonoBehaviour
         _XROrigin.SetPositionAndRotation(ExperimentSpawn.position, ExperimentSpawn.rotation);
         _UIExperimentPanelManager.ToggleRunningPanel(false);
         _UIExperimentPanelManager.OpenSetupPanel();
-
+        ExperimentState = ExperimentState.IDLE;
     }
 
     public void PathAssessmentCompleted()

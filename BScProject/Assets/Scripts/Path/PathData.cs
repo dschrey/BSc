@@ -13,4 +13,8 @@ public class PathData : ScriptableObject
     public List<Sprite> PathImageSelection;
     public List<PathSegmentData> Segments = new();
 
+    public PathSegmentData GetSegmentData(int id)
+    {
+        return Segments.Find(s => s.SegmentID == id);
+    }
 }

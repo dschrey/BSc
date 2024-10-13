@@ -88,7 +88,7 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
         }
 
         _selectedSegment.DistanceValue = distanceValue;
-        AssessmentManager.Instance.SetPathSegmentDistance(_selectedSegment.SegmentID, _selectedSegment.DistanceValue);
+        AssessmentManager.Instance.SetPathSegmentObjectiveDistance(_selectedSegment.SegmentID, _selectedSegment.DistanceValue);
         _confirmButton.interactable = CheckAllSegmentsVisited();
     }
 

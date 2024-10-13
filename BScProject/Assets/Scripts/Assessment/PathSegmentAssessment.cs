@@ -28,17 +28,22 @@ public class PathSegmentAssessment
 
     public bool EvaluateSegmentObjectAssignment()
     {
-        foreach (KeyValuePair<PathSegmentData, ObjectRenderer> entry in ObjectRenderManager.Instance.ActiveRenderTextures)
-        {
-            if (entry.Key.SegmentID != _pathSegment.SegmentID)
-                continue;
+        // foreach (KeyValuePair<PathSegmentData, ObjectRenderer> entry in ObjectRenderManager.Instance.ActiveRenderTextures)
+        // {
+        //     if (entry.Key.SegmentID != _pathSegment.SegmentID)
+        //         continue;
 
-            if (entry.Value.GetRenderTexture() == _pathSegment.SegmentObjectRenderTexture)
-            {
-                return true;
-            }
-        }
-        return false;
+        //     if (entry.Value.GetRenderTexture() == _pathSegment.SegmentObjectRenderTexture)
+        //     {
+        //         return true;
+        //     }
+        // }
+        return SelectedObjectiveObjectRenderTexture == _pathSegment.SegmentObjectRenderTexture;
+    }
+
+    public bool EvaluateObjectiveObjectAssignment()
+    {
+        return SelectedObjectiveObjectRenderTexture == _pathSegment.SegmentObjectRenderTexture;
     }
     
     public bool EvaluateSegmnetDistanceAssignment()

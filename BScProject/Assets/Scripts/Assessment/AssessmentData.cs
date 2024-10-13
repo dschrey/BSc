@@ -4,39 +4,74 @@ using System.Collections.Generic;
 [Serializable]
 public class AssessmentData
 {
-    public int ID;
+    public int AssessmentID;
     public DateTime DateTime;
     public List<PathAssessmentData> Paths;
+    public bool Completed;
 
     public AssessmentData(int id, DateTime dateTime)
     {
-        ID = id;
+        AssessmentID = id;
         DateTime = dateTime;
+        Completed = false;
+    }
+
+    public void AddPath(PathData pathData)
+    {
+        PathAssessmentData pathAssessmentData = new(pathData);
+        Paths.Add(pathAssessmentData);
+    }
+
+    public PathAssessmentData GetPath(int pathID)
+    {
+        return Paths.Find(p => p.PathAssessmentID == pathID);
     }
 }
 
 [Serializable]
 public class PathAssessmentData
 {
-    public int ID;
+    public int PathAssessmentID;
     public PathType Type;
     public int Length;
     public bool CorrentPathImageSelected;
     public List<SegmentAssessmentData> PathSegments;
+
+    public PathAssessmentData(PathData pathData)
+    {
+        PathAssessmentID = pathData.PathID;
+        Type = pathData.Type;
+        Length = pathData.Segments.Count;
+        foreach (PathSegmentData pathSegment in pathData.Segments)
+        {
+            SegmentAssessmentData segmentAssessmentData = new(pathSegment.SegmentID);
+            PathSegments.Add(segmentAssessmentData);
+        }
+    }
+
+    public SegmentAssessmentData GetSegment(int segmentAssessmentID)
+    {
+        return PathSegments.Find(s => s.SegmentAssessmentID == segmentAssessmentID);
+    }
 
 }
 
 [Serializable]
 public class SegmentAssessmentData
 {
-    public int ID;
-    public float SelectedObjectiveDistance;
-    public float CalculatedObjectiveDistance;
+    public int SegmentAssessmentID;
+    public float SelectedDistanceToPreviousSegment;
+    public float CalculatedDistanceToPreviousSegment;
     public bool CorrectObjectiveObjectSelected;
 
-    public float SelectedObjectDistance;
-    public float CorrectObjectDistance;
-    public bool CorrectObjectSelected;
+    public float SelectedObjectDistanceToObjective;
+    public float CalculatedObjectDistanceToObjective;
+    public bool CorrectSegmentObjectSelected;
+
+    public SegmentAssessmentData (int id)
+    {
+        SegmentAssessmentID = id;
+    }
 }
 
 

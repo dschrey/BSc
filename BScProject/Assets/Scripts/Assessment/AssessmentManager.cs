@@ -27,7 +27,9 @@ public class AssessmentManager : MonoBehaviour
 
     [Header("Assessment Results")]
     public PathData CurrentPath;
-    public PathAssessment PathAssessmentData;
+
+    public PathAssessment PathAssessment;
+    public AssessmentData Assessment;
 
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
@@ -80,9 +82,9 @@ public class AssessmentManager : MonoBehaviour
             case AssessmentStep.COMPLETED:
                 _activePanel = null;
                 ExperimentManager.Instance.PathAssessmentCompleted();
-                // TODO Save data;
+                DataManager.Instance.SaveAssessmentData(Assessment);
                 CurrentPath = null;
-                PathAssessmentData = null;
+                PathAssessment = null;
                 _assessmentStep = AssessmentStep.IDLE;
 				break;
 		}
@@ -95,7 +97,10 @@ public class AssessmentManager : MonoBehaviour
     public void StartPathAssessment(PathData currentPath)
     {
         CurrentPath = currentPath;
-        PathAssessmentData = new PathAssessment(currentPath);
+        PathAssessment = new PathAssessment(currentPath);
+        Debug.Log($"Started assessment on path {currentPath.PathID} at {System.DateTime.Now}");
+        Assessment ??= new(ExperimentManager.Instance.ExperimentSettings.CompletedAssessments, System.DateTime.Now);
+        Assessment.AddPath(currentPath);
         
         _currentAssessmentStep = 0;
         ProceedToNextAssessmentStep();
@@ -150,7 +155,9 @@ public class AssessmentManager : MonoBehaviour
     /// <param name="seletedPathImage"></param>
     public void SetSelectedPathImage(Sprite seletedPathImage)
     {
-        PathAssessmentData.SelectedPathSprite = seletedPathImage;
+        PathAssessment.SelectedPathSprite = seletedPathImage;
+        PathAssessmentData pathAssessment = Assessment.GetPath(CurrentPath.PathID);
+        pathAssessment.CorrentPathImageSelected = PathAssessment.EvaluateSelectedPathImage();
     }
 
     /// <summary>
@@ -158,15 +165,19 @@ public class AssessmentManager : MonoBehaviour
     /// </summary>
     /// <param name="segmentID"></param>
     /// <param name="distanceValue"></param>
-    public void SetPathSegmentDistance(int segmentID, float distanceValue)
+    public void SetPathSegmentObjectiveDistance(int segmentID, float distanceValue)
     {
-        foreach (PathSegmentAssessment segmentAssessment in PathAssessmentData.PathSegmentAssessments)
+        foreach (PathSegmentAssessment segmentAssessment in PathAssessment.PathSegmentAssessments)
         {
             if (segmentAssessment.GetSegmentID() != segmentID)
                 continue;
 
             segmentAssessment.SelectedDistanceToPreviousSegment = distanceValue;
         }
+
+        SegmentAssessmentData segmentAssessmentData = Assessment.GetPath(CurrentPath.PathID).GetSegment(segmentID);
+        segmentAssessmentData.SelectedDistanceToPreviousSegment = distanceValue;
+        segmentAssessmentData.CalculatedDistanceToPreviousSegment = CurrentPath.GetSegmentData(segmentID).DistanceToPreviousSegment;
     }
 
     /// <summary>
@@ -176,44 +187,56 @@ public class AssessmentManager : MonoBehaviour
     /// <param name="distanceValue"></param>
     public void SetPathSegmentObjectDistance(int segmentID, float distanceValue)
     {
-        foreach (PathSegmentAssessment segmentAssessment in PathAssessmentData.PathSegmentAssessments)
+        foreach (PathSegmentAssessment segmentAssessment in PathAssessment.PathSegmentAssessments)
         {
             if (segmentAssessment.GetSegmentID() != segmentID)
                 continue;
 
             segmentAssessment.SelectedDistanceOfObjectToObjective = distanceValue;
+            
         }
+
+        
+        SegmentAssessmentData segmentAssessmentData = Assessment.GetPath(CurrentPath.PathID).GetSegment(segmentID);
+        segmentAssessmentData.SelectedObjectDistanceToObjective = distanceValue;
+        segmentAssessmentData.CalculatedObjectDistanceToObjective = CurrentPath.GetSegmentData(segmentID).ObjectDistanceToObjective;
     }
      
     /// <summary>
     /// Assigns the selected objective object to the specified segment for assessment. 
     /// </summary>
     /// <param name="segmentID"></param>
-    /// <param name="selectedObjectRenderTexture"></param>
-    public void AssignPathSegmentObjectiveObject(int segmentID, RenderTexture selectedObjectRenderTexture)
+    /// <param name="selectedRenderTexture"></param>
+    public void AssignPathSegmentObjectiveObject(int segmentID, RenderTexture selectedRenderTexture)
     {
-        foreach (PathSegmentAssessment segmentAssessment in PathAssessmentData.PathSegmentAssessments)
+        foreach (PathSegmentAssessment segmentAssessment in PathAssessment.PathSegmentAssessments)
         {
             if (segmentAssessment.GetSegmentID() != segmentID)
                 continue;
 
-            segmentAssessment.SelectedObjectiveObjectRenderTexture = selectedObjectRenderTexture;
+            segmentAssessment.SelectedObjectiveObjectRenderTexture = selectedRenderTexture;
+            SegmentAssessmentData segmentAssessmentData = Assessment.GetPath(CurrentPath.PathID).GetSegment(segmentID);
+            segmentAssessmentData.CorrectObjectiveObjectSelected = segmentAssessment.EvaluateObjectiveObjectAssignment();
         }
+
+
     }
      
     /// <summary>
     /// Assigns the selected segment object to the specified segment for assessment. 
     /// </summary>
     /// <param name="segmentID"></param>
-    /// <param name="selectedObjectRenderTexture"></param>
-    public void AssignPathSegmentObject(int segmentID, RenderTexture selectedObjectRenderTexture)
+    /// <param name="selectedRenderTexture"></param>
+    public void AssignPathSegmentObject(int segmentID, RenderTexture selectedRenderTexture)
     {
-        foreach (PathSegmentAssessment segmentAssessment in PathAssessmentData.PathSegmentAssessments)
+        foreach (PathSegmentAssessment segmentAssessment in PathAssessment.PathSegmentAssessments)
         {
             if (segmentAssessment.GetSegmentID() != segmentID)
                 continue;
 
-            segmentAssessment.SelectedSegmentObjectRenderTexture = selectedObjectRenderTexture;
+            segmentAssessment.SelectedSegmentObjectRenderTexture = selectedRenderTexture;
+            SegmentAssessmentData segmentAssessmentData = Assessment.GetPath(CurrentPath.PathID).GetSegment(segmentID);
+            segmentAssessmentData.CorrectSegmentObjectSelected = segmentAssessment.EvaluateSegmentObjectAssignment();
         }
     }
 
