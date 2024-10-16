@@ -1,21 +1,20 @@
+using System;
 using UnityEngine;
 
 public class ObjectRenderer : MonoBehaviour
 {
     [SerializeField] private Camera _renderCamera;
-    [SerializeField] private GameObject _objectSpawnpoint;
+    [SerializeField] private Transform _objectSpawnpoint;
 
-    public ObjectRenderer SpawnObject(GameObject objectPrefab, RenderTexture renderTexture)
+    public void Initialize(GameObject objectPrefab, RenderTexture renderTexture)
     {
-        Instantiate(objectPrefab, _objectSpawnpoint.transform);
-        // ScaleToCameraView(spawnedObject);
-
+        Instantiate(objectPrefab, _objectSpawnpoint);
         _renderCamera.targetTexture = renderTexture;
-        return this;
     }
 
     public RenderTexture GetRenderTexture()
     {
         return _renderCamera.targetTexture;
     }
+
 }

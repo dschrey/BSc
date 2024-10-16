@@ -3,66 +3,36 @@ using UnityEngine;
 
 public class ObjectRenderManager : MonoBehaviour
 {
-    public static ObjectRenderManager Instance { get; private set; }
-
-    public Dictionary<PathSegmentData, ObjectRenderer> ActiveRenderTextures = new();
-    [SerializeField] private GameObject _objectiveObjectParent;
-    [SerializeField] private GameObject _segmentObjectParent;
-    [SerializeField] private GameObject _renderSetupPrefab;
+    public List<GameObject> ActiveObjectRenderings;
+    [SerializeField] private Transform _objectiveObjectParent;
+    [SerializeField] private Transform _segmentObjectParent;
+    [SerializeField] private GameObject _objectRendererPrefab;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
-
     void Start()
     {
-        ActiveRenderTextures = new();
+        ActiveObjectRenderings = new();
     }
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
-    public void CreateNewSegmentObject(PathSegmentData segmentData)
+    public RenderTexture CreateNewRenderTexture(PathSegmentData segmentData, bool isObjectiveObject = false)
     {
-        Vector3 position = new(0, 0, 0)
+        RenderTexture renderTexture = new(256, 256, 24);
+        GameObject objectRender;
+        if (isObjectiveObject)
         {
-            x = ActiveRenderTextures.Count * 0.5f
-        };
-
-        ObjectRenderer objectRenderer = Instantiate(_renderSetupPrefab, position, Quaternion.identity, 
-            _segmentObjectParent.transform).GetComponent<ObjectRenderer>();
-        objectRenderer.SpawnObject(segmentData.ObjectPrefab, segmentData.SegmentObjectRenderTexture);
-        ActiveRenderTextures.Add(segmentData, objectRenderer);
-    }
-
-    public void ClearSegmentObjectRenderTextures()
-    {
-        foreach (ObjectRenderer objectRenderer in ActiveRenderTextures.Values)
-        {
-            Destroy(objectRenderer.gameObject);
+            objectRender = Instantiate(_objectRendererPrefab, _objectiveObjectParent);
+            objectRender.GetComponent<ObjectRenderer>().Initialize(segmentData.ObjectiveObjectPrefab, renderTexture);
         }
-        ActiveRenderTextures.Clear();
-    }
-    public void CreateNewObjectiveObject(PathSegmentData segmentData)
-    {
-        Vector3 position = new(0, 0, 0)
+        else
         {
-            x = ActiveRenderTextures.Count * 0.5f
-        };
+            objectRender = Instantiate(_objectRendererPrefab, _segmentObjectParent);
+            objectRender.GetComponent<ObjectRenderer>().Initialize(segmentData.ObjectPrefab, renderTexture);
+        }
+        ActiveObjectRenderings.Add(objectRender);
 
-        ObjectRenderer objectRenderer = Instantiate(_renderSetupPrefab, position, Quaternion.identity,
-            _objectiveObjectParent.transform).GetComponent<ObjectRenderer>();
-        objectRenderer.SpawnObject(segmentData.ObjectiveObjectPrefab, segmentData.ObjectiveObjectRenderTexture);
-        ActiveRenderTextures.Add(segmentData, objectRenderer);
+        return renderTexture;
     }
-
 }

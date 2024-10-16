@@ -12,7 +12,7 @@ public class PathAssessment
         PathData = correctPath;
         PathSegmentAssessments = new();
 
-    foreach (PathSegmentData segment in correctPath.Segments)
+    foreach (PathSegmentData segment in correctPath.SegmentsData)
         {
             PathSegmentAssessment pathSegmentAssessment = new(segment);
             PathSegmentAssessments.Add(pathSegmentAssessment);

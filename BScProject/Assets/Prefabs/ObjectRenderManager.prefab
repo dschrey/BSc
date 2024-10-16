@@ -108,6 +108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ed98ed1f62fc3046b4d3463a7d1e3d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _objectiveObjectParent: {fileID: 7813828477782523859}
-  _segmentObjectParent: {fileID: 8757700892858790173}
-  _renderSetupPrefab: {fileID: 4674197709550136622, guid: 5416d0f9c0856b3428ab453aaeb24529, type: 3}
+  ActiveRenderTextures: []
+  _objectiveObjectParent: {fileID: 6193543084203788576}
+  _segmentObjectParent: {fileID: 3805668435411140551}
+  _objectRendererPrefab: {fileID: 4674197709550136622, guid: 5416d0f9c0856b3428ab453aaeb24529, type: 3}

@@ -8,13 +8,14 @@ public class PathData : ScriptableObject
 {
     public int PathID;
     public PathType Type = PathType.DEFAULT;
+    public Color PathColor;
     public Sprite PathImage;
     [Header("Path image selection options (at least 4)")]
     public List<Sprite> PathImageSelection;
-    public List<PathSegmentData> Segments = new();
+    public List<PathSegmentData> SegmentsData = new();
 
     public PathSegmentData GetSegmentData(int id)
     {
-        return Segments.Find(s => s.SegmentID == id);
+        return SegmentsData.Find(s => s.SegmentID == id);
     }
 }

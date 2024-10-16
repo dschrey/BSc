@@ -17,7 +17,7 @@ public class ExperimentSettings : ScriptableObject
     [Tooltip("Paths to be played per iteration.")]
     public List<PathData> paths;
 
-    [Header("Evaulation Settings")]
+    [Header("Assessment Settings")]
     [Tooltip("Standard: PathSelection, ItemDistance\nExtended: PathSelection, ItemPosition, ItemDistance")]
     [Range(0, 1)] public float MovementSpeedStepSize = 0.25f;
     public float MovementSpeedMultiplier = 1;

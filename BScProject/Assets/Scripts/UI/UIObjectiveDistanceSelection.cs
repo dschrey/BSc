@@ -24,7 +24,7 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
         _confirmButton.onClick.AddListener(OnConfirmButtonClicked);
         _confirmButton.interactable = false;
         
-        foreach (PathSegmentData segmentData in AssessmentManager.Instance.CurrentPath.Segments)
+        foreach (PathSegmentData segmentData in AssessmentManager.Instance.CurrentPath.SegmentsData)
         {
             PathSegmentOption segmentOption = Instantiate(_segmentDistanceTogglePrefab, _segmentDistanceToggleParent).GetComponent<PathSegmentOption>();
             segmentOption.Initialize(segmentData.SegmentID, segmentData.SegmentColor, this);

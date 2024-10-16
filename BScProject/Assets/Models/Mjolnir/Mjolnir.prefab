@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 188996242134400788}
   - component: {fileID: 3033580615859215503}
+  - component: {fileID: 2467776533874067707}
   m_Layer: 0
   m_Name: Mjolnir
   m_TagString: Untagged
@@ -26,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 7847295606037552468}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.16104937, y: 0, z: -31.181}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -43,6 +44,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fb6fadf448ce13e47b46bdf0043f055e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2467776533874067707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7847295606037552468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f367710c89c2c2445989dcdaf74d8117, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &5519627099048224229

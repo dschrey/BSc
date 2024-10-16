@@ -17,11 +17,11 @@ public class UIObjectiveObjectSelection : MonoBehaviour
         _confirmButton.onClick.AddListener(OnSegmentObjectiveObjectAssigned);
         _confirmButton.interactable = false;
 
-        for(int i = 0; i < AssessmentManager.Instance.CurrentPath.Segments.Count; i++)
+        for(int i = 0; i < AssessmentManager.Instance.CurrentPath.SegmentsData.Count; i++)
         {
             SegmentObjectSelection segmentObjectSelection = Instantiate(_segmentObjectSelectionPrefab, _segmentSelectionParent).GetComponent<SegmentObjectSelection>();
-            segmentObjectSelection.SetSegmentLabel(i, AssessmentManager.Instance.CurrentPath.Segments[i].SegmentColor);
-            segmentObjectSelection.AddObjectChoise(AssessmentManager.Instance.CurrentPath.Segments[i].ObjectiveObjectRenderTexture);
+            segmentObjectSelection.SetSegmentLabel(i, AssessmentManager.Instance.CurrentPath.SegmentsData[i].SegmentColor);
+            segmentObjectSelection.AddObjectChoise(AssessmentManager.Instance.CurrentPath.SegmentsData[i].ObjectiveObjectRenderTexture);
             segmentObjectSelection.SelectedObjectChanged += OnObjectiveObjectChanged;
             _segmentObjects.Add(segmentObjectSelection);
         }
@@ -35,7 +35,7 @@ public class UIObjectiveObjectSelection : MonoBehaviour
 
         for(int i = 0; i < _segmentObjects.Count; i++)
         {
-            if (i < AssessmentManager.Instance.CurrentPath.Segments.Count)
+            if (i < AssessmentManager.Instance.CurrentPath.SegmentsData.Count)
             {
                 _segmentObjects[i].SelectedObjectChanged -= OnObjectiveObjectChanged;
             }

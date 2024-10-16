@@ -11,7 +11,6 @@ public class PathManager : MonoBehaviour
     public PathSegment LastSegment;
     public List<PathSegment> UnlockedSegments;
     [SerializeField] private MovementDetection _experimentSpawnMovementDetection;
-
     private int _unlockedSegments;
 
 
@@ -53,7 +52,6 @@ public class PathManager : MonoBehaviour
             return;
         
         _unlockedSegments++;
-        Debug.Log($"{_unlockedSegments} - {CurrentPath.Segments.Count}");
         if (_unlockedSegments == CurrentPath.Segments.Count)
         {
             Debug.Log($"Path {CurrentPath.PathData.PathID} completed.");
@@ -79,9 +77,7 @@ public class PathManager : MonoBehaviour
         CurrentSegment.SetObjectiveInvisible();
     }
 
-
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
-
 
     public void StartNewPath(PathData pathData)
     {
@@ -96,11 +92,10 @@ public class PathManager : MonoBehaviour
         }
         
         CurrentPath = Instantiate(_pathPrefab, ExperimentManager.Instance.ExperimentSpawn.position, ExperimentManager.Instance.ExperimentSpawn.rotation).GetComponent<Path>();
-        
-        CurrentPath.SetupPathSegments(pathData);
+        CurrentPath.SetupPath(pathData);
 
         TeleportPlayerToStart();
-        ObjectRenderManager.Instance.ClearSegmentObjectRenderTextures();
+        // ObjectRenderManager.Instance.ClearRenderTextures();
         RevealNextPathSegment();
     }
 

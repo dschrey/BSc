@@ -5,8 +5,8 @@ public class PathSegment : MonoBehaviour
 {
     public PathSegmentData PathSegmentData;
     public event Action SegmentCompleted;
-    public Objective Objective { get; private set; }
-    public GameObject SegmentObject { get; private set; }
+    public Objective Objective;
+    public GameObject SegmentObject;
     private MovementDetection _movementDetection;
     
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------------
@@ -29,9 +29,6 @@ public class PathSegment : MonoBehaviour
             return;
         }
         Objective.ObjectiveCaptured += OnObjectiveCaptured;
-
-        SpawnSegmentObject();
-        SpawnObjectivetObject();
 
     }
 
@@ -73,37 +70,42 @@ public class PathSegment : MonoBehaviour
         Objective.ShowObjectiveHint();
     }
 
-    private void SpawnObjectivetObject()
+    public void SpawnSegmentObjects(PathType pathType)
     {
-        Path path = transform.parent.GetComponent<Path>();
-        if (path.PathData.Type != PathType.EXTENDED)
+        if (pathType != PathType.EXTENDED)
         {
             return;
         }
 
-        Objective.SpawnObject(PathSegmentData.ObjectiveObjectPrefab);
-
-        RenderTexture renderTexture = new(256, 256, 24);
-        PathSegmentData.SegmentObjectRenderTexture = renderTexture;
-        ObjectRenderManager.Instance.CreateNewSegmentObject(PathSegmentData);
+        SpawnObjectiveObject();
+        SpawnSegmentObject();
+        SpawnSegmentObstacle();
     }
 
-    private void SpawnSegmentObject()
+    private  void SpawnObjectiveObject()
     {
-        Path path = transform.parent.GetComponent<Path>();
-        if (path.PathData.Type != PathType.EXTENDED)
-        {
-            return;
-        }
+        Objective.SpawnObject(PathSegmentData.ObjectiveObjectPrefab);
 
+        ObjectRenderManager objectRenderManager = FindObjectOfType<ObjectRenderManager>();
+        PathSegmentData.ObjectiveObjectRenderTexture = objectRenderManager.CreateNewRenderTexture(PathSegmentData, true);
+    }
+
+    private  void SpawnSegmentObject()
+    {
         Vector3 objectSpawnpoint = transform.position + PathSegmentData.RelativeObjectPositionToObjective;
         
         SegmentObject = Instantiate(PathSegmentData.ObjectPrefab, objectSpawnpoint, PathSegmentData.ObjectRotation, transform);
         PathSegmentData.ObjectDistanceToObjective = Vector3.Distance(transform.position, objectSpawnpoint);
 
-        RenderTexture renderTexture = new(256, 256, 24);
-        PathSegmentData.SegmentObjectRenderTexture = renderTexture;
-        ObjectRenderManager.Instance.CreateNewSegmentObject(PathSegmentData);
+        ObjectRenderManager objectRenderManager = FindObjectOfType<ObjectRenderManager>();
+        PathSegmentData.SegmentObjectRenderTexture = objectRenderManager.CreateNewRenderTexture(PathSegmentData);
     } 
+
+    private  void SpawnSegmentObstacle()
+    {
+        Instantiate(PathSegmentData.SegmentObstaclePrefab, PathSegmentData.SegmentObstaclePrefab.transform.position, 
+            PathSegmentData.SegmentObstaclePrefab.transform.rotation, transform);
+    }
+
 
 }

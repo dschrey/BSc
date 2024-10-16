@@ -41,8 +41,8 @@ public class PathAssessmentData
     {
         PathAssessmentID = pathData.PathID;
         Type = pathData.Type;
-        Length = pathData.Segments.Count;
-        foreach (PathSegmentData pathSegment in pathData.Segments)
+        Length = pathData.SegmentsData.Count;
+        foreach (PathSegmentData pathSegment in pathData.SegmentsData)
         {
             SegmentAssessmentData segmentAssessmentData = new(pathSegment.SegmentID);
             PathSegments.Add(segmentAssessmentData);
