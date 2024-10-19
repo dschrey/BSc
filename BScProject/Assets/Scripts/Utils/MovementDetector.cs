@@ -17,13 +17,6 @@ public class MovementDetection : MonoBehaviour
         _collider.radius = ExperimentManager.Instance.ExperimentSettings.PlayerDetectionRadius;
     }
 
-    // void OnDrawGizmos()
-    // {
-    //     Gizmos.color = Color.blue;
-    //     Gizmos.DrawWireSphere(transform.position, ExperimentManager.Instance.ExperimentSettings.PlayerDetectionRadius);
-    // }
-
-
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------------
 
     private void OnTriggerEnter(Collider collider)

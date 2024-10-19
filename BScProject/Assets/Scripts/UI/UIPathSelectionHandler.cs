@@ -34,7 +34,7 @@ public class UIPathSelectionHandler : MonoBehaviour
         {
             pathOption.PathSelectionChanged.RemoveListener(OnSelectedPathChanged);
         }
-
+        _pathOptions.Clear();
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------

@@ -83,6 +83,8 @@ public class PathManager : MonoBehaviour
     {
         if (CurrentPath != null)
         {
+            ObjectRenderManager objectRenderManager = FindObjectOfType<ObjectRenderManager>();
+            objectRenderManager.ClearRenderTextures();  
             Destroy(CurrentPath.gameObject);
             CurrentPath = null;
             CurrentSegment = null;
@@ -92,10 +94,9 @@ public class PathManager : MonoBehaviour
         }
         
         CurrentPath = Instantiate(_pathPrefab, ExperimentManager.Instance.ExperimentSpawn.position, ExperimentManager.Instance.ExperimentSpawn.rotation).GetComponent<Path>();
-        CurrentPath.SetupPath(pathData);
+        CurrentPath.Initialize(pathData);
 
         TeleportPlayerToStart();
-        // ObjectRenderManager.Instance.ClearRenderTextures();
         RevealNextPathSegment();
     }
 

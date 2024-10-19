@@ -16,17 +16,19 @@ public class UIObjectiveObjectSelection : MonoBehaviour
     {
         _confirmButton.onClick.AddListener(OnSegmentObjectiveObjectAssigned);
         _confirmButton.interactable = false;
-
-        for(int i = 0; i < AssessmentManager.Instance.CurrentPath.SegmentsData.Count; i++)
+        
+        List<RenderTexture> textures = new();
+        foreach (PathSegmentData pathSegment in AssessmentManager.Instance.CurrentPath.SegmentsData)
         {
             SegmentObjectSelection segmentObjectSelection = Instantiate(_segmentObjectSelectionPrefab, _segmentSelectionParent).GetComponent<SegmentObjectSelection>();
-            segmentObjectSelection.SetSegmentLabel(i, AssessmentManager.Instance.CurrentPath.SegmentsData[i].SegmentColor);
-            segmentObjectSelection.AddObjectChoise(AssessmentManager.Instance.CurrentPath.SegmentsData[i].ObjectiveObjectRenderTexture);
+            segmentObjectSelection.Initialize(pathSegment.SegmentID, pathSegment.SegmentColor);
+            textures.Add(pathSegment.ObjectiveObjectRenderTexture);
             segmentObjectSelection.SelectedObjectChanged += OnObjectiveObjectChanged;
             _segmentObjects.Add(segmentObjectSelection);
         }
-
-        _selectedPathImage.sprite = AssessmentManager.Instance.CurrentPath.PathImage;
+        
+        _segmentObjects.ForEach(obj => obj.AddObjectChoices(textures));
+        _selectedPathImage.sprite = AssessmentManager.Instance.PathAssessment.SelectedPathSprite;
     }
 
     private void OnDisable() 
@@ -40,6 +42,7 @@ public class UIObjectiveObjectSelection : MonoBehaviour
                 _segmentObjects[i].SelectedObjectChanged -= OnObjectiveObjectChanged;
             }
         }
+        _segmentObjects.Clear();
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
@@ -63,7 +66,4 @@ public class UIObjectiveObjectSelection : MonoBehaviour
     }
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
-
-
-
 }

@@ -98,7 +98,7 @@ public class AssessmentManager : MonoBehaviour
     {
         CurrentPath = currentPath;
         PathAssessment = new PathAssessment(currentPath);
-        Debug.Log($"Started assessment on path {currentPath.PathID} at {System.DateTime.Now}");
+        Debug.Log($"AssessmentManager :: StartPathAssessment() : Started assessment on path (ID: {currentPath.PathID}) at {System.DateTime.Now}.");
         Assessment ??= new(ExperimentManager.Instance.ExperimentSettings.CompletedAssessments, System.DateTime.Now);
         Assessment.AddPath(currentPath);
         
@@ -146,7 +146,7 @@ public class AssessmentManager : MonoBehaviour
                 break;
         }
         _currentAssessmentStep++;
-        Debug.Log($"Current assessment step {_currentAssessmentStep}");
+        Debug.Log($"AssessmentManager :: ProceedToNextAssessmentStep() : Assessment step: {_currentAssessmentStep}");
     }
 
     /// <summary>

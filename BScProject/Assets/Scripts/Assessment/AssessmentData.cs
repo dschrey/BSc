@@ -11,6 +11,7 @@ public class AssessmentData
 
     public AssessmentData(int id, DateTime dateTime)
     {
+        Paths = new();
         AssessmentID = id;
         DateTime = dateTime;
         Completed = false;
@@ -39,6 +40,7 @@ public class PathAssessmentData
 
     public PathAssessmentData(PathData pathData)
     {
+        PathSegments = new();
         PathAssessmentID = pathData.PathID;
         Type = pathData.Type;
         Length = pathData.SegmentsData.Count;

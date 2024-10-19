@@ -21,16 +21,12 @@ public class UISegmentObjectPosition : MonoBehaviour
     public Path _currentPath;
     [SerializeField] private UIDragHandler _draggableCanvasObject;
 
-    // TODO test if this works
-
-
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
     void OnEnable()
     {
-        // _currentPath = null; // TODO remove comment after testing is done
+        _currentPath = null;
         _selectedSegment = null;
-        _segmentObjects.Clear();
         _lineRender.ResetLinePoints();
 
         ToggleGroup = GetComponent<ToggleGroup>();
@@ -68,7 +64,7 @@ public class UISegmentObjectPosition : MonoBehaviour
         _sliderverticalPosition.onValueChanged.RemoveListener(OnVerticalPositionChanged);
         _confirmButton.onClick.RemoveListener(OnConfirmButtonPressed);
         _canvasEnvironment.SetActive(false);
-
+        _segmentObjects.Clear();
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------

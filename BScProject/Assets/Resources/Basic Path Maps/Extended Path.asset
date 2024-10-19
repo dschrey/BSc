@@ -34,3 +34,15 @@ MonoBehaviour:
     ObjectDistanceToObjective: 2.236068
     ObjectRotation: {x: 0, y: 0, z: 0, w: 0}
     SegmentObstaclePrefab: {fileID: 6306846414418973985, guid: fc63f274707dc4a4187dfdc77340bd7c, type: 3}
+  - SegmentID: 0
+    SegmentColor: {r: 0.23092759, g: 1, b: 0, a: 1}
+    RelativeSegmentPosition: {x: -4, y: 0, z: 0}
+    DistanceToPreviousSegment: 2.9154758
+    ObjectiveObjectRenderTexture: {fileID: 0}
+    ObjectiveObjectPrefab: {fileID: 2411977904040133610, guid: 07d5caecaae5ecf48bbaaf3e5d4029f5, type: 3}
+    ObjectPrefab: {fileID: 7847295606037552468, guid: 8b58cdf80062d9b47a10f12f25a329ce, type: 3}
+    SegmentObjectRenderTexture: {fileID: 0}
+    RelativeObjectPositionToObjective: {x: -4, y: 0, z: 0}
+    ObjectDistanceToObjective: 2.236068
+    ObjectRotation: {x: 0, y: 0, z: 0, w: 0}
+    SegmentObstaclePrefab: {fileID: 6306846414418973985, guid: fc63f274707dc4a4187dfdc77340bd7c, type: 3}

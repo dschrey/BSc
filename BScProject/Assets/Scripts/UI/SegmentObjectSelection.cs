@@ -12,7 +12,7 @@ public class SegmentObjectSelection : MonoBehaviour
     [SerializeField] private Button _buttonNext;
     [SerializeField] private RawImage _selectedObjectImage;
     public event Action<int> SelectedObjectChanged;
-    private List<RenderTexture> _objectRenderChoises = new();
+    public List<RenderTexture> _objectRenderChoises = new();
     private int _segmentID;
     private int _selectedRenderTextureID;
 
@@ -24,7 +24,7 @@ public class SegmentObjectSelection : MonoBehaviour
         _buttonNext.onClick.AddListener(OnNextButtonClick);
 
         _selectedRenderTextureID = -1;
-        _selectedObjectImage = null;
+        _selectedObjectImage.texture = null;
         _objectRenderChoises.Clear();
     }
 
@@ -44,7 +44,7 @@ public class SegmentObjectSelection : MonoBehaviour
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
-    public void SetSegmentLabel(int segmentID, Color segmentColor)
+    public void Initialize(int segmentID, Color segmentColor)
     {
         _segmentID = segmentID;
         _segmentLabelImage.color = segmentColor;
@@ -55,9 +55,13 @@ public class SegmentObjectSelection : MonoBehaviour
         }
     }
 
-    public void AddObjectChoise(RenderTexture choice)
+    public void AddObjectChoices(List<RenderTexture> textures)
     {
-        _objectRenderChoises.Add(choice);
+        _objectRenderChoises.AddRange(textures);
+        int randomIndex = UnityEngine.Random.Range(0, _objectRenderChoises.Count - 1);
+        RenderTexture texture = _objectRenderChoises[randomIndex];
+        _selectedObjectImage.texture = texture;
+        _selectedRenderTextureID = randomIndex;
     }
 
     private void UpdateObjectImage()

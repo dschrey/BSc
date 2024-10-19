@@ -4,15 +4,13 @@ using UnityEngine;
 public class ObjectRenderManager : MonoBehaviour
 {
     public List<GameObject> ActiveObjectRenderings;
-    [SerializeField] private Transform _objectiveObjectParent;
-    [SerializeField] private Transform _segmentObjectParent;
     [SerializeField] private GameObject _objectRendererPrefab;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
     void Start()
     {
-        ActiveObjectRenderings = new();
+        ActiveObjectRenderings = new List<GameObject>();
     }
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
@@ -20,19 +18,47 @@ public class ObjectRenderManager : MonoBehaviour
     public RenderTexture CreateNewRenderTexture(PathSegmentData segmentData, bool isObjectiveObject = false)
     {
         RenderTexture renderTexture = new(256, 256, 24);
-        GameObject objectRender;
-        if (isObjectiveObject)
+        
+        // Transform objectParent = isObjectiveObject ? _objectiveObjectParent : _segmentObjectParent;
+        Vector3 position = new(0, 0, 0)
         {
-            objectRender = Instantiate(_objectRendererPrefab, _objectiveObjectParent);
-            objectRender.GetComponent<ObjectRenderer>().Initialize(segmentData.ObjectiveObjectPrefab, renderTexture);
+            x = ActiveObjectRenderings.Count
+        };
+
+        GameObject objectRender = Instantiate(_objectRendererPrefab, transform);
+        objectRender.transform.localPosition = position;
+        SetLayerRecursively(objectRender, LayerMask.NameToLayer("ObjectRendering"));
+        ActiveObjectRenderings.Add(objectRender);
+    
+        if (objectRender.TryGetComponent<ObjectRenderer>(out var objectRenderer))
+        {
+            GameObject objectPrefab = isObjectiveObject ? segmentData.ObjectiveObjectPrefab : segmentData.ObjectPrefab;
+            objectRenderer.Initialize(objectPrefab, renderTexture);
         }
         else
         {
-            objectRender = Instantiate(_objectRendererPrefab, _segmentObjectParent);
-            objectRender.GetComponent<ObjectRenderer>().Initialize(segmentData.ObjectPrefab, renderTexture);
+            Debug.LogError("CreateNewRenderTexture : ObjectRenderer component missing.");
         }
-        ActiveObjectRenderings.Add(objectRender);
 
         return renderTexture;
     }
+
+    public void ClearRenderTextures()
+    {
+        foreach (GameObject renderObject in ActiveObjectRenderings)
+        {
+            Destroy(renderObject);
+        }
+        ActiveObjectRenderings.Clear();
+    }
+
+    private void SetLayerRecursively(GameObject obj, int layerIndex)
+    {
+        obj.layer = layerIndex;
+        foreach (Transform child in obj.transform)
+        {
+            SetLayerRecursively(child.gameObject, layerIndex);
+        }
+    }   
+
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,7 +15,7 @@ public class Path : MonoBehaviour
         {
             Gizmos.color = PathData.PathColor;
             Vector3 position = transform.position;
-            position.y = 1;
+            position.y = 0;
             Gizmos.DrawLine(position, Segments[0].transform.position);
             for (int i = 0; i < Segments.Count - 1; i++)
             {
@@ -24,9 +23,9 @@ public class Path : MonoBehaviour
                 {
 
                     Vector3 fromPos = Segments[i].transform.position;
-                    fromPos.y = 1;
+                    fromPos.y = 0;
                     Vector3 toPos = Segments[i + 1].transform.position;
-                    toPos.y = 1;
+                    toPos.y = 0;
                     Gizmos.DrawLine(fromPos, toPos);
                 }
             }
@@ -35,39 +34,26 @@ public class Path : MonoBehaviour
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------------
 
-    public void SetupPath(PathData pathData)
+    public void Initialize(PathData pathData)
     {
         PathData = pathData;
-        GameObject lastSegment = null;
+        Vector3 lastSegmentPosition = transform.position;
         foreach (PathSegmentData pathSegmentData in pathData.SegmentsData)
         {
-            Vector3 segmentSpawnpoint;
-            float segmentDistance;
-            if (lastSegment == null)
-            {
-                // First segment
-                segmentSpawnpoint = transform.position + pathSegmentData.RelativeSegmentPosition;
-                segmentDistance = Vector3.Distance(transform.position, segmentSpawnpoint);
-            }
-            else
-            {
-                segmentSpawnpoint = lastSegment.transform.position + pathSegmentData.RelativeSegmentPosition;
-                segmentDistance = Vector3.Distance(lastSegment.transform.position, segmentSpawnpoint);
-            }
+            Vector3 segmentSpawnpoint = lastSegmentPosition + pathSegmentData.RelativeSegmentPosition;
+            float segmentDistance = Vector3.Distance(lastSegmentPosition, segmentSpawnpoint);
 
             PathSegment segment = Instantiate(_pathSegmentPrefab, segmentSpawnpoint, Quaternion.identity, transform).GetComponent<PathSegment>();
-            segment.PathSegmentData = pathSegmentData;
-            pathSegmentData.DistanceToPreviousSegment = segmentDistance;
-            segment.PathSegmentData.DistanceToPreviousSegment = segmentDistance;
-            segment.SpawnSegmentObjects(pathData.Type);
+            segment.Initialize(pathSegmentData, segmentDistance);
+
+            if (pathData.Type == PathType.EXTENDED)
+            {
+                segment.SpawnSegmentObjects();
+            }
+
             Segments.Add(segment);
-            lastSegment = segment.gameObject;
+            lastSegmentPosition = segmentSpawnpoint;
             segment.gameObject.SetActive(false);
         }
-    }
-
-    internal static object Combine(string persistentDataPath, string v)
-    {
-        throw new NotImplementedException();
     }
 }

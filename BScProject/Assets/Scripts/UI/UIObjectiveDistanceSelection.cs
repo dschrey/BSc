@@ -32,7 +32,7 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
         }
 
         _numpadInput.InputChangedEvent += OnNumpadInputChanged;
-        _selectedPathImage.sprite = AssessmentManager.Instance.CurrentPath.PathImage;
+        _selectedPathImage.sprite = AssessmentManager.Instance.PathAssessment.SelectedPathSprite;
     }
 
     private void OnDisable() 
@@ -40,6 +40,7 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
         SelectedSegmentChanged.RemoveListener(OnSelectedSegmentChanged);
         _confirmButton.onClick.RemoveListener(OnConfirmButtonClicked);
         _numpadInput.InputChangedEvent -= OnNumpadInputChanged;
+        _segmentDistanceToggles.Clear();
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------

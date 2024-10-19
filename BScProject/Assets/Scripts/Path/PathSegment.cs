@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PathSegment : MonoBehaviour 
 {
-    public PathSegmentData PathSegmentData;
+    public PathSegmentData PathSegmentData { get; private set; }
     public event Action SegmentCompleted;
     public Objective Objective;
     public GameObject SegmentObject;
@@ -34,9 +34,17 @@ public class PathSegment : MonoBehaviour
 
     private void OnDestroy()
     {
+        Debug.Log($"PathSegment :: OnDestroy() : Attempting release of render textures for segment (ID: {PathSegmentData.SegmentID}.) ");
         if (PathSegmentData.SegmentObjectRenderTexture != null)
         {
             PathSegmentData.SegmentObjectRenderTexture.Release();
+            Debug.Log($" --- Released segment object texture.");
+        }
+
+        if (PathSegmentData.ObjectiveObjectRenderTexture != null)
+        {
+            PathSegmentData.ObjectiveObjectRenderTexture.Release();
+            Debug.Log($" --- Released objective object texture.");
         }
     }
 
@@ -55,6 +63,12 @@ public class PathSegment : MonoBehaviour
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------------
 
+    public void Initialize(PathSegmentData pathSegmentData, float distance)
+    {
+        PathSegmentData = pathSegmentData;
+        PathSegmentData.DistanceToPreviousSegment = distance;
+    }
+
     public void SetObjectiveInvisible()
     {
         Objective.HideObjective();
@@ -70,19 +84,15 @@ public class PathSegment : MonoBehaviour
         Objective.ShowObjectiveHint();
     }
 
-    public void SpawnSegmentObjects(PathType pathType)
+    public void SpawnSegmentObjects()
     {
-        if (pathType != PathType.EXTENDED)
-        {
-            return;
-        }
-
+        Debug.Log($"PathSegment :: SpawnSegmentObjects : Spawning objects for segment (ID: {PathSegmentData.SegmentID}).");
         SpawnObjectiveObject();
         SpawnSegmentObject();
         SpawnSegmentObstacle();
     }
 
-    private  void SpawnObjectiveObject()
+    private void SpawnObjectiveObject()
     {
         Objective.SpawnObject(PathSegmentData.ObjectiveObjectPrefab);
 
@@ -99,7 +109,7 @@ public class PathSegment : MonoBehaviour
 
         ObjectRenderManager objectRenderManager = FindObjectOfType<ObjectRenderManager>();
         PathSegmentData.SegmentObjectRenderTexture = objectRenderManager.CreateNewRenderTexture(PathSegmentData);
-    } 
+    }
 
     private  void SpawnSegmentObstacle()
     {
