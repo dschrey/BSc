@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
 using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.Events;
 
-public enum ExperimentState {IDLE, LOADPATH, RUNNING, EVALUATION, FINISHED, CANCELLED };
+public enum ExperimentState {IDLE, LOADPATH, RUNNING, ASSESSMENT, FINISHED, CANCELLED };
 
 public class ExperimentManager : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class ExperimentManager : MonoBehaviour
     [SerializeField] private Transform _evaluationRoomSpawnPoint;
     public Transform _XROrigin;
     public Transform ExperimentSpawn;
+    public Timer Timer;
     public UnityEvent PathCompletion = new();
     private UnityEvent<ExperimentState> _experimentStateChanged = new();
     private ExperimentState _experimentState = ExperimentState.IDLE;
@@ -31,7 +33,6 @@ public class ExperimentManager : MonoBehaviour
     public bool PathAvailable => _pathCount != Paths.Count;
 
 
-
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
     private void Awake()
@@ -45,6 +46,7 @@ public class ExperimentManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
     private void Start() 
     {
         _XROrigin = FindObjectOfType<XROrigin>().transform;
@@ -56,14 +58,12 @@ public class ExperimentManager : MonoBehaviour
 
         PathCompletion.AddListener(OnPathCompletion);
         _experimentStateChanged.AddListener(OnExperimentStateChanged);
-
         _experimentState = ExperimentState.IDLE;
     }
 
 
-    
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
-    
+
     private void OnExperimentStateChanged(ExperimentState newState)
     {
         switch (newState)
@@ -72,22 +72,21 @@ public class ExperimentManager : MonoBehaviour
                 break;
             case ExperimentState.RUNNING:
                 break;
-            case ExperimentState.EVALUATION:
+            case ExperimentState.ASSESSMENT:
                 StartAssessment();
 				break;
             case ExperimentState.FINISHED:
-                AssessmentManager.Instance.Assessment.Completed = true;
-                DataManager.Instance.SaveAssessmentData(AssessmentManager.Instance.Assessment);
-                AssessmentManager.Instance.Assessment = null;
-                DataManager.Instance.AssessmentFile = null;
+                AssessmentManager.Instance.FinishAssessment();
+                PathManager.Instance.ClearPath();
                 StopExperiment();
                 break;
 		}
     }
 
     private void OnPathCompletion()
-    {   
-        ExperimentState = ExperimentState.EVALUATION;
+    {
+        Timer.Stop();
+        ExperimentState = ExperimentState.ASSESSMENT;
     }
 
     
@@ -111,6 +110,7 @@ public class ExperimentManager : MonoBehaviour
             return;
         }
         Debug.Log($"ExperimentManager :: StartNextPath() : Getting next Path.");
+        Timer.Reset();
         PathManager.Instance.StartNewPath(Paths[_pathCount]);
         
         ExperimentState = ExperimentState.RUNNING;
@@ -128,7 +128,8 @@ public class ExperimentManager : MonoBehaviour
         _pathCount = 0;
         _XROrigin.SetPositionAndRotation(ExperimentSpawn.position, ExperimentSpawn.rotation);
         _UIExperimentPanelManager.ToggleRunningPanel(false);
-        _UIExperimentPanelManager.OpenSetupPanel();
+        _UIExperimentPanelManager.ResetPanelPosition();
+        _UIExperimentPanelManager.ShowSetupPanel();
         ExperimentState = ExperimentState.IDLE;
     }
 
@@ -137,4 +138,6 @@ public class ExperimentManager : MonoBehaviour
         ExperimentState = ExperimentState.IDLE;
         LoadNextPath();
     }
+
+
 }

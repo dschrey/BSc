@@ -45,7 +45,7 @@ public class Path : MonoBehaviour
 
             PathSegment segment = Instantiate(_pathSegmentPrefab, segmentSpawnpoint, Quaternion.identity, transform).GetComponent<PathSegment>();
             segment.Initialize(pathSegmentData, segmentDistance);
-
+            
             if (pathData.Type == PathType.EXTENDED)
             {
                 segment.SpawnSegmentObjects();
@@ -54,6 +54,20 @@ public class Path : MonoBehaviour
             Segments.Add(segment);
             lastSegmentPosition = segmentSpawnpoint;
             segment.gameObject.SetActive(false);
+        }
+    }
+
+    public void TogglePathPreview(bool state)
+    {
+        if (PathData == null)
+        {
+            Debug.LogWarning($"Cannot preview a path with no data.");
+            return;
+        }
+
+        foreach (PathSegment segment in Segments)
+        {
+            segment.gameObject.SetActive(state);
         }
     }
 }

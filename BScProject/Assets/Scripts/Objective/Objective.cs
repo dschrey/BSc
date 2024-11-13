@@ -105,13 +105,15 @@ public class Objective : MonoBehaviour
     public void HideObjective()
     {
         LockedParticles.SetActive(false);
-        ObjectiveObject.SetActive(false);
+        if (ObjectiveObject != null)
+            ObjectiveObject.SetActive(false);
     }
 
     public void ShowObjective()
     {
         LockedParticles.SetActive(true);
-        ObjectiveObject.SetActive(true);
+        if (ObjectiveObject != null)
+            ObjectiveObject.SetActive(true);
     }
 
     public void ShowObjectiveHint()

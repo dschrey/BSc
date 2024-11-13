@@ -9,12 +9,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7352032099133688340}
+  - component: {fileID: 9084379310323130093}
   - component: {fileID: 5262424835874572471}
   - component: {fileID: 7850418634816921351}
   - component: {fileID: 4950433619689913335}
   - component: {fileID: 8618037674096817353}
   - component: {fileID: 7988349489023501478}
-  - component: {fileID: 9084379310323130093}
   m_Layer: 0
   m_Name: ExperimentPanels
   m_TagString: Untagged
@@ -40,6 +40,37 @@ Transform:
   - {fileID: 7795969676016892705}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9084379310323130093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3564258820763133090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 273bd4f33847f00458cbea1510202289, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _experimentSetupPanel: {fileID: 6909713749802791816}
+  _experimentRunningPanel: {fileID: 738431230926445856}
+  _experimentFinishedPanel: {fileID: 2087182334090759094}
+  _activationButton:
+    m_UseReference: 1
+    m_Action:
+      m_Name: Activation Button
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: 49a9a72f-31de-4d08-a66c-157383021b1a
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: 4116954447336496447, guid: 0be0028c24f2a4c14a96b6aa39055933, type: 3}
+  _panelSpawnpoint: {fileID: 0}
+  _isBillboard: 1
+  _distanceFromPlayer: 1
+  _panelHeight: 1.5
 --- !u!137 &5262424835874572471
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 0
@@ -47,7 +78,7 @@ SkinnedMeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3564258820763133090}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -138,7 +169,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 3, y: 0.6, z: 0.10000006}
   m_Center: {x: 0.000000059604645, y: 0, z: -0.000000009313229}
@@ -149,7 +180,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3564258820763133090}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0ad34abafad169848a38072baa96cdb2, type: 3}
   m_Name: 
@@ -271,7 +302,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3564258820763133090}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1a2d7d89889b4d94fa1f8d6fe49788e8, type: 3}
   m_Name: 
@@ -291,34 +322,6 @@ MonoBehaviour:
   m_MinAngleAllowed: 0.1
   m_MaxAngleAllowed: 5
   m_TimeUntilThresholdReachesMaxAngle: 3
---- !u!114 &9084379310323130093
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3564258820763133090}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 273bd4f33847f00458cbea1510202289, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _experimentSetupPanel: {fileID: 6909713749802791816}
-  _experimentRunningPanel: {fileID: 738431230926445856}
-  _experimentFinishedPanel: {fileID: 2087182334090759094}
-  _activationButton:
-    m_UseReference: 1
-    m_Action:
-      m_Name: Activation Button
-      m_Type: 0
-      m_ExpectedControlType: 
-      m_Id: 49a9a72f-31de-4d08-a66c-157383021b1a
-      m_Processors: 
-      m_Interactions: 
-      m_SingletonActionBindings: []
-      m_Flags: 0
-    m_Reference: {fileID: 4116954447336496447, guid: 0be0028c24f2a4c14a96b6aa39055933, type: 3}
-  _isBillboard: 0
 --- !u!1001 &2021905537257539120
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -330,6 +333,10 @@ PrefabInstance:
     - target: {fileID: 69921354099641734, guid: a9e7b5cd409e0f64eabe559d327ddc89, type: 3}
       propertyPath: m_Name
       value: FinishPanel
+      objectReference: {fileID: 0}
+    - target: {fileID: 69921354099641734, guid: a9e7b5cd409e0f64eabe559d327ddc89, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4250786035535446739, guid: a9e7b5cd409e0f64eabe559d327ddc89, type: 3}
       propertyPath: m_Pivot.x
@@ -397,7 +404,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4250786035535446739, guid: a9e7b5cd409e0f64eabe559d327ddc89, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 2.54
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4250786035535446739, guid: a9e7b5cd409e0f64eabe559d327ddc89, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -443,10 +450,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: SetupPanel
       objectReference: {fileID: 0}
-    - target: {fileID: 7073351350169141463, guid: 54e7aaaf839dbae44ae5c3d569d0332d, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 7680006236052805357, guid: 54e7aaaf839dbae44ae5c3d569d0332d, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -513,7 +516,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7680006236052805357, guid: 54e7aaaf839dbae44ae5c3d569d0332d, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 2.54
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7680006236052805357, guid: 54e7aaaf839dbae44ae5c3d569d0332d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -527,28 +530,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 9210684815411458203, guid: 54e7aaaf839dbae44ae5c3d569d0332d, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9210684815411458203, guid: 54e7aaaf839dbae44ae5c3d569d0332d, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9210684816116043922, guid: 54e7aaaf839dbae44ae5c3d569d0332d, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9210684816116043922, guid: 54e7aaaf839dbae44ae5c3d569d0332d, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9210684816116043922, guid: 54e7aaaf839dbae44ae5c3d569d0332d, type: 3}
-      propertyPath: m_AnchorMin.x
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 1913408513822276441, guid: 54e7aaaf839dbae44ae5c3d569d0332d, type: 3}
+    - target: {fileID: 8258497034749391697, guid: 54e7aaaf839dbae44ae5c3d569d0332d, type: 3}
+      propertyPath: _panelManager
+      value: 
+      objectReference: {fileID: 9084379310323130093}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -637,7 +623,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1860181716885434494, guid: 61c440e5cbd576e41aa6bd25b31a3b78, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 2.54
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1860181716885434494, guid: 61c440e5cbd576e41aa6bd25b31a3b78, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -651,6 +637,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2397257360071724556, guid: 61c440e5cbd576e41aa6bd25b31a3b78, type: 3}
+      propertyPath: _panelManager
+      value: 
+      objectReference: {fileID: 9084379310323130093}
     - target: {fileID: 9214091321943856767, guid: 61c440e5cbd576e41aa6bd25b31a3b78, type: 3}
       propertyPath: m_Name
       value: RunningPanel

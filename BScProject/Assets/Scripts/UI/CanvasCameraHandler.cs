@@ -6,7 +6,8 @@ public class CanvasCameraHandler : MonoBehaviour
 
     private Camera _canvasCamera;
     // Start is called before the first frame update
-    void Awake()
+    
+    void OnEnable()
     {
         _canvasCamera = GetComponent<Camera>();
     }

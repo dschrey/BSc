@@ -9,12 +9,12 @@ public class UIExperimentSetup : MonoBehaviour
     [SerializeField] private Slider _sliderMovementSpeed;
     [SerializeField] private TMP_Text _textMovementSpeed;
     [SerializeField] private ExperimentStartPointHandler _startPointHandler;
+    [SerializeField] private UIExperimentPanelManager _panelManager;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
     void OnEnable()
     {
-
         _buttonSetSpawn.onClick.AddListener(OnSetSpawnButtonClicked);
         _buttonStart.onClick.AddListener(OnStartButtonClicked);
         _sliderMovementSpeed.onValueChanged.AddListener(OnMovementSpeedChanged);
@@ -57,7 +57,9 @@ public class UIExperimentSetup : MonoBehaviour
 
     private void OnSetSpawnButtonClicked()
     {
-        _startPointHandler.SetExperimentStartPosition(ExperimentManager.Instance._XROrigin.transform);
+        // _startPointHandler.SetExperimentStartPosition(ExperimentManager.Instance._XROrigin.transform);
+        ExperimentManager.Instance._XROrigin.SetPositionAndRotation(_startPointHandler.transform.position, _startPointHandler.transform.rotation);
+        _panelManager.ResetPanelPosition();
     }
 
     private void OnMovementSpeedChanged(float value)
@@ -85,6 +87,5 @@ public class UIExperimentSetup : MonoBehaviour
     {
         return Mathf.Round(value / stepSize) * stepSize;
     }
-
 
 }

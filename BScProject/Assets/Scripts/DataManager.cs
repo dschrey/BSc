@@ -1,5 +1,4 @@
 using System.IO;
-using Unity.Tutorials.Core.Editor;
 using UnityEngine;
 
 public class DataManager : MonoBehaviour
@@ -9,7 +8,7 @@ public class DataManager : MonoBehaviour
     [SerializeField] private ExperimentSettings _experimentData;
     private string _experimentSettingsPath;
     private string _experimentResultsPath;
-    public string AssessmentFile;
+    private string _assessmentFilePath;
 
 
    // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
@@ -27,12 +26,15 @@ public class DataManager : MonoBehaviour
         }
 
         _experimentSettingsPath = Application.persistentDataPath + "experimentSettings.json";
-        _experimentResultsPath = Application.persistentDataPath + "Results";
+        _experimentResultsPath = Application.persistentDataPath + "/Assessments";
     }
 
     private void Start() 
     {
-        AssessmentFile = null;
+        if (! Directory.Exists(_experimentResultsPath))
+        {
+            Directory.CreateDirectory(_experimentResultsPath);
+        }
         LoadExperimentSettings();
     }
 
@@ -74,25 +76,18 @@ public class DataManager : MonoBehaviour
 
     public void SaveAssessmentData(AssessmentData data)
     {
-        if (! Directory.Exists(_experimentResultsPath))
-        {
-            Directory.CreateDirectory(_experimentResultsPath);
-        }
-
         string jsonData = JsonUtility.ToJson(data, true);
-        string filePath = _experimentResultsPath + "/" + $"Assessment_{data.DateTime}.json";
-        AssessmentFile = filePath;
-        if (!AssessmentFile.IsNullOrEmpty())
-        {
-            File.WriteAllText(AssessmentFile, jsonData);
-        }
-        else
-        {
-            File.WriteAllText(filePath, jsonData);
-            AssessmentFile = filePath;
-        }
+ 
+        string filePath = _experimentResultsPath + "/" + $"Assessment_{ExperimentManager.Instance.ExperimentSettings.CompletedAssessments}.json";
+        File.WriteAllText(filePath, jsonData);
+        _assessmentFilePath = filePath;
 
         Debug.Log($"Assessment data saved to: {filePath}");
+    }
+
+    public void ResetAssessmentFilePath()
+    {
+        _assessmentFilePath = null;
     }
 
 }

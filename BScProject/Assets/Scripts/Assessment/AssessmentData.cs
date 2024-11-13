@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 [Serializable]
 public class AssessmentData
 {
     public int AssessmentID;
-    public DateTime DateTime;
+    public string DateTime;
     public List<PathAssessmentData> Paths;
     public bool Completed;
 
@@ -13,13 +14,13 @@ public class AssessmentData
     {
         Paths = new();
         AssessmentID = id;
-        DateTime = dateTime;
+        DateTime = dateTime.ToString().Replace(" ", "_");
         Completed = false;
     }
 
-    public void AddPath(PathData pathData)
+    public void AddPath(PathData pathData, int timeTaken)
     {
-        PathAssessmentData pathAssessmentData = new(pathData);
+        PathAssessmentData pathAssessmentData = new(pathData, timeTaken);
         Paths.Add(pathAssessmentData);
     }
 
@@ -35,15 +36,17 @@ public class PathAssessmentData
     public int PathAssessmentID;
     public PathType Type;
     public int Length;
+    public int Time;
     public bool CorrentPathImageSelected;
     public List<SegmentAssessmentData> PathSegments;
 
-    public PathAssessmentData(PathData pathData)
+    public PathAssessmentData(PathData pathData, int timeTaken)
     {
         PathSegments = new();
         PathAssessmentID = pathData.PathID;
         Type = pathData.Type;
         Length = pathData.SegmentsData.Count;
+        Time = timeTaken;
         foreach (PathSegmentData pathSegment in pathData.SegmentsData)
         {
             SegmentAssessmentData segmentAssessmentData = new(pathSegment.SegmentID);
@@ -64,16 +67,20 @@ public class SegmentAssessmentData
     public int SegmentAssessmentID;
     public float SelectedDistanceToPreviousSegment;
     public float CalculatedDistanceToPreviousSegment;
-    public bool CorrectObjectiveObjectSelected;
 
+    // Extented Path Assessment Data
+    public bool CorrectObjectiveObjectSelected;
     public float SelectedObjectDistanceToObjective;
     public float CalculatedObjectDistanceToObjective;
+    public float ObjectDistanceToRealObject;
     public bool CorrectSegmentObjectSelected;
 
     public SegmentAssessmentData (int id)
     {
         SegmentAssessmentID = id;
     }
+
+
 }
 
 

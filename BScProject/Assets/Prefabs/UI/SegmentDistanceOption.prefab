@@ -167,12 +167,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 44.75
+  m_fontSize: 35
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 35
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
@@ -203,7 +203,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 4.772827, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -274,9 +274,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abab39f8fb868014c9712cf39d463145, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Color: {r: 0, g: 0, b: 0, a: 0}
   Checkmark: {fileID: 6844637738710923406}
   DistanceText: {fileID: 2999015346780576675}
+  DistanceValue: 0
   _segmentIndicator: {fileID: 5030563305170980494}
   HasDistanceValue: 0
 --- !u!114 &7982554694715270741

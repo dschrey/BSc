@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -9,13 +8,10 @@ public class PathManager : MonoBehaviour
     public Path CurrentPath;
     public PathSegment CurrentSegment;
     public PathSegment LastSegment;
-    public List<PathSegment> UnlockedSegments;
     [SerializeField] private MovementDetection _experimentSpawnMovementDetection;
     private int _unlockedSegments;
 
-
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
-
 
     private void Awake()
     {
@@ -40,7 +36,6 @@ public class PathManager : MonoBehaviour
 
         CurrentSegment = null;
         LastSegment = null;
-        UnlockedSegments.Clear();
         _unlockedSegments = 0;
     }
 
@@ -83,16 +78,9 @@ public class PathManager : MonoBehaviour
     {
         if (CurrentPath != null)
         {
-            ObjectRenderManager objectRenderManager = FindObjectOfType<ObjectRenderManager>();
-            objectRenderManager.ClearRenderTextures();  
-            Destroy(CurrentPath.gameObject);
-            CurrentPath = null;
-            CurrentSegment = null;
-            LastSegment = null;
-            UnlockedSegments.Clear();
-            _unlockedSegments = 0;
+            ClearPath();
         }
-        
+        ExperimentManager.Instance.Timer.StartTimer();
         CurrentPath = Instantiate(_pathPrefab, ExperimentManager.Instance.ExperimentSpawn.position, ExperimentManager.Instance.ExperimentSpawn.rotation).GetComponent<Path>();
         CurrentPath.Initialize(pathData);
 
@@ -144,5 +132,17 @@ public class PathManager : MonoBehaviour
     private void TeleportPlayerToStart()
     {
         ExperimentManager.Instance._XROrigin.SetPositionAndRotation(ExperimentManager.Instance.ExperimentSpawn.position, ExperimentManager.Instance.ExperimentSpawn.rotation);
+    }
+
+    public void ClearPath()
+    {
+        ObjectRenderManager objectRenderManager = FindObjectOfType<ObjectRenderManager>();
+        objectRenderManager.ClearRenderObjects(); 
+        if (CurrentPath != null) 
+            Destroy(CurrentPath.gameObject);
+        CurrentPath = null;
+        CurrentSegment = null;
+        LastSegment = null;
+        _unlockedSegments = 0;
     }
 }

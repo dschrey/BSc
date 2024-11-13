@@ -22,7 +22,7 @@ public class UIExperimentFinish : MonoBehaviour
 
     private void OnRestartExperimentButtonClicked()
     {
-        _panelManager.OpenSetupPanel();
+        _panelManager.ShowSetupPanel();
         ExperimentManager.Instance.ExperimentState = ExperimentState.IDLE;
         gameObject.SetActive(false);
     }

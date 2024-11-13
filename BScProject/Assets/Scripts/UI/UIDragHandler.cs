@@ -1,18 +1,18 @@
-using System;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UIDragHandler : MonoBehaviour, IDragHandler
+public class UIDragHandler : MonoBehaviour, IDragHandler, IEndDragHandler
 {
     [SerializeField] private RectTransform _movementArea;
     [SerializeField] private Slider _sliderhorizontalPosition;
     [SerializeField] private Slider _sliderverticalPosition;
-    public UnityEvent<Vector3> WorldPositionChanged;
-    private RectTransform _rectTransform;
-    private GameObject _objectInWorldSpace;
-    private DraggableObject _draggableObject;
+    public UnityEvent WorldPositionChanged;
+    public UnityEvent SegmentObjectPositioned;
+    [SerializeField] private RectTransform _rectTransform;
+    public GameObject _objectInWorldSpace;
+    public DraggableObject _draggableWorldObject;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
@@ -46,51 +46,78 @@ public class UIDragHandler : MonoBehaviour, IDragHandler
 
             );
 
-            Vector2 clampedPosition = new(
-                Mathf.Clamp(pointInRectangle.x, _movementArea.rect.xMin + _rectTransform.rect.width / 2, _movementArea.rect.xMax - _rectTransform.rect.width / 2),
-                Mathf.Clamp(pointInRectangle.y, _movementArea.rect.yMin + _rectTransform.rect.height / 2, _movementArea.rect.yMax - _rectTransform.rect.height / 2)
+            Vector2 clampedCanvasPosition = new(
+                Mathf.Clamp(pointInRectangle.x, _movementArea.rect.xMin, _movementArea.rect.xMax),
+                Mathf.Clamp(pointInRectangle.y, _movementArea.rect.yMin, _movementArea.rect.yMax)
             );
-            _rectTransform.localPosition = clampedPosition;
+            _rectTransform.localPosition = clampedCanvasPosition;
 
-            Vector3 worldPosition = _draggableObject.DragObjectIn3DSpace(clampedPosition);
             UpdateSliderValues();
-            WorldPositionChanged?.Invoke(worldPosition);
+            if (_draggableWorldObject != null)
+            {
+                _draggableWorldObject.DragObjectIn3DSpace(clampedCanvasPosition);
+                WorldPositionChanged?.Invoke();
+            }
         }
     }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        SegmentObjectPositioned.Invoke();
+    }
+
 
     private void OnHorizontalPositionChanged(float value)
     {
         Vector2 newPosition = _rectTransform.anchoredPosition;
-        newPosition.x = value + (_movementArea.rect.width / 2); 
+        newPosition.x = value;
         _rectTransform.anchoredPosition = newPosition;
+        UpdateWorldObjectPosition(newPosition);
     }
 
     private void OnVerticalPositionChanged(float value)
     {
         Vector2 newPosition = _rectTransform.anchoredPosition;
-        newPosition.y = value + (_movementArea.rect.height / 2);
-        _rectTransform.anchoredPosition = newPosition;   
+        newPosition.y = value;
+        _rectTransform.anchoredPosition = newPosition;
+        UpdateWorldObjectPosition(newPosition);
     }
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
-    public void SetWorldObject(GameObject draggableObject)
+    public void SetupDraggableObjects(GameObject draggableSegmentObject)
     {
-        _objectInWorldSpace = draggableObject;
-        _draggableObject = _objectInWorldSpace.GetComponent<DraggableObject>();
+        _objectInWorldSpace = draggableSegmentObject;
+
+        if (_objectInWorldSpace == null)
+            return;
+
+        _draggableWorldObject = _objectInWorldSpace.GetComponent<DraggableObject>();
 
         CanvasCameraHandler canvasCameraHandler = FindObjectOfType<CanvasCameraHandler>();
         Vector3 screenPosition = canvasCameraHandler.WorldCoordinatesToScreenSpace(_objectInWorldSpace.transform.position);
-        Debug.Log($"Moved {this} to {screenPosition}");
-        _rectTransform.localPosition = screenPosition;
+        _rectTransform.anchoredPosition = screenPosition;
     }
 
     public void UpdateSliderValues()
     {
-        Vector2 currentPosition = _rectTransform.anchoredPosition;
+        _sliderhorizontalPosition.value = _rectTransform.anchoredPosition.x;
+        _sliderverticalPosition.value = _rectTransform.anchoredPosition.y;
+    }
 
-        _sliderhorizontalPosition.value = currentPosition.x - (_movementArea.rect.width / 2);
-        _sliderverticalPosition.value = currentPosition.y - (_movementArea.rect.height / 2);
+    private void UpdateWorldObjectPosition(Vector2 newPosition)
+    {
+        if (_draggableWorldObject != null)
+        {
+            _draggableWorldObject.DragObjectIn3DSpace(newPosition);
+            WorldPositionChanged?.Invoke();
+            SegmentObjectPositioned?.Invoke();
+        }
+    }
+
+    public Vector2 GetCurrentPosition()
+    {
+        return _rectTransform.anchoredPosition;
     }
 
 }

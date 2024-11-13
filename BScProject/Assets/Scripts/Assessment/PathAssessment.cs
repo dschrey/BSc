@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class PathAssessment 
 {
-    public PathData PathData { get; }
-    public Sprite SelectedPathSprite { get; set; }
+    public PathData PathData { get; private set; }
+    public Sprite SelectedPathSprite;
     public List<PathSegmentAssessment> PathSegmentAssessments { get; private set; }
 
     public PathAssessment(PathData correctPath)

@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -8,71 +8,82 @@ public class UISegmentObjectPosition : MonoBehaviour
 {
     [SerializeField] private GameObject _segmentObjectPositionOptionPrefab;
     [SerializeField] private Transform _segmentSelectionParent;
+    [SerializeField] private TMP_Text _textHorizontalPosition;
     [SerializeField] private Slider _sliderhorizontalPosition;
+    [SerializeField] private TMP_Text _textVerticalPosition;
     [SerializeField] private Slider _sliderverticalPosition;
     [SerializeField] private Button _confirmButton;
     [SerializeField] private GameObject _canvasEnvironment;
     [SerializeField] private CanvasCameraHandler _canvasCamera;
     [SerializeField] private LineController _lineRender;
+    [SerializeField] private UIDragHandler _draggableCanvasObject;
+    [SerializeField] private ToggleGroup _toggleGroup;
     public UnityEvent<int> SelectedSegmentChanged;
     private List<SegmentObjectPositionOption> _segmentObjects = new();
     private SegmentObjectPositionOption _selectedSegment;
-    public ToggleGroup ToggleGroup;
-    public Path _currentPath;
-    [SerializeField] private UIDragHandler _draggableCanvasObject;
+    private Path _currentPath;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
     void OnEnable()
     {
-        _currentPath = null;
-        _selectedSegment = null;
-        _lineRender.ResetLinePoints();
-
-        ToggleGroup = GetComponent<ToggleGroup>();
+        _canvasEnvironment.SetActive(true);
 
         SelectedSegmentChanged.AddListener(OnSelectedSegmentChanged);
-        _sliderhorizontalPosition.onValueChanged.AddListener(OnHorizontalPositionChanged);
-        _sliderverticalPosition.onValueChanged.AddListener(OnVerticalPositionChanged);
         _confirmButton.onClick.AddListener(OnConfirmButtonPressed);
-        _draggableCanvasObject.WorldPositionChanged.AddListener(OnSegmentObjectPositionChanged);
+        _draggableCanvasObject.WorldPositionChanged.AddListener(OnDraggableSegmentObjectPositionChanged);
+        _draggableCanvasObject.SegmentObjectPositioned.AddListener(OnDraggableSegmentObjectPositioned);
 
-        SetSliderSettings(_sliderhorizontalPosition, -ExperimentManager.Instance.ExperimentSettings.MovementArea.x * 50, ExperimentManager.Instance.ExperimentSettings.MovementArea.x *50, 0f);
-        SetSliderSettings(_sliderverticalPosition, -ExperimentManager.Instance.ExperimentSettings.MovementArea.y*50, ExperimentManager.Instance.ExperimentSettings.MovementArea.y*50, 0f);
+        SetSliderSettings(_sliderhorizontalPosition, 0, ExperimentManager.Instance.ExperimentSettings.MovementArea.x * 100, 0f);
+        SetSliderSettings(_sliderverticalPosition, 0, ExperimentManager.Instance.ExperimentSettings.MovementArea.y * 100, 0f);
 
-        for (int i = 0; i < AssessmentManager.Instance.PathAssessment.PathSegmentAssessments.Count; i++)
+        PrepareSegments();
+
+        if (_currentPath == null)
+        {
+            Debug.LogError($"UISegmentObjectPosition :: OnEnable() : _currentPath is null");
+            return;
+        }
+
+        foreach (PathSegmentAssessment pathAssessmentData in AssessmentManager.Instance.CurrentPathAssessment.PathSegmentAssessments)
         {
             SegmentObjectPositionOption segmentObjectPosition = Instantiate(_segmentObjectPositionOptionPrefab, _segmentSelectionParent).GetComponent<SegmentObjectPositionOption>();
-            segmentObjectPosition.InitializeSegment(i, _currentPath.Segments[i].PathSegmentData.ObjectPrefab, 
-                AssessmentManager.Instance.PathAssessment.PathSegmentAssessments[i].SelectedObjectiveObjectRenderTexture,
-                _currentPath.Segments[i].Objective.gameObject,  this);
-
+            segmentObjectPosition.Initialize(pathAssessmentData.GetSegmentID(), pathAssessmentData.GetSegmentData().SegmentColor,
+                _toggleGroup, ResourceManager.Instance.GetSegmentRenderTexture(pathAssessmentData.SelectedSegmentObjectID),
+                ResourceManager.Instance.GetSegmentObject(pathAssessmentData.GetSegmentData().SegmentObjectID),
+                _currentPath.Segments.Find(seg => seg.PathSegmentData.SegmentID == pathAssessmentData.GetSegmentID()).gameObject, this);
             _segmentObjects.Add(segmentObjectPosition);
         }
 
-        _canvasEnvironment.SetActive(true);
-
-        PrepareSegments();
-        SwapSegment(0, -1); // Start with first segment
+        _segmentObjects[0].Select();
     }
-
 
     private void OnDisable() 
     {
         SelectedSegmentChanged.RemoveListener(OnSelectedSegmentChanged);
-        _sliderhorizontalPosition.onValueChanged.RemoveListener(OnHorizontalPositionChanged);
-        _sliderverticalPosition.onValueChanged.RemoveListener(OnVerticalPositionChanged);
         _confirmButton.onClick.RemoveListener(OnConfirmButtonPressed);
-        _canvasEnvironment.SetActive(false);
+
+        _currentPath = null;
+        _draggableCanvasObject.SetupDraggableObjects(null);
+        _selectedSegment = null;
+        _lineRender.ResetLinePoints();
+
+        _segmentObjects.ForEach(s => s.CleanSegment());
         _segmentObjects.Clear();
+        
+        _canvasEnvironment.SetActive(false);
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
-    
+
     private void OnSelectedSegmentChanged(int segmentToggleID)
     {
-        _selectedSegment.SegmentCheckmark.gameObject.SetActive(_selectedSegment.ObjectPositioned);
-        SwapSegment(segmentToggleID, _selectedSegment.SegmentID);
+        int oldSegmentID = -1;
+        if (_selectedSegment != null)
+        {
+            oldSegmentID = _selectedSegment.SegmentID;
+        }
+        SwapSegment(segmentToggleID, oldSegmentID);
     }
 
     private void OnConfirmButtonPressed()
@@ -86,28 +97,19 @@ public class UISegmentObjectPosition : MonoBehaviour
         AssessmentManager.Instance.ProceedToNextAssessmentStep();
     }
 
-    private void OnHorizontalPositionChanged(float value)
+    private void OnDraggableSegmentObjectPositionChanged()
     {
-        if (_selectedSegment == null)
-            return;
-        _selectedSegment.HorizontalPosition = value;
+        _selectedSegment.CalculateDistanceToRealObject(_currentPath.Segments.Find(s => s.PathSegmentData.SegmentID == _selectedSegment.SegmentID).SegmentObject);
+        _selectedSegment.CalculateDistanceToObjective();
+        _textHorizontalPosition.text = _selectedSegment.GetHorizontalValue().ToString("F2") + "m";
+        _textVerticalPosition.text =  _selectedSegment.GetVerticalValue().ToString("F2") + "m";
     }
 
-    private void OnVerticalPositionChanged(float value)
+    private void OnDraggableSegmentObjectPositioned()
     {
-        if (_selectedSegment == null)
-            return;
-        _selectedSegment.VerticalPosition = value;
-    }
-
-    private void OnSegmentObjectPositionChanged(Vector3 arg0)
-    {
-        _selectedSegment.CalculateDistance();
-        AssessmentManager.Instance.SetPathSegmentObjectDistance(_selectedSegment.SegmentID, _selectedSegment.DistanceValue);
-        _selectedSegment.HorizontalPosition = _sliderhorizontalPosition.value;
-        _selectedSegment.VerticalPosition = _sliderverticalPosition.value;
-
-        // Check if all segments objects are positioned
+        _selectedSegment.CanvasObjectPosition = _draggableCanvasObject.GetCurrentPosition();
+        AssessmentManager.Instance.SetPathSegmentObjectDistance(_selectedSegment.SegmentID, _selectedSegment.DistanceToObjective, _selectedSegment.DistanceToRealObject);
+   
         foreach (SegmentObjectPositionOption segmentObjectPosition in _segmentObjects)
         {
             if (!segmentObjectPosition.ObjectPositioned)
@@ -132,7 +134,6 @@ public class UISegmentObjectPosition : MonoBehaviour
 
     private void PrepareSegments()
     {
-        _currentPath = null;
         _currentPath = PathManager.Instance.CurrentPath;
 
         foreach (PathSegment pathSegment in _currentPath.Segments)
@@ -141,44 +142,34 @@ public class UISegmentObjectPosition : MonoBehaviour
         }
     }
 
-    private void SwapSegment(int newSegmentID, int oldSegmentID = -1)
+    private void SwapSegment(int newSegmentID, int oldSegmentID)
     {
-        if (oldSegmentID != -1)
+        Debug.Log($"SwapSegment() :: Switching segments: {oldSegmentID} -> {newSegmentID}.");
+        for (int i = 0; i < _segmentObjects.Count; i++)
         {
-            _selectedSegment.DisableSegmentObject();
+            if (oldSegmentID != -1 && oldSegmentID == _segmentObjects[i].SegmentID)
+            {
+                _selectedSegment.DisableDraggableSegmentObject();
+                _currentPath.Segments[i].gameObject.SetActive(false);
+            }
+            if (newSegmentID == _segmentObjects[i].SegmentID)
+            {
+                _currentPath.Segments[i].gameObject.SetActive(true);
+            }
         }
-
+    
         _selectedSegment = _segmentObjects[newSegmentID];
-        foreach (PathSegment pathSegment in _currentPath.Segments)
-        {
-            if (oldSegmentID != -1 && oldSegmentID == pathSegment.PathSegmentData.SegmentID)
-            {
-                pathSegment.SegmentObject.SetActive(true);
-                pathSegment.gameObject.SetActive(false);
-            }
-            if (newSegmentID == pathSegment.PathSegmentData.SegmentID)
-            {
-                pathSegment.gameObject.SetActive(true);
-                pathSegment.SegmentObject.SetActive(false);
+        _selectedSegment.EnableDraggableSegmentObject(_canvasEnvironment.transform);
+        _draggableCanvasObject.SetupDraggableObjects(_selectedSegment.DraggableSegmentObject);
+        _draggableCanvasObject.UpdateSliderValues();
+        _textHorizontalPosition.text = _selectedSegment.GetHorizontalValue().ToString("F2") + "m";
+        _textVerticalPosition.text =  _selectedSegment.GetVerticalValue().ToString("F2") + "m";
 
-            }
-        }
-
-        _selectedSegment.SpawnSegmentObject(_canvasEnvironment.transform);
-        _draggableCanvasObject.SetWorldObject(_selectedSegment.SegmentObject);
         List<Transform> lineTransforms = new()
         {
             _selectedSegment.SegmentObjective.transform,
-            _selectedSegment.SegmentObject.transform
+            _selectedSegment.DraggableSegmentObject.transform
         };
         _lineRender.SetLinePoints(lineTransforms);
-        _sliderhorizontalPosition.value = _selectedSegment.HorizontalPosition;
-        _sliderverticalPosition.value = _selectedSegment.VerticalPosition;
-
-
-        
-        _draggableCanvasObject.SetWorldObject(_selectedSegment.SegmentObject);
     }
-
-
 }

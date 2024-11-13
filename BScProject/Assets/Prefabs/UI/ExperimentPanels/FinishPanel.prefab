@@ -9,13 +9,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4250786035535446739}
+  - component: {fileID: 8323617926862744648}
   - component: {fileID: 5818788445823083282}
   - component: {fileID: 852766272444086868}
   - component: {fileID: 5372783758152608300}
   - component: {fileID: 4128847938556539956}
   - component: {fileID: 2363296710946143785}
   - component: {fileID: 554107847129036656}
-  - component: {fileID: 8323617926862744648}
   m_Layer: 5
   m_Name: FinishPanel
   m_TagString: Untagged
@@ -47,6 +47,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 2.54}
   m_SizeDelta: {x: 350, y: 448}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &8323617926862744648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 69921354099641734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3b8f1d9a00ab274f9a7c7383c5064dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _buttonRestart: {fileID: 7994908718012834617}
+  _panelManager: {fileID: 0}
 --- !u!223 &5818788445823083282
 Canvas:
   m_ObjectHideFlags: 0
@@ -167,20 +181,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 4
---- !u!114 &8323617926862744648
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 69921354099641734}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3b8f1d9a00ab274f9a7c7383c5064dc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _buttonRestart: {fileID: 7994908718012834617}
-  _panelManager: {fileID: 0}
 --- !u!1 &1905343470292010377
 GameObject:
   m_ObjectHideFlags: 0

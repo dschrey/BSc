@@ -16,10 +16,12 @@ public class UIPathSelectionHandler : MonoBehaviour
         _confirmButton.onClick.AddListener(OnPathSelectionConfirmed);
         _confirmButton.interactable = false;
 
-        foreach (Sprite spite in AssessmentManager.Instance.CurrentPath.PathImageSelection)
+        List<Sprite> images = Utils.Shuffle(AssessmentManager.Instance.CurrentPath.PathImageSelection);
+
+        foreach (Sprite sprite in images)
         {
             PathSelectionOption pathOption = Instantiate(_pathSelectionPrefab, _selectionParent.transform).GetComponent<PathSelectionOption>();
-            pathOption.Initialize(spite, _selectionParent.GetComponent<ToggleGroup>());
+            pathOption.Initialize(sprite, _selectionParent.GetComponent<ToggleGroup>());
             pathOption.PathSelectionChanged.AddListener(OnSelectedPathChanged);
             _pathOptions.Add(pathOption);
         }
@@ -33,6 +35,7 @@ public class UIPathSelectionHandler : MonoBehaviour
         foreach (PathSelectionOption pathOption in _pathOptions)
         {
             pathOption.PathSelectionChanged.RemoveListener(OnSelectedPathChanged);
+            Destroy(pathOption.gameObject);
         }
         _pathOptions.Clear();
     }
@@ -57,4 +60,5 @@ public class UIPathSelectionHandler : MonoBehaviour
         AssessmentManager.Instance.ProceedToNextAssessmentStep();
     }
 
+    // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 }

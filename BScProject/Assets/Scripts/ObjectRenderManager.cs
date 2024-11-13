@@ -3,36 +3,28 @@ using UnityEngine;
 
 public class ObjectRenderManager : MonoBehaviour
 {
-    public List<GameObject> ActiveObjectRenderings;
+    [SerializeField] private HashSet<GameObject> _activeObjectRenderings = new();
     [SerializeField] private GameObject _objectRendererPrefab;
 
-    // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
-
-    void Start()
-    {
-        ActiveObjectRenderings = new List<GameObject>();
-    }
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
-    public RenderTexture CreateNewRenderTexture(PathSegmentData segmentData, bool isObjectiveObject = false)
+    public RenderTexture CreateNewRenderTexture(GameObject objectPrefab)
     {
         RenderTexture renderTexture = new(256, 256, 24);
         
-        // Transform objectParent = isObjectiveObject ? _objectiveObjectParent : _segmentObjectParent;
         Vector3 position = new(0, 0, 0)
         {
-            x = ActiveObjectRenderings.Count
+            x = _activeObjectRenderings.Count
         };
 
         GameObject objectRender = Instantiate(_objectRendererPrefab, transform);
         objectRender.transform.localPosition = position;
-        SetLayerRecursively(objectRender, LayerMask.NameToLayer("ObjectRendering"));
-        ActiveObjectRenderings.Add(objectRender);
+        Utils.SetLayerRecursively(objectRender, LayerMask.NameToLayer("ObjectRendering"));
+        _activeObjectRenderings.Add(objectRender);
     
         if (objectRender.TryGetComponent<ObjectRenderer>(out var objectRenderer))
         {
-            GameObject objectPrefab = isObjectiveObject ? segmentData.ObjectiveObjectPrefab : segmentData.ObjectPrefab;
             objectRenderer.Initialize(objectPrefab, renderTexture);
         }
         else
@@ -43,22 +35,13 @@ public class ObjectRenderManager : MonoBehaviour
         return renderTexture;
     }
 
-    public void ClearRenderTextures()
+    public void ClearRenderObjects()
     {
-        foreach (GameObject renderObject in ActiveObjectRenderings)
+        foreach (GameObject renderObject in _activeObjectRenderings)
         {
             Destroy(renderObject);
         }
-        ActiveObjectRenderings.Clear();
+        _activeObjectRenderings.Clear();
     }
-
-    private void SetLayerRecursively(GameObject obj, int layerIndex)
-    {
-        obj.layer = layerIndex;
-        foreach (Transform child in obj.transform)
-        {
-            SetLayerRecursively(child.gameObject, layerIndex);
-        }
-    }   
 
 }

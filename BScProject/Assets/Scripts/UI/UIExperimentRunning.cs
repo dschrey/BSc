@@ -7,7 +7,7 @@ public class UIExperimentRunning : MonoBehaviour
     [SerializeField] private Button _buttonShowHint;
     [SerializeField] private Button _buttonRestartSegment;
     [SerializeField] private Button _buttonStopExperiment;
-
+    [SerializeField] private UIExperimentPanelManager _panelManager;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
@@ -39,6 +39,5 @@ public class UIExperimentRunning : MonoBehaviour
     }
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
-
 
 }

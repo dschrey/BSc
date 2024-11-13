@@ -1264,13 +1264,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7680006236052805357}
+  - component: {fileID: 8258497034749391697}
   - component: {fileID: 1489239795198458610}
   - component: {fileID: 7350948413472108616}
   - component: {fileID: 5903237162444986441}
   - component: {fileID: 6058849644517149404}
   - component: {fileID: 4412475182244015218}
   - component: {fileID: 3987680749874122271}
-  - component: {fileID: 8258497034749391697}
   m_Layer: 5
   m_Name: SetupPanel
   m_TagString: Untagged
@@ -1285,7 +1285,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7073351350169141463}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.009999997, y: 0.010000001, z: 0.009999997}
   m_ConstrainProportionsScale: 0
@@ -1298,12 +1298,30 @@ RectTransform:
   - {fileID: 2471405969318563909}
   - {fileID: 4988381252828008188}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 160, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 2.54}
   m_SizeDelta: {x: 350, y: 448}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &8258497034749391697
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7073351350169141463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 591b3e72ad9315348ad7e5050a8d2cc6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _buttonSetSpawn: {fileID: 1751139746675628749}
+  _buttonStart: {fileID: 2811247112493822855}
+  _sliderMovementSpeed: {fileID: 9210684815799411469}
+  _textMovementSpeed: {fileID: 9210684815853903427}
+  _startPointHandler: {fileID: 0}
+  _panelManager: {fileID: 0}
 --- !u!223 &1489239795198458610
 Canvas:
   m_ObjectHideFlags: 0
@@ -1424,23 +1442,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 2
---- !u!114 &8258497034749391697
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7073351350169141463}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 591b3e72ad9315348ad7e5050a8d2cc6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _buttonSetSpawn: {fileID: 1751139746675628749}
-  _buttonStart: {fileID: 2811247112493822855}
-  _sliderMovementSpeed: {fileID: 9210684815799411469}
-  _textMovementSpeed: {fileID: 9210684815853903427}
-  _experimentStartPoint: {fileID: 0}
 --- !u!1 &7416988120730934743
 GameObject:
   m_ObjectHideFlags: 0
@@ -2006,6 +2007,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: MovementSpeed Slider
       objectReference: {fileID: 0}
+    - target: {fileID: 2179057468902719980, guid: 41d89b59fe3e9964a83686ff24b7d0c5, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2179057469866936249, guid: 41d89b59fe3e9964a83686ff24b7d0c5, type: 3}
       propertyPath: m_text
       value: Movement Speed
@@ -2092,23 +2097,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7081840893004531709, guid: 41d89b59fe3e9964a83686ff24b7d0c5, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 7081840893004531709, guid: 41d89b59fe3e9964a83686ff24b7d0c5, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7081840893004531709, guid: 41d89b59fe3e9964a83686ff24b7d0c5, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 7081840893373687796, guid: 41d89b59fe3e9964a83686ff24b7d0c5, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 7081840893373687796, guid: 41d89b59fe3e9964a83686ff24b7d0c5, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7081840893373687797, guid: 41d89b59fe3e9964a83686ff24b7d0c5, type: 3}
       propertyPath: m_IsActive

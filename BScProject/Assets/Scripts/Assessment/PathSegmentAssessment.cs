@@ -7,9 +7,10 @@ public class PathSegmentAssessment
 {
     private PathSegmentData _pathSegment;
     public float SelectedDistanceToPreviousSegment;
-    public RenderTexture SelectedObjectiveObjectRenderTexture;
+    public int SelectedObjectiveObjectID;
     public float SelectedDistanceOfObjectToObjective;
-    public RenderTexture SelectedSegmentObjectRenderTexture;
+    public float SelectedDistanceOfObjectToRealObject;
+    public int SelectedSegmentObjectID;
 
     public PathSegmentAssessment(PathSegmentData pathSegment)
     {
@@ -21,29 +22,14 @@ public class PathSegmentAssessment
         return _pathSegment;
     }
 
-    public float GetDistanceToPreviousSegment(Vector3 previousSegmentPosition, Vector3 nextSegmentPosition)
+    public bool AssessSegmentObject()
     {
-        return Vector3.Distance(previousSegmentPosition, nextSegmentPosition);
+        return SelectedSegmentObjectID == _pathSegment.SegmentObjectID;
     }
 
-    public bool EvaluateSegmentObjectAssignment()
+    public bool AssessObjectiveObject()
     {
-        // foreach (KeyValuePair<PathSegmentData, ObjectRenderer> entry in ObjectRenderManager.Instance.ActiveRenderTextures)
-        // {
-        //     if (entry.Key.SegmentID != _pathSegment.SegmentID)
-        //         continue;
-
-        //     if (entry.Value.GetRenderTexture() == _pathSegment.SegmentObjectRenderTexture)
-        //     {
-        //         return true;
-        //     }
-        // }
-        return SelectedObjectiveObjectRenderTexture == _pathSegment.SegmentObjectRenderTexture;
-    }
-
-    public bool EvaluateObjectiveObjectAssignment()
-    {
-        return SelectedObjectiveObjectRenderTexture == _pathSegment.SegmentObjectRenderTexture;
+        return SelectedObjectiveObjectID == _pathSegment.ObjectiveObjectID;
     }
     
     public bool EvaluateSegmnetDistanceAssignment()

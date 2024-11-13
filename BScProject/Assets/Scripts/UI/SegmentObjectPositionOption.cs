@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,19 +8,18 @@ public class SegmentObjectPositionOption : MonoBehaviour
     [SerializeField] private RawImage _segmentObjectImage;
     [SerializeField] private Toggle _segmentToggle;
     [SerializeField] private TMP_Text _distanceText;
-    public int SegmentID;
+    [SerializeField] private Image _segmentLabelImage;
+    [SerializeField] private TMP_Text _segmentLabelText;
+    public int SegmentID { get; private set; }
     public Image SegmentCheckmark;
-    public bool ObjectPositioned => DistanceValue != 0f;
-    public float VerticalPosition = 0F;
-    public float HorizontalPosition = 0F;
-    public float DistanceValue = 0F;
-    public Vector3 CanvasInteractablePosition;
-    public Vector3 WorldObjectPosition;
-    public GameObject SegmentObject { get; private set; }
+    public bool ObjectPositioned => DistanceToObjective != 0f;
+    public float DistanceToObjective = 0f;
+    public float DistanceToRealObject = 0f;
+    public Vector2 CanvasObjectPosition;
+    public GameObject DraggableSegmentObject { get; private set; }
     public GameObject SegmentObjective { get; private set; }
     private GameObject _segmentObjectPrefab;
     private UISegmentObjectPosition _parentObject;
-
     private bool _isSelected = false;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
@@ -30,18 +30,13 @@ public class SegmentObjectPositionOption : MonoBehaviour
         SegmentObjective = null;
     }
 
-    // private void Update() 
-    // {
-    //     if (_isSelected)
-    //     {
-    //         _distanceText.text = Distance.ToString("F2") + "m";
-    //     }
-    // }
-
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
 
     private void OnSegmentSelected(bool state)
     {
+        if (_parentObject == null)
+            return;
+
         if (state)
         {
             _parentObject.SelectedSegmentChanged.Invoke(SegmentID);
@@ -51,48 +46,94 @@ public class SegmentObjectPositionOption : MonoBehaviour
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
-    public void InitializeSegment(int segmentID, GameObject segmentObjectPrefab, RenderTexture objectRenderTexture, GameObject segmentObjective, UISegmentObjectPosition parent)
+    public void Initialize(int segmentID, Color segmentColor, ToggleGroup toggleGroup, RenderTexture objectRenderTexture, 
+        GameObject segmentObjectPrefab, GameObject segmentObjective, UISegmentObjectPosition parent)
     {
         SegmentID = segmentID;
-        if (segmentID == 0)
+        _segmentLabelImage.color = segmentColor;
+        if (_segmentLabelText != null)
         {
-            _segmentToggle.isOn = true;
+            _segmentLabelText.color = segmentColor;
+            _segmentLabelText.text = (segmentID + 1).ToString();
+        }
+        if (toggleGroup == null)
+        {
+            Debug.LogError($"Toggle group parameter was not properly assigned.");
+            return;
+        }
+        _segmentToggle.group = toggleGroup;
+        if (_segmentToggle.group == null)
+        {
+            Debug.LogError($"Toggle group was not properly assigned.");
+            return;
         }
         _segmentObjectPrefab = segmentObjectPrefab;
         SegmentObjective = segmentObjective;
         _segmentObjectImage.texture = objectRenderTexture;
         _parentObject = parent;
-        _segmentToggle.group = parent.ToggleGroup;
     }
 
-    public void CalculateDistance()
+    public void CalculateDistanceToObjective()
     {
-        Vector3 objectPos = SegmentObject.transform.position;
+        Vector3 objectPos = DraggableSegmentObject.transform.position;
         objectPos.y = 0f; 
         Vector3 objectivePos = SegmentObjective.transform.position;
         objectivePos.y = 0f; 
-        DistanceValue = Vector3.Distance(objectPos, objectivePos);
-        _distanceText.text = DistanceValue.ToString("F2") + "m";
+        DistanceToObjective = Vector3.Distance(objectPos, objectivePos);
+        _distanceText.text = DistanceToObjective.ToString("F2") + "m";
     }
 
-
-    public void SpawnSegmentObject(Transform parent)
+    public void CalculateDistanceToRealObject(GameObject realObject)
     {
-        if (SegmentObject == null)
+        Vector3 objectPos = DraggableSegmentObject.transform.position;
+        objectPos.y = 0f; 
+        Vector3 realPos = realObject.transform.position;
+        realPos.y = 0f; 
+        DistanceToRealObject = Vector3.Distance(objectPos, realPos);
+    }
+
+    public void EnableDraggableSegmentObject(Transform parent)
+    {
+        if (DraggableSegmentObject == null)
         {
-            SegmentObject = Instantiate(_segmentObjectPrefab, SegmentObjective.transform.position, Quaternion.identity, parent);
+            DraggableSegmentObject = Instantiate(_segmentObjectPrefab, SegmentObjective.transform.position, Quaternion.identity, parent);
+            DraggableSegmentObject.AddComponent<DraggableObject>();
+            CanvasCameraHandler canvasCamera = FindObjectOfType<CanvasCameraHandler>();
+            CanvasObjectPosition = canvasCamera.WorldCoordinatesToScreenSpace(DraggableSegmentObject.transform.position);
         }
         else
         {
-            SegmentObject.SetActive(true);
+            DraggableSegmentObject.SetActive(true);
         }
     }
 
-    internal void DisableSegmentObject()
+    public void DisableDraggableSegmentObject()
     {
-        if (SegmentObject != null)
+        if (DraggableSegmentObject != null)
         {
-            SegmentObject.SetActive(false);
+            DraggableSegmentObject.SetActive(false);
         }
+    }
+
+    public void Select()
+    {
+        _segmentToggle.isOn = true;
+    }
+
+    public float GetHorizontalValue()
+    {
+        return Math.Abs(SegmentObjective.transform.position.z - DraggableSegmentObject.transform.position.z);     
+    }
+
+    public float GetVerticalValue()
+    {
+        return Math.Abs(SegmentObjective.transform.position.x - DraggableSegmentObject.transform.position.x);     
+    }
+
+    public void CleanSegment()
+    {
+        Debug.Log($"CleanSegment :: Destroying drag object and segment {SegmentID}");
+        Destroy(DraggableSegmentObject);
+        Destroy(this);
     }
 }
