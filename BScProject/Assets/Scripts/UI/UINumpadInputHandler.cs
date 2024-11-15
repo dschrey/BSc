@@ -1,8 +1,10 @@
+using System;
 using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+[Obsolete("Class is deprecated and will be removed in the future.", true)]
 public class UINumpadInputHandler : MonoBehaviour
 {    
     public delegate void OnInputChanged(string newInput);

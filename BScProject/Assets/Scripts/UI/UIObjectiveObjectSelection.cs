@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class PathSegmentObjectData
 {
     public PathSegmentData PathSegmentData;
-    public int selectedObjectID = -1;
+    public int SelectedObjectID = -1;
 
     public PathSegmentObjectData(PathSegmentData data)
     {
@@ -30,10 +30,10 @@ public class UIObjectiveObjectSelection : MonoBehaviour
     [SerializeField] private Transform _objectDisplaySpawnpoint;
     [SerializeField] private ToggleGroup _toggleGroup;
     private readonly List<GridObjectSelection> _selectionObjects = new();
-    private readonly List<UISegmentIndicator> _segmentIndicator = new();
-    private readonly List<PathSegmentObjectData> _segmentsToAssign = new();
+    private readonly List<UISegmentIndicator> _segmentIndicators = new();
+    private readonly List<PathSegmentObjectData> _segmentObjectData = new();
     private PathSegmentObjectData _currentSegment;
-    private int _selectedSegment;
+    private int _selectedSegmentID;
     private GameObject _displayObject;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
@@ -46,13 +46,13 @@ public class UIObjectiveObjectSelection : MonoBehaviour
 
         _objectDisplay.SetActive(true);
         _confirmButton.interactable = false;
-        _selectedSegment = 0;
+        _selectedSegmentID = 0;
 
         AssessmentManager.Instance.CurrentPath.SegmentsData.ForEach(s =>
         {
-            _segmentsToAssign.Add(new PathSegmentObjectData(s));
+            _segmentObjectData.Add(new PathSegmentObjectData(s));
             UISegmentIndicator segmentIndicator = Instantiate(_segmentIndicatorPrefab, _segmentIndicatorParent).GetComponent<UISegmentIndicator>();
-            _segmentIndicator.Add(segmentIndicator);
+            _segmentIndicators.Add(segmentIndicator);
         });
 
         UpdateSelectedSegment();
@@ -92,21 +92,21 @@ public class UIObjectiveObjectSelection : MonoBehaviour
 
     private void OnNextButtonClick()
     {
-        _segmentIndicator[_selectedSegment].Toggle(false);
-        _selectedSegment = (_selectedSegment + 1) % _segmentsToAssign.Count;
+        _segmentIndicators[_selectedSegmentID].Toggle(false);
+        _selectedSegmentID = (_selectedSegmentID + 1) % _segmentObjectData.Count;
         UpdateSelectedSegment();
     }
 
     private void OnPreviousButtonClick()
     {
-        _segmentIndicator[_selectedSegment].Toggle(false);
-        _selectedSegment = (_selectedSegment - 1 + _segmentsToAssign.Count) % _segmentsToAssign.Count;
+        _segmentIndicators[_selectedSegmentID].Toggle(false);
+        _selectedSegmentID = (_selectedSegmentID - 1 + _segmentObjectData.Count) % _segmentObjectData.Count;
         UpdateSelectedSegment();
     }
 
     private void OnDisplayObjectChanged(int objectID)
     {
-        if (_currentSegment.selectedObjectID != -1)
+        if (_currentSegment.SelectedObjectID != -1)
             return; 
         UpdateDisplayObject(ResourceManager.Instance.GetObjectiveObject(objectID));
     }
@@ -118,21 +118,21 @@ public class UIObjectiveObjectSelection : MonoBehaviour
 
     private void OnObjectiveObjectChanged(int objectID)
     {
-        _currentSegment.selectedObjectID = objectID;
+        _currentSegment.SelectedObjectID = objectID;
         if (objectID == -1)
         {
-            _segmentIndicator[_selectedSegment].SetState(false);
+            _segmentIndicators[_selectedSegmentID].SetState(false);
             _confirmButton.interactable = false;
             return; 
         }
         
-        _segmentIndicator[_selectedSegment].SetState(true);
+        _segmentIndicators[_selectedSegmentID].SetState(true);
         AssessmentManager.Instance.AssignPathSegmentObjectiveObject(_currentSegment.PathSegmentData.SegmentID, objectID);
         UpdateDisplayObject(ResourceManager.Instance.GetObjectiveObject(objectID));
         
-        foreach (PathSegmentObjectData segment in _segmentsToAssign)
+        foreach (PathSegmentObjectData segment in _segmentObjectData)
         {
-            if (segment.selectedObjectID == -1)
+            if (segment.SelectedObjectID == -1)
                 return;
         }
 
@@ -143,16 +143,16 @@ public class UIObjectiveObjectSelection : MonoBehaviour
 
     private void UpdateSelectedSegment()
     {
-        GridObjectSelection currentGridSelection = _selectionObjects.Find(g => g.ObjectTextureID == _currentSegment.selectedObjectID);
+        GridObjectSelection currentGridSelection = _selectionObjects.Find(g => g.ObjectTextureID == _currentSegment.SelectedObjectID);
         if (currentGridSelection != null)
         {
             currentGridSelection.IsSegmentSwap = true;
         }
 
-        _currentSegment = _segmentsToAssign[_selectedSegment];
+        _currentSegment = _segmentObjectData[_selectedSegmentID];
         _textSelectedSegment.color = _currentSegment.PathSegmentData.SegmentColor;
-        _textSelectedSegment.text = (_selectedSegment + 1).ToString();
-        _segmentIndicator[_selectedSegment].Toggle(true);
+        _textSelectedSegment.text = (_selectedSegmentID + 1).ToString();
+        _segmentIndicators[_selectedSegmentID].Toggle(true);
 
         Toggle toggle = _toggleGroup.ActiveToggles().FirstOrDefault();
         if (toggle != null)
@@ -160,14 +160,14 @@ public class UIObjectiveObjectSelection : MonoBehaviour
             toggle.isOn = false;
         }
 
-        GridObjectSelection gridObjectSelection = _selectionObjects.Find(o => o.ObjectTextureID == _currentSegment.selectedObjectID);
+        GridObjectSelection gridObjectSelection = _selectionObjects.Find(o => o.ObjectTextureID == _currentSegment.SelectedObjectID);
         if (gridObjectSelection == null)
         {
             UpdateDisplayObject(null);
         }
         else
         { 
-            UpdateDisplayObject(ResourceManager.Instance.GetObjectiveObject(_currentSegment.selectedObjectID));
+            UpdateDisplayObject(ResourceManager.Instance.GetObjectiveObject(_currentSegment.SelectedObjectID));
             gridObjectSelection.Select();
         }
     }

@@ -191,8 +191,10 @@ public class AssessmentManager : MonoBehaviour
 
         SegmentAssessmentData segmentAssessmentData = Assessment.GetPath(CurrentPath.PathID).GetSegment(segmentID);
         segmentAssessmentData.SelectedDistanceToPreviousSegment = distanceValue;
-        segmentAssessmentData.SegmentDistanceDifference = Math.Abs(segmentAssessmentData.CalculatedDistanceToPreviousSegment - distanceValue);
         segmentAssessmentData.CalculatedDistanceToPreviousSegment = CurrentPath.GetSegmentData(segmentID).DistanceToPreviousSegment;
+        segmentAssessmentData.SegmentDistanceDifference = Math.Abs(segmentAssessmentData.CalculatedDistanceToPreviousSegment - distanceValue);
+
+        Debug.Log($"Entered distance for segment {segmentID} : {distanceValue} \n\tActual distance: {segmentAssessmentData.CalculatedDistanceToPreviousSegment} \n\tDifference: {segmentAssessmentData.SegmentDistanceDifference}");
     }
 
     /// <summary>

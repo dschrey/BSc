@@ -1,8 +1,10 @@
 
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+[Obsolete("Class is deprecated and will be removed in the future.", true)]
 [RequireComponent(typeof(Toggle))]
 public class PathSegmentOption : MonoBehaviour
 {
@@ -52,7 +54,7 @@ public class PathSegmentOption : MonoBehaviour
             Debug.LogError($"PathSegmentOption :: OnToggleStateChanged() : Could not find parent panel of {this}");
             return;
         }
-        _parentPanel.SelectedSegmentChanged?.Invoke(this);
+        // _parentPanel.SelectedSegmentChanged?.Invoke(this);
     }
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------

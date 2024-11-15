@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4676428885510073253, guid: bddc0ff5856647b4cbe2361bd79a9aeb, type: 3}
       propertyPath: m_Name
-      value: TestObstacle Variant
+      value: Segment2
       objectReference: {fileID: 0}
     - target: {fileID: 6627014281709290530, guid: bddc0ff5856647b4cbe2361bd79a9aeb, type: 3}
       propertyPath: m_LocalPosition.x
@@ -22,7 +22,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6627014281709290530, guid: bddc0ff5856647b4cbe2361bd79a9aeb, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -4.39
+      value: -0.66
       objectReference: {fileID: 0}
     - target: {fileID: 6627014281709290530, guid: bddc0ff5856647b4cbe2361bd79a9aeb, type: 3}
       propertyPath: m_LocalRotation.w

@@ -25,7 +25,7 @@ public class UISegmentObjectPosition : MonoBehaviour
     [SerializeField] private Button _buttonNext;
     [SerializeField] private TMP_Text _textSelectedSegment;
     [SerializeField] private Button _confirmButton;
-    private readonly List<UISegmentIndicator> _segmentIndicator = new();
+    private readonly List<UISegmentIndicator> _segmentIndicators = new();
 
     [Header("Object Positioning")]
     [SerializeField] private TMP_Text _textDistanceValue;
@@ -50,7 +50,7 @@ public class UISegmentObjectPosition : MonoBehaviour
     [SerializeField] private Button _buttonRightLarge;
     [SerializeField] private Button _buttonRightSmall;
     [SerializeField] private Button _buttonReset;
-    private readonly List<SegmentObjectPositionData> _segmentpositionData = new();
+    private readonly List<SegmentObjectPositionData> _segmentPositionData = new();
     public SegmentObjectPositionData _currentSegment;
     private int _selectedSegmentID;
     private Path _currentPath;
@@ -110,9 +110,9 @@ public class UISegmentObjectPosition : MonoBehaviour
 
         AssessmentManager.Instance.CurrentPath.SegmentsData.ForEach(s =>
         {
-            _segmentpositionData.Add(new SegmentObjectPositionData(s));
+            _segmentPositionData.Add(new SegmentObjectPositionData(s));
             UISegmentIndicator segmentIndicator = Instantiate(_segmentIndicatorPrefab, _segmentIndicatorParent).GetComponent<UISegmentIndicator>();
-            _segmentIndicator.Add(segmentIndicator);
+            _segmentIndicators.Add(segmentIndicator);
         });
         
         _selectedPathImage.sprite = AssessmentManager.Instance.CurrentPathAssessment.SelectedPathSprite;
@@ -145,7 +145,7 @@ public class UISegmentObjectPosition : MonoBehaviour
         _currentSegment = null;
         _lineRender.ResetLinePoints();
 
-        _segmentpositionData.Clear();
+        _segmentPositionData.Clear();
         
         _canvasEnvironment.SetActive(false);
     }
@@ -153,15 +153,15 @@ public class UISegmentObjectPosition : MonoBehaviour
 
     private void OnNextButtonClick()
     {
-        _segmentIndicator[_selectedSegmentID].Toggle(false);
-        int newSegment = (_selectedSegmentID + 1) % _segmentpositionData.Count;
+        _segmentIndicators[_selectedSegmentID].Toggle(false);
+        int newSegment = (_selectedSegmentID + 1) % _segmentPositionData.Count;
         SwapSegment(newSegment);
     }
 
     private void OnPreviousButtonClick()
     {
-        _segmentIndicator[_selectedSegmentID].Toggle(false);
-        int newSegment = (_selectedSegmentID - 1 + _segmentpositionData.Count) % _segmentpositionData.Count;
+        _segmentIndicators[_selectedSegmentID].Toggle(false);
+        int newSegment = (_selectedSegmentID - 1 + _segmentPositionData.Count) % _segmentPositionData.Count;
         SwapSegment(newSegment);
     }
 
@@ -193,12 +193,12 @@ public class UISegmentObjectPosition : MonoBehaviour
 
     private void OnDraggableSegmentObjectPositioned()
     {
-        _segmentIndicator[_selectedSegmentID].SetState(true);
+        _segmentIndicators[_selectedSegmentID].SetState(true);
         _currentSegment.WorldObjectPosition = _draggableObject.transform.position;
         _currentSegment.CanvasObjectPosition = _draggableCanvasObject.GetCurrentPosition();
         AssessmentManager.Instance.SetPathSegmentObjectDistance(_currentSegment.PathSegmentData.SegmentID, _currentSegment.DistanceToObjective, _currentSegment.DistanceToRealObject);
    
-        foreach (SegmentObjectPositionData segmentObjectPosition in _segmentpositionData)
+        foreach (SegmentObjectPositionData segmentObjectPosition in _segmentPositionData)
         {
             if (!segmentObjectPosition.ObjectPositioned)
                 return;
@@ -216,7 +216,7 @@ public class UISegmentObjectPosition : MonoBehaviour
         _currentSegment.DistanceToObjective = 0;
         _currentSegment.DistanceToRealObject = -1;
         _draggableCanvasObject.UpdateSliderValues();
-        _segmentIndicator[_selectedSegmentID].SetState(false);
+        _segmentIndicators[_selectedSegmentID].SetState(false);
     }
 
     private void OnRightSmallButtonClicked()
@@ -294,14 +294,14 @@ public class UISegmentObjectPosition : MonoBehaviour
         }
 
         _selectedSegmentID = newSegmentID;
-        _segmentpositionData.Find(data => data.PathSegmentData.SegmentID == _selectedSegmentID);
+        _segmentPositionData.Find(data => data.PathSegmentData.SegmentID == _selectedSegmentID);
         _currentPath.GetPathSegment(_selectedSegmentID).gameObject.SetActive(true);
 
-        _currentSegment = _segmentpositionData[_selectedSegmentID];
+        _currentSegment = _segmentPositionData[_selectedSegmentID];
                 
         _textSelectedSegment.color = _currentSegment.PathSegmentData.SegmentColor;
         _textSelectedSegment.text = (_selectedSegmentID + 1).ToString();
-        _segmentIndicator[_selectedSegmentID].Toggle(true);
+        _segmentIndicators[_selectedSegmentID].Toggle(true);
 
         _textDistanceValue.text = _currentSegment.DistanceToObjective.ToString("F2", CultureInfo.InvariantCulture) + "m";
         _textDistanceValueBig.text = _currentSegment.DistanceToObjective.ToString("F2", CultureInfo.InvariantCulture) + "m";

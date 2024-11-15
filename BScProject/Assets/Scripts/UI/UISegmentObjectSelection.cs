@@ -95,7 +95,7 @@ public class UISegmentObjectSelection : MonoBehaviour
 
     private void OnDisplayObjectChanged(int objectID)
     {
-        if (_currentSegment.selectedObjectID != -1)
+        if (_currentSegment.SelectedObjectID != -1)
             return; 
         UpdateDisplayObject(ResourceManager.Instance.GetSegmentObject(objectID));
     }
@@ -107,7 +107,7 @@ public class UISegmentObjectSelection : MonoBehaviour
 
     private void OnObjectChanged(int objectID)
     {
-        _currentSegment.selectedObjectID = objectID;
+        _currentSegment.SelectedObjectID = objectID;
         if (objectID == -1)
         {
             _segmentIndicator[_selectedSegmentID].SetState(false);
@@ -121,7 +121,7 @@ public class UISegmentObjectSelection : MonoBehaviour
         
         foreach (PathSegmentObjectData segment in _segmentsToAssign)
         {
-            if (segment.selectedObjectID == -1)
+            if (segment.SelectedObjectID == -1)
                 return;
         }
 
@@ -132,7 +132,7 @@ public class UISegmentObjectSelection : MonoBehaviour
 
     private void UpdateSelectedSegment()
     {
-        GridObjectSelection currentGridSelection = _selectionObjects.Find(g => g.ObjectTextureID == _currentSegment.selectedObjectID);
+        GridObjectSelection currentGridSelection = _selectionObjects.Find(g => g.ObjectTextureID == _currentSegment.SelectedObjectID);
         if (currentGridSelection != null)
         {
             currentGridSelection.IsSegmentSwap = true;
@@ -149,14 +149,14 @@ public class UISegmentObjectSelection : MonoBehaviour
             toggle.isOn = false;
         }
 
-        GridObjectSelection gridObjectSelection = _selectionObjects.Find(o => o.ObjectTextureID == _currentSegment.selectedObjectID);
+        GridObjectSelection gridObjectSelection = _selectionObjects.Find(o => o.ObjectTextureID == _currentSegment.SelectedObjectID);
         if (gridObjectSelection == null)
         {
             UpdateDisplayObject(null);
         }
         else
         { 
-            UpdateDisplayObject(ResourceManager.Instance.GetSegmentObject(_currentSegment.selectedObjectID));
+            UpdateDisplayObject(ResourceManager.Instance.GetSegmentObject(_currentSegment.SelectedObjectID));
             gridObjectSelection.Select();
         }
     }

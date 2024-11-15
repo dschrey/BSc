@@ -22,7 +22,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5519031934986926758, guid: fc63f274707dc4a4187dfdc77340bd7c, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1.21
+      value: -0.36
       objectReference: {fileID: 0}
     - target: {fileID: 5519031934986926758, guid: fc63f274707dc4a4187dfdc77340bd7c, type: 3}
       propertyPath: m_LocalRotation.w
@@ -30,7 +30,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5519031934986926758, guid: fc63f274707dc4a4187dfdc77340bd7c, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5519031934986926758, guid: fc63f274707dc4a4187dfdc77340bd7c, type: 3}
       propertyPath: m_LocalRotation.y
@@ -38,7 +38,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5519031934986926758, guid: fc63f274707dc4a4187dfdc77340bd7c, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5519031934986926758, guid: fc63f274707dc4a4187dfdc77340bd7c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -54,7 +54,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6306846414418973985, guid: fc63f274707dc4a4187dfdc77340bd7c, type: 3}
       propertyPath: m_Name
-      value: TestObstacle Variant
+      value: Segment1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

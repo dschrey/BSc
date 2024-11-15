@@ -1,109 +1,330 @@
 using System.Collections.Generic;
+using System.Text;
+using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
+
+public class PathSegmentDistanceData
+{
+    public PathSegmentData PathSegmentData;
+    public float SelectedDistance = -1;
+
+    public PathSegmentDistanceData(PathSegmentData data)
+    {
+        PathSegmentData = data;
+    }
+}
 
 public class UIObjectiveDistanceSelection : MonoBehaviour
 {
+        
+    [Header("Segment Selection")]
+    [SerializeField] private Transform _segmentIndicatorParent;
+    [SerializeField] private GameObject _segmentIndicatorPrefab;
+    [SerializeField] private Button _buttonPrevious;
+    [SerializeField] private Button _buttonNext;
+    [SerializeField] private TMP_Text _textSelectedSegment;
+    [SerializeField] private TMP_Text _selectionIndicator;
+    [SerializeField] private TMP_Text _textSegmentDistance;
 
-    [SerializeField] private GameObject _segmentDistanceTogglePrefab;
-    [SerializeField] private Transform _segmentDistanceToggleParent;
-    [SerializeField] private Button _confirmButton;
+    [Header("Numpad Buttons")]
+    [SerializeField] private Button _buttonZero;
+    [SerializeField] private Button _buttonOne;
+    [SerializeField] private Button _buttonTwo;
+    [SerializeField] private Button _buttonThree;
+    [SerializeField] private Button _buttonFour;
+    [SerializeField] private Button _buttonFive;
+    [SerializeField] private Button _buttonSix;
+    [SerializeField] private Button _buttonSeven;
+    [SerializeField] private Button _buttonEight;
+    [SerializeField] private Button _buttonNine;
+    [SerializeField] private Button _buttonRemove;
+    [SerializeField] private Button _buttonClear;
+    [SerializeField] private Button _buttonComma;
+    private StringBuilder _inputBuffer = new();
+    private bool _isDecimal = false;
+
+    [Header("Misc")]
     [SerializeField] private Image _selectedPathImage;
-    [SerializeField] private UINumpadInputHandler _numpadInput;
-    public UnityEvent<PathSegmentOption> SelectedSegmentChanged = new();
-    private List<PathSegmentOption> _segmentDistanceToggles = new();
-    private PathSegmentOption _selectedSegment;
+    [SerializeField] private Button _confirmButton;
 
+    private readonly List<UISegmentIndicator> _segmentIndicators = new();
+    private readonly List<PathSegmentDistanceData> _segmentDistanceData = new();
+    private PathSegmentDistanceData _currentSegment;
+    private int _selectedSegmentID;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
     
     private void OnEnable() 
     {
-        SelectedSegmentChanged.AddListener(OnSelectedSegmentChanged);
+        _buttonPrevious.onClick.AddListener(OnPreviousButtonClick);
+        _buttonNext.onClick.AddListener(OnNextButtonClick);
         _confirmButton.onClick.AddListener(OnConfirmButtonClicked);
-        _confirmButton.interactable = false;
-        
-        foreach (PathSegmentData segmentData in AssessmentManager.Instance.CurrentPath.SegmentsData)
-        {
-            PathSegmentOption segmentOption = Instantiate(_segmentDistanceTogglePrefab, _segmentDistanceToggleParent).GetComponent<PathSegmentOption>();
-            segmentOption.Initialize(segmentData.SegmentID, segmentData.SegmentColor, this);
-            _segmentDistanceToggles.Add(segmentOption);
-        }
+        InitializeNumpad();
 
-        _numpadInput.InputChangedEvent += OnNumpadInputChanged;
+        _confirmButton.interactable = false;
+        _selectedSegmentID = 0;
+
+        AssessmentManager.Instance.CurrentPath.SegmentsData.ForEach(s =>
+        {
+            _segmentDistanceData.Add(new PathSegmentDistanceData(s));
+            UISegmentIndicator segmentIndicator = Instantiate(_segmentIndicatorPrefab, _segmentIndicatorParent).GetComponent<UISegmentIndicator>();
+            _segmentIndicators.Add(segmentIndicator);
+        });
+
         _selectedPathImage.sprite = AssessmentManager.Instance.CurrentPathAssessment.SelectedPathSprite;
+
+        UpdateSelectedSegment();
     }
 
     private void OnDisable() 
     {
-        SelectedSegmentChanged.RemoveListener(OnSelectedSegmentChanged);
+        _buttonPrevious.onClick.RemoveListener(OnPreviousButtonClick);
+        _buttonNext.onClick.RemoveListener(OnNextButtonClick);
         _confirmButton.onClick.RemoveListener(OnConfirmButtonClicked);
-        _numpadInput.InputChangedEvent -= OnNumpadInputChanged;
-
-        _segmentDistanceToggles.ForEach(x => Destroy(x.gameObject));
-        _segmentDistanceToggles.Clear();
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
 
+
+    private void OnNextButtonClick()
+    {
+        _segmentIndicators[_selectedSegmentID].Toggle(false);
+        _selectedSegmentID = (_selectedSegmentID + 1) % _segmentDistanceData.Count;
+        UpdateSelectedSegment();
+
+    }
+
+    private void OnPreviousButtonClick()
+    {
+        _segmentIndicators[_selectedSegmentID].Toggle(false);
+        _selectedSegmentID = (_selectedSegmentID - 1 + _segmentDistanceData.Count) % _segmentDistanceData.Count;
+        UpdateSelectedSegment();
+
+    }
+
     private void OnConfirmButtonClicked()
     {
-        _numpadInput.ResetInput();
-        _numpadInput.gameObject.SetActive(false);
+        ResetNumpadInput();
         AssessmentManager.Instance.ProceedToNextAssessmentStep();
     }
-
-    private void OnSelectedSegmentChanged(PathSegmentOption segment)
+    
+    private void InputChanged()
     {
-        _selectedSegment = segment;
-        if (!_numpadInput.gameObject.activeSelf)
-            _numpadInput.gameObject.SetActive(true);
-        _numpadInput.ResetInput();
-        _numpadInput.SelectionIndicator.color = _selectedSegment.Color;
-    }
-
-    private void OnNumpadInputChanged(string numpadInput)
-    {
-        if (_selectedSegment == null)
+        string input = _inputBuffer.ToString();
+        if (_currentSegment == null)
         {
-            _numpadInput.ResetInput();
+            ResetNumpadInput();
             return;
         }
 
-        _selectedSegment.DistanceText.text = numpadInput + "m";
+        Debug.Log($"Change text to {input}m");
 
-        if (! float.TryParse(numpadInput, out float distanceValue))
+        _textSegmentDistance.text = input + "m";
+
+        if (! float.TryParse(input, out float distanceValue))
         {
             Debug.LogError($"Could not parse numpad input into float.");
             return;
         }
+        
+        _segmentIndicators[_selectedSegmentID].SetState(true);
 
-        if (distanceValue > 0)
-        {
-            _selectedSegment.HasDistanceValue = true;
-            _selectedSegment.Checkmark.gameObject.SetActive(true);
-        }
-        else
-        {
-            _selectedSegment.HasDistanceValue = false;
-            _selectedSegment.Checkmark.gameObject.SetActive(false);
-        }
+        _currentSegment.SelectedDistance = distanceValue;
+        AssessmentManager.Instance.SetPathSegmentObjectiveDistance(_currentSegment.PathSegmentData.SegmentID, _currentSegment.SelectedDistance);
+        _confirmButton.interactable = VerifyDistanceValues();
+    }
 
-        _selectedSegment.DistanceValue = distanceValue;
-        AssessmentManager.Instance.SetPathSegmentObjectiveDistance(_selectedSegment.SegmentID, _selectedSegment.DistanceValue);
-        _confirmButton.interactable = CheckAllSegmentsVisited();
+    private void OnButtonZeroClick()
+    {
+        AddNumber(0);
+    }
+
+    private void OnButtonOneClick()
+    {
+        AddNumber(1);
+    }
+
+    private void OnButtonTwoClick()
+    {
+        AddNumber(2);
+    }
+
+    private void OnButtonThreeClick()
+    {
+        AddNumber(3);
+    }
+
+    private void OnButtonFourClick()
+    {
+        AddNumber(4);
+    }
+
+    private void OnButtonFiveClick()
+    {
+        AddNumber(5);
+    }
+
+    private void OnButtonSixClick()
+    {
+        AddNumber(6);
+    }
+
+    private void OnButtonSevenClick()
+    {
+        AddNumber(7);
+    }
+
+    private void OnButtonEightClick()
+    {
+        AddNumber(8);
+    }
+
+    private void OnButtonNineClick()
+    {
+        AddNumber(9);
+    }
+
+    private void OnButtonCommaClick()
+    {
+        AddDecimalPoint();
+    }
+
+    private void OnButtonClearClick()
+    {
+        _segmentIndicators[_selectedSegmentID].SetState(false);
+        _inputBuffer.Clear();
+        _isDecimal = false;
+        AddNumber(0);
+    }
+
+    private void OnButtonRemoveClick()
+    {
+        RemoveLastInput();
     }
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
-    private bool CheckAllSegmentsVisited()
+    private void InitializeNumpad()
     {
-        foreach (PathSegmentOption pathSegmentOption in _segmentDistanceToggles)
+        
+        _buttonComma.onClick.AddListener(OnButtonCommaClick);
+        _buttonZero.onClick.AddListener(OnButtonZeroClick);
+        _buttonOne.onClick.AddListener(OnButtonOneClick);
+        _buttonTwo.onClick.AddListener(OnButtonTwoClick);
+        _buttonThree.onClick.AddListener(OnButtonThreeClick);
+        _buttonFour.onClick.AddListener(OnButtonFourClick);
+        _buttonFive.onClick.AddListener(OnButtonFiveClick);
+        _buttonSix.onClick.AddListener(OnButtonSixClick);
+        _buttonSeven.onClick.AddListener(OnButtonSevenClick);
+        _buttonEight.onClick.AddListener(OnButtonEightClick);
+        _buttonNine.onClick.AddListener(OnButtonNineClick);
+        _buttonClear.onClick.AddListener(OnButtonClearClick);
+        _buttonRemove.onClick.AddListener(OnButtonRemoveClick);
+    }
+    private void RemoveNumpad()
+    {
+        _buttonComma.onClick.RemoveListener(OnButtonCommaClick);
+        _buttonZero.onClick.RemoveListener(OnButtonZeroClick);
+        _buttonOne.onClick.RemoveListener(OnButtonOneClick);
+        _buttonTwo.onClick.RemoveListener(OnButtonTwoClick);
+        _buttonThree.onClick.RemoveListener(OnButtonThreeClick);
+        _buttonFour.onClick.RemoveListener(OnButtonFourClick);
+        _buttonFive.onClick.RemoveListener(OnButtonFiveClick);
+        _buttonSix.onClick.RemoveListener(OnButtonSixClick);
+        _buttonSeven.onClick.RemoveListener(OnButtonSevenClick);
+        _buttonEight.onClick.RemoveListener(OnButtonEightClick);
+        _buttonNine.onClick.RemoveListener(OnButtonNineClick);
+        _buttonClear.onClick.RemoveListener(OnButtonClearClick);
+        _buttonRemove.onClick.RemoveListener(OnButtonRemoveClick);
+    }
+
+    private void UpdateSelectedSegment()
+    {
+        ResetNumpadInput();
+        _currentSegment = _segmentDistanceData[_selectedSegmentID];
+        _textSelectedSegment.color = _currentSegment.PathSegmentData.SegmentColor;
+        _textSelectedSegment.text = (_selectedSegmentID + 1).ToString();
+        _selectionIndicator.color = _currentSegment.PathSegmentData.SegmentColor;
+
+        if (_currentSegment.SelectedDistance == -1)
         {
-            if (! pathSegmentOption.HasDistanceValue)
+            _textSegmentDistance.text = 0 + "m";
+        }
+        else
+        {
+            _textSegmentDistance.text = _currentSegment.SelectedDistance + "m";
+        }
+
+        _segmentIndicators[_selectedSegmentID].Toggle(true);
+    }
+
+    private bool VerifyDistanceValues()
+    {
+        foreach (var segmentData in _segmentDistanceData)
+        {
+            if (segmentData.SelectedDistance == -1)
                 return false;
         }
         return true;
     }
+
+    
+    private void AddNumber(int number)
+    {
+        if (_isDecimal)
+        {
+            _inputBuffer.Append(number);
+        }
+        else
+        {
+            if (_inputBuffer.Length == 1 && _inputBuffer[0] == '0') 
+            {
+                _inputBuffer.Clear();
+            }
+            _inputBuffer.Append(number);
+        }
+
+        InputChanged();
+    }
+
+    private void AddDecimalPoint()
+    {
+        if (!_isDecimal && _inputBuffer.Length > 0)
+        {
+            _inputBuffer.Append(System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator);
+            _isDecimal = true;
+        }
+        else if (_inputBuffer.Length == 0)
+        {
+            _inputBuffer.Append("0" + System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator);
+            _isDecimal = true;
+        }
+
+        InputChanged();
+    }
+
+    private void RemoveLastInput()
+    {
+        if (_inputBuffer.Length > 0)
+        {
+            string decimalSeparator = System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+
+            if (_inputBuffer[_inputBuffer.Length - 1].ToString() == decimalSeparator)
+            {
+                _isDecimal = false;
+            }
+            _inputBuffer.Remove(_inputBuffer.Length - 1, 1);
+            InputChanged();
+        }
+    }
+
+
+    private void ResetNumpadInput()
+    {
+        _inputBuffer.Clear();
+        _isDecimal = false;
+        _selectionIndicator.color = Color.white;
+    }
+
 }
