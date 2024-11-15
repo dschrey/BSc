@@ -61,6 +61,7 @@ public class ResourceManager : MonoBehaviour
             objectiveObject.RenderTexture = objectRenderManager.CreateNewRenderTexture(obj);
 
             renderObjects.Add(objectiveObject);
+            count++;
         }
 
         return renderObjects;
@@ -79,7 +80,7 @@ public class ResourceManager : MonoBehaviour
 
     public GameObject GetObjectiveObject(int id)
     {
-        return ObjectiveObjects[id].gameObject;
+        return ObjectiveObjects.Find(obj => obj.ID == id).gameObject;
     }
 
     public List<RenderObject> ShuffleObjectiveObjects(int seed = -1)
@@ -100,7 +101,7 @@ public class ResourceManager : MonoBehaviour
 
     public GameObject GetSegmentObject(int id)
     {
-        return SegmentObjects[id].gameObject;
+        return SegmentObjects.Find(obj => obj.ID == id).gameObject;
     }
 
     public List<RenderObject> ShuffleSegmentObjects(int seed = -1)

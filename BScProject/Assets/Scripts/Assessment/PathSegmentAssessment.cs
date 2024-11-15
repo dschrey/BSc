@@ -41,11 +41,6 @@ public class PathSegmentAssessment
         return false;
     }
 
-    public float GetSegmnetDistanceDifference()
-    {
-        return Math.Abs(_pathSegment.DistanceToPreviousSegment - SelectedDistanceToPreviousSegment);
-    }
-
     public int GetSegmentID()
     {
         return _pathSegment.SegmentID;

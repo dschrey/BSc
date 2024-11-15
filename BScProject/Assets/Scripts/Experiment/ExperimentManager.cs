@@ -29,8 +29,8 @@ public class ExperimentManager : MonoBehaviour
         }
     }
     
-    private int _pathCount;
-    public bool PathAvailable => _pathCount != Paths.Count;
+    public int CompletedPaths;
+    public bool PathAvailable => CompletedPaths != Paths.Count;
 
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
@@ -96,14 +96,14 @@ public class ExperimentManager : MonoBehaviour
     {
         Debug.Log($"ExperimentManager :: StartExperiment() : Starting Experiment..");
         _UIExperimentPanelManager.CloseSetupPanel();
-        _pathCount = 0;
-        PathManager.Instance.StartNewPath(Paths[_pathCount]);
+        CompletedPaths = 0;
+        PathManager.Instance.StartNewPath(Paths[CompletedPaths]);
         ExperimentState = ExperimentState.RUNNING;
     }
 
     private void LoadNextPath()
     {
-        _pathCount++;
+        CompletedPaths++;
         if (! PathAvailable)
         {
             ExperimentState = ExperimentState.FINISHED;
@@ -111,7 +111,7 @@ public class ExperimentManager : MonoBehaviour
         }
         Debug.Log($"ExperimentManager :: StartNextPath() : Getting next Path.");
         Timer.Reset();
-        PathManager.Instance.StartNewPath(Paths[_pathCount]);
+        PathManager.Instance.StartNewPath(Paths[CompletedPaths]);
         
         ExperimentState = ExperimentState.RUNNING;
     }
@@ -125,7 +125,7 @@ public class ExperimentManager : MonoBehaviour
 
     public void StopExperiment()
     {
-        _pathCount = 0;
+        CompletedPaths = 0;
         _XROrigin.SetPositionAndRotation(ExperimentSpawn.position, ExperimentSpawn.rotation);
         _UIExperimentPanelManager.ToggleRunningPanel(false);
         _UIExperimentPanelManager.ResetPanelPosition();

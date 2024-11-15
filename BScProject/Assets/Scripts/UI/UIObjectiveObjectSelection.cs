@@ -180,6 +180,9 @@ public class UIObjectiveObjectSelection : MonoBehaviour
         }
 
         if (obj != null)
+        {
             _displayObject = Instantiate(obj, _objectDisplaySpawnpoint.position, Quaternion.identity, _objectDisplaySpawnpoint);
+            _displayObject.AddComponent<Rotate>();
+        }
     }
 }

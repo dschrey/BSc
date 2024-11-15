@@ -22,9 +22,8 @@ public class UISegmentObjectSelection : MonoBehaviour
     private readonly List<UISegmentIndicator> _segmentIndicator = new();
     private readonly List<PathSegmentObjectData> _segmentsToAssign = new();
     private PathSegmentObjectData _currentSegment;
-    private int _selectedSegment;
+    private int _selectedSegmentID;
     private GameObject _displayObject;
-    
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
     
@@ -36,7 +35,7 @@ public class UISegmentObjectSelection : MonoBehaviour
 
         _objectDisplay.SetActive(true);
         _confirmButton.interactable = false;
-        _selectedSegment = 0;
+        _selectedSegmentID = 0;
 
         AssessmentManager.Instance.CurrentPath.SegmentsData.ForEach(s =>
         {
@@ -82,15 +81,15 @@ public class UISegmentObjectSelection : MonoBehaviour
 
     private void OnNextButtonClick()
     {
-        _segmentIndicator[_selectedSegment].Toggle(false);
-        _selectedSegment = (_selectedSegment + 1) % _segmentsToAssign.Count;
+        _segmentIndicator[_selectedSegmentID].Toggle(false);
+        _selectedSegmentID = (_selectedSegmentID + 1) % _segmentsToAssign.Count;
         UpdateSelectedSegment();
     }
 
     private void OnPreviousButtonClick()
     {
-        _segmentIndicator[_selectedSegment].Toggle(false);
-        _selectedSegment = (_selectedSegment - 1 + _segmentsToAssign.Count) % _segmentsToAssign.Count;
+        _segmentIndicator[_selectedSegmentID].Toggle(false);
+        _selectedSegmentID = (_selectedSegmentID - 1 + _segmentsToAssign.Count) % _segmentsToAssign.Count;
         UpdateSelectedSegment();
     }
 
@@ -111,12 +110,12 @@ public class UISegmentObjectSelection : MonoBehaviour
         _currentSegment.selectedObjectID = objectID;
         if (objectID == -1)
         {
-            _segmentIndicator[_selectedSegment].SetState(false);
+            _segmentIndicator[_selectedSegmentID].SetState(false);
             _confirmButton.interactable = false;
             return; 
         }
         
-        _segmentIndicator[_selectedSegment].SetState(true);
+        _segmentIndicator[_selectedSegmentID].SetState(true);
         AssessmentManager.Instance.AssignPathSegmentObject(_currentSegment.PathSegmentData.SegmentID, objectID);
         UpdateDisplayObject(ResourceManager.Instance.GetSegmentObject(objectID));
         
@@ -139,10 +138,10 @@ public class UISegmentObjectSelection : MonoBehaviour
             currentGridSelection.IsSegmentSwap = true;
         }
 
-        _currentSegment = _segmentsToAssign[_selectedSegment];
+        _currentSegment = _segmentsToAssign[_selectedSegmentID];
         _textSelectedSegment.color = _currentSegment.PathSegmentData.SegmentColor;
-        _textSelectedSegment.text = (_selectedSegment + 1).ToString();
-        _segmentIndicator[_selectedSegment].Toggle(true);
+        _textSelectedSegment.text = (_selectedSegmentID + 1).ToString();
+        _segmentIndicator[_selectedSegmentID].Toggle(true);
 
         Toggle toggle = _toggleGroup.ActiveToggles().FirstOrDefault();
         if (toggle != null)

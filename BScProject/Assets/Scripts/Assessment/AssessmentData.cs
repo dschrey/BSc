@@ -67,6 +67,7 @@ public class SegmentAssessmentData
     public int SegmentAssessmentID;
     public float SelectedDistanceToPreviousSegment;
     public float CalculatedDistanceToPreviousSegment;
+    public float SegmentDistanceDifference;
 
     // Extented Path Assessment Data
     public bool CorrectObjectiveObjectSelected;

@@ -8,11 +8,11 @@ public class UIDragHandler : MonoBehaviour, IDragHandler, IEndDragHandler
     [SerializeField] private RectTransform _movementArea;
     [SerializeField] private Slider _sliderhorizontalPosition;
     [SerializeField] private Slider _sliderverticalPosition;
+    [SerializeField] private Image _imgDragHint;
     public UnityEvent WorldPositionChanged;
     public UnityEvent SegmentObjectPositioned;
     [SerializeField] private RectTransform _rectTransform;
-    public GameObject _objectInWorldSpace;
-    public DraggableObject _draggableWorldObject;
+    public DraggableObject DraggableWorldObject;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
@@ -34,8 +34,11 @@ public class UIDragHandler : MonoBehaviour, IDragHandler, IEndDragHandler
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (_objectInWorldSpace == null)
+        if (DraggableWorldObject == null)
             return;
+
+        if (_imgDragHint.enabled)
+            _imgDragHint.enabled = false;
         if (eventData.pointerCurrentRaycast.isValid)
         {
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -53,11 +56,8 @@ public class UIDragHandler : MonoBehaviour, IDragHandler, IEndDragHandler
             _rectTransform.localPosition = clampedCanvasPosition;
 
             UpdateSliderValues();
-            if (_draggableWorldObject != null)
-            {
-                _draggableWorldObject.DragObjectIn3DSpace(clampedCanvasPosition);
-                WorldPositionChanged?.Invoke();
-            }
+            DraggableWorldObject.DragObjectIn3DSpace(clampedCanvasPosition);
+            WorldPositionChanged?.Invoke();
         }
     }
 
@@ -85,17 +85,8 @@ public class UIDragHandler : MonoBehaviour, IDragHandler, IEndDragHandler
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
-    public void SetupDraggableObjects(GameObject draggableSegmentObject)
+    public void PositionCanvasObject(Vector3 screenPosition)
     {
-        _objectInWorldSpace = draggableSegmentObject;
-
-        if (_objectInWorldSpace == null)
-            return;
-
-        _draggableWorldObject = _objectInWorldSpace.GetComponent<DraggableObject>();
-
-        CanvasCameraHandler canvasCameraHandler = FindObjectOfType<CanvasCameraHandler>();
-        Vector3 screenPosition = canvasCameraHandler.WorldCoordinatesToScreenSpace(_objectInWorldSpace.transform.position);
         _rectTransform.anchoredPosition = screenPosition;
     }
 
@@ -107,9 +98,9 @@ public class UIDragHandler : MonoBehaviour, IDragHandler, IEndDragHandler
 
     private void UpdateWorldObjectPosition(Vector2 newPosition)
     {
-        if (_draggableWorldObject != null)
+        if (DraggableWorldObject != null)
         {
-            _draggableWorldObject.DragObjectIn3DSpace(newPosition);
+            DraggableWorldObject.DragObjectIn3DSpace(newPosition);
             WorldPositionChanged?.Invoke();
             SegmentObjectPositioned?.Invoke();
         }
@@ -118,6 +109,53 @@ public class UIDragHandler : MonoBehaviour, IDragHandler, IEndDragHandler
     public Vector2 GetCurrentPosition()
     {
         return _rectTransform.anchoredPosition;
+    }
+
+    
+    public void AdjustHorizontalSlider(float adjustmentValue)
+    {
+        Vector2 newPosition = _rectTransform.anchoredPosition;
+
+        float newSliderValue;
+        if (adjustmentValue > 0)
+        {
+            newSliderValue = Mathf.Min(_sliderhorizontalPosition.value + adjustmentValue, _sliderhorizontalPosition.maxValue);
+        }
+        else
+        {
+            newSliderValue = Mathf.Max(_sliderhorizontalPosition.value + adjustmentValue, _sliderhorizontalPosition.minValue);
+        }
+
+        // Adjust the RectTransform position by the actual adjustment value
+        newPosition.x += adjustmentValue;
+
+        // Set the slider to the clamped new value
+        _sliderhorizontalPosition.value = newSliderValue;
+        _rectTransform.anchoredPosition = newPosition;
+        UpdateWorldObjectPosition(newPosition);
+    }
+    
+    public void AdjustVerticalSlider(float adjustmentValue)
+    {
+        Vector2 newPosition = _rectTransform.anchoredPosition;
+
+        float newSliderValue;
+        if (adjustmentValue > 0)
+        {
+            newSliderValue = Mathf.Min(_sliderverticalPosition.value + adjustmentValue, _sliderverticalPosition.maxValue);
+        }
+        else
+        {
+            newSliderValue = Mathf.Max(_sliderverticalPosition.value + adjustmentValue, _sliderverticalPosition.minValue);
+        }
+
+        // Adjust the RectTransform position by the actual adjustment value
+        newPosition.y += adjustmentValue;
+
+        // Set the slider to the clamped new value
+        _sliderverticalPosition.value = newSliderValue;
+        _rectTransform.anchoredPosition = newPosition;
+        UpdateWorldObjectPosition(newPosition);
     }
 
 }

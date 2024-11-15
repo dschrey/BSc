@@ -191,6 +191,7 @@ public class AssessmentManager : MonoBehaviour
 
         SegmentAssessmentData segmentAssessmentData = Assessment.GetPath(CurrentPath.PathID).GetSegment(segmentID);
         segmentAssessmentData.SelectedDistanceToPreviousSegment = distanceValue;
+        segmentAssessmentData.SegmentDistanceDifference = Math.Abs(segmentAssessmentData.CalculatedDistanceToPreviousSegment - distanceValue);
         segmentAssessmentData.CalculatedDistanceToPreviousSegment = CurrentPath.GetSegmentData(segmentID).DistanceToPreviousSegment;
     }
 
@@ -232,7 +233,6 @@ public class AssessmentManager : MonoBehaviour
 
             segmentAssessment.SelectedObjectiveObjectID = objectID;
             SegmentAssessmentData segmentAssessmentData = Assessment.GetPath(CurrentPath.PathID).GetSegment(segmentID);
-            // segmentAssessmentData.CorrectObjectiveObjectSelected = segmentAssessment.EvaluateObjectiveObjectAssignment();
             segmentAssessmentData.CorrectObjectiveObjectSelected = segmentAssessment.AssessObjectiveObject();
             Debug.Log($"AssessmentManager :: Objective Object -> Segment {segmentID} - Correct: {segmentAssessmentData.CorrectObjectiveObjectSelected}.");
         }

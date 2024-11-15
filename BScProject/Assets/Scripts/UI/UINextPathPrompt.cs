@@ -12,7 +12,7 @@ public class UINextPathPrompt : MonoBehaviour
     private void OnEnable() 
     {
         _confirmButton.onClick.AddListener(OnNextPathRequested);
-        _remainingPaths.text = (ExperimentManager.Instance.Paths.Count - 1).ToString();
+        _remainingPaths.text = (ExperimentManager.Instance.Paths.Count - (ExperimentManager.Instance.CompletedPaths + 1)).ToString();
     }
 
     private void OnDisable() 

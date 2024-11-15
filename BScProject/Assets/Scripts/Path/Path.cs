@@ -70,4 +70,9 @@ public class Path : MonoBehaviour
             segment.gameObject.SetActive(state);
         }
     }
+
+    public PathSegment GetPathSegment(int segmentID)
+    {
+        return Segments.Find(s => s.PathSegmentData.SegmentID == segmentID);
+    }
 }

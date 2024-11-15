@@ -38,7 +38,7 @@ public class UIExperimentPanelManager : MonoBehaviour
     {
         _menuVisible = true;
         _experimentSetupPanel.SetActive(_menuVisible);
-        _experimentSetupPanel.transform.position = _panelSpawnpoint.position;
+        _experimentSetupPanel.transform.localPosition = _panelSpawnpoint.position;
     }
 
     public void CloseSetupPanel()

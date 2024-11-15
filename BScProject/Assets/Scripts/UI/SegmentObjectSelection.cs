@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+[Obsolete("Class is deprecated and will be removed in the future.", true)]
 public class SegmentObjectSelection : MonoBehaviour
 {
     [SerializeField] private Image _segmentLabelImage;
