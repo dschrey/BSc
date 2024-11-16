@@ -27,9 +27,4 @@ public class LineController : MonoBehaviour
     {
         _points = points;
     }
-
-    public void ResetLinePoints()
-    {
-        _lineRenderer.positionCount = 0;
-    }
 }

@@ -105,7 +105,7 @@ public class AssessmentManager : MonoBehaviour
         CurrentPath = currentPath;
         CurrentPathAssessment = new PathAssessment(currentPath);
         Debug.Log($"AssessmentManager :: StartPathAssessment() : Started assessment on path (ID: {currentPath.PathID}).");
-        Assessment ??= new(ExperimentManager.Instance.ExperimentSettings.CompletedAssessments, System.DateTime.Now);
+        Assessment ??= new(ExperimentManager.Instance.ExperimentSettings.CompletedAssessments, DateTime.Now);
         Assessment.AddPath(currentPath, (int)Math.Floor(ExperimentManager.Instance.Timer.GetElapsedTime()));
         
         _currentAssessmentStep = 0;
@@ -157,8 +157,42 @@ public class AssessmentManager : MonoBehaviour
                 }
                 break;
         }
-        Debug.Log($"AssessmentManager :: ProceedToNextAssessmentStep() : Assessment step: {_currentAssessmentStep}");
+        Debug.Log($"AssessmentManager :: Proceed to step: {_currentAssessmentStep}");
         _currentAssessmentStep++;
+    }
+
+    public void GoToPreviousAssessmentStep()
+    {
+         switch (CurrentPath.Type)
+        {
+            case PathType.DEFAULT:
+                switch (_currentAssessmentStep)
+                {
+                    case 3:
+                        AssessmentStep = AssessmentStep.OBJECTIVEDISTANCE;
+                        _currentAssessmentStep = 2;
+                        break;
+                }
+                break;
+            case PathType.EXTENDED:
+                switch (_currentAssessmentStep)
+                {
+                    case 3:
+                        AssessmentStep = AssessmentStep.OBJECTIVEOBJECTSELECTION;
+                        _currentAssessmentStep = 2;
+                        break;
+                    case 4:
+                        AssessmentStep = AssessmentStep.OBJECTSELECTION;
+                        _currentAssessmentStep = 3;
+                        break;
+                    case 5:
+                        AssessmentStep = AssessmentStep.OBJECTDISTANCE;
+                        _currentAssessmentStep = 4;
+                        break;
+                }
+                break;
+        }
+        Debug.Log($"AssessmentManager :: Go back to step: {_currentAssessmentStep}");
     }
 
     /// <summary>
@@ -267,6 +301,14 @@ public class AssessmentManager : MonoBehaviour
         DataManager.Instance.SaveAssessmentData(Assessment);
         ExperimentManager.Instance.ExperimentSettings.CompletedAssessments++; 
         Assessment = null;
+    }
+
+    public void ResetPanelData()
+    {
+        _objectiveDistancePanel.GetComponent<UIObjectiveDistanceSelection>().ResetPanelData();
+        _objectiveObjectPanel.GetComponent<UIObjectiveObjectSelection>().ResetPanelData();
+        _objectSelectionPanel.GetComponent<UISegmentObjectSelection>().ResetPanelData();
+        _objectDistancePanel.GetComponent<UISegmentObjectPosition>().ResetPanelData();
     }
 
 }

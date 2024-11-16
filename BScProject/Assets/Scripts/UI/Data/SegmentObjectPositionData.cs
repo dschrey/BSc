@@ -3,7 +3,6 @@ using UnityEngine;
 public class SegmentObjectPositionData
 {
     public PathSegmentData PathSegmentData;
-    public bool ObjectPositioned => DistanceToObjective != 0f;
     public float DistanceToObjective = 0f;
     public float DistanceToRealObject = -1f;
     public Vector3 CanvasObjectPosition = Vector3.zero;

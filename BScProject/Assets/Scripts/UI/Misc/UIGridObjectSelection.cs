@@ -3,12 +3,13 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class GridObjectSelection : MonoBehaviour, IPointerEnterHandler
+public class GridObjectSelection : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private RawImage _objectImage;
     [SerializeField] private Texture _emptyTexture;
     public event Action<int> SelectedObjectChanged;
     public event Action<int> HoverObjectChanged;
+    public event Action HoverObjectRemoved;
     private Toggle _toggle;
     public int ObjectTextureID;
     public bool IsSegmentSwap = false;
@@ -50,6 +51,11 @@ public class GridObjectSelection : MonoBehaviour, IPointerEnterHandler
         HoverObjectChanged?.Invoke(ObjectTextureID);
     }
 
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        HoverObjectRemoved?.Invoke();
+    }
+
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
     public void Initialize(int objectID, RenderTexture texture, ToggleGroup group)
@@ -58,7 +64,6 @@ public class GridObjectSelection : MonoBehaviour, IPointerEnterHandler
         _objectImage.texture = texture;
         _toggle.group = group;
     }
-
 
     public void Select()
     {

@@ -13,7 +13,7 @@ public class UISegmentObjectPosition : MonoBehaviour
     [SerializeField] private GameObject _tutorialPanel;
     [SerializeField] private GameObject _instructionPanel;
     [SerializeField] private GameObject _inputPanel;
-    [SerializeField] private Button _continueButton;
+    [SerializeField] private Button _completeTutorialButton;
     [SerializeField] private GameObject _movementArea;
     private bool _hasCompletedTutorial = false;
     
@@ -24,7 +24,6 @@ public class UISegmentObjectPosition : MonoBehaviour
     [SerializeField] private Button _buttonPrevious;
     [SerializeField] private Button _buttonNext;
     [SerializeField] private TMP_Text _textSelectedSegment;
-    [SerializeField] private Button _confirmButton;
     private readonly List<UISegmentIndicator> _segmentIndicators = new();
 
     [Header("Object Positioning")]
@@ -50,6 +49,11 @@ public class UISegmentObjectPosition : MonoBehaviour
     [SerializeField] private Button _buttonRightLarge;
     [SerializeField] private Button _buttonRightSmall;
     [SerializeField] private Button _buttonReset;
+
+    [Header("Misc")]
+    [SerializeField] private Button _continueButton;
+    [SerializeField] private Button _backButton;
+
     private readonly List<SegmentObjectPositionData> _segmentPositionData = new();
     public SegmentObjectPositionData _currentSegment;
     private int _selectedSegmentID;
@@ -61,8 +65,9 @@ public class UISegmentObjectPosition : MonoBehaviour
     {
         _canvasEnvironment.SetActive(true);
 
-        _buttonPrevious.onClick.AddListener(OnPreviousButtonClick);
-        _buttonNext.onClick.AddListener(OnNextButtonClick);
+        _buttonPrevious.onClick.AddListener(OnPreviousSegmentButtonClick);
+        _buttonNext.onClick.AddListener(OnNextSegmentButtonClick);
+
         _buttonUpLarge.onClick.AddListener(OnUpLargeButtonClicked);
         _buttonUpSmall.onClick.AddListener(OnUpSmallButtonClicked);
         _buttonDownLarge.onClick.AddListener(OnDownLargeButtonClicked);
@@ -79,7 +84,7 @@ public class UISegmentObjectPosition : MonoBehaviour
             _instructionPanel.SetActive(false);
             _movementArea.SetActive(false);
             _inputPanel.SetActive(false);
-            _continueButton.onClick.AddListener(OnContineButtonPressed);
+            _completeTutorialButton.onClick.AddListener(OnCompleteTutorialButtonPressed);
         }
         else
         {
@@ -89,41 +94,39 @@ public class UISegmentObjectPosition : MonoBehaviour
             _inputPanel.SetActive(true);
         }
 
-        _confirmButton.onClick.AddListener(OnConfirmButtonPressed);
+        _continueButton.onClick.AddListener(OnContinueButtonPressed);
+        _backButton.onClick.AddListener(OnBackButtonClicked);
+
         _draggableCanvasObject.WorldPositionChanged.AddListener(OnDraggableSegmentObjectPositionChanged);
         _draggableCanvasObject.SegmentObjectPositioned.AddListener(OnDraggableSegmentObjectPositioned);
 
         _draggableCanvasObject.DraggableWorldObject = _draggableObject;
 
-        _confirmButton.interactable = false;
-
         SetSliderSettings(_sliderhorizontalPosition, 0, ExperimentManager.Instance.ExperimentSettings.MovementArea.x * 100, 0f);
         SetSliderSettings(_sliderverticalPosition, 0, ExperimentManager.Instance.ExperimentSettings.MovementArea.y * 100, 0f);
 
-        PrepareSegments();
-
-        if (_currentPath == null)
+        if (_segmentPositionData.Count == 0)
         {
-            Debug.LogError($"UISegmentObjectPosition :: OnEnable() : _currentPath is null");
-            return;
+            _selectedSegmentID = 0;
+            PrepareSegments();
+            AssessmentManager.Instance.CurrentPath.SegmentsData.ForEach(s =>
+            {
+                _segmentPositionData.Add(new SegmentObjectPositionData(s));
+                UISegmentIndicator segmentIndicator = Instantiate(_segmentIndicatorPrefab, _segmentIndicatorParent).GetComponent<UISegmentIndicator>();
+                _segmentIndicators.Add(segmentIndicator);
+            });
         }
-
-        AssessmentManager.Instance.CurrentPath.SegmentsData.ForEach(s =>
-        {
-            _segmentPositionData.Add(new SegmentObjectPositionData(s));
-            UISegmentIndicator segmentIndicator = Instantiate(_segmentIndicatorPrefab, _segmentIndicatorParent).GetComponent<UISegmentIndicator>();
-            _segmentIndicators.Add(segmentIndicator);
-        });
         
+        _continueButton.interactable = VerifyPositionValues();
         _selectedPathImage.sprite = AssessmentManager.Instance.CurrentPathAssessment.SelectedPathSprite;
 
-        SwapSegment(0);
+        UpdateSelectedSegment(-1);
     }
 
     private void OnDisable() 
     {
-        _buttonPrevious.onClick.RemoveListener(OnPreviousButtonClick);
-        _buttonNext.onClick.RemoveListener(OnNextButtonClick);
+        _buttonPrevious.onClick.RemoveListener(OnPreviousSegmentButtonClick);
+        _buttonNext.onClick.RemoveListener(OnNextSegmentButtonClick);
         
         _buttonUpLarge.onClick.RemoveListener(OnUpLargeButtonClicked);
         _buttonUpSmall.onClick.RemoveListener(OnUpSmallButtonClicked);
@@ -135,42 +138,42 @@ public class UISegmentObjectPosition : MonoBehaviour
         _buttonRightSmall.onClick.RemoveListener(OnRightSmallButtonClicked);
         _buttonReset.onClick.RemoveListener(OnResetButtonClicked);
 
-        _confirmButton.onClick.RemoveListener(OnConfirmButtonPressed);
+        _continueButton.onClick.RemoveListener(OnContinueButtonPressed);
+        _backButton.onClick.RemoveListener(OnBackButtonClicked);
         _draggableCanvasObject.WorldPositionChanged.RemoveListener(OnDraggableSegmentObjectPositionChanged);
         _draggableCanvasObject.SegmentObjectPositioned.RemoveListener(OnDraggableSegmentObjectPositioned);
 
-        _continueButton.onClick.RemoveListener(OnContineButtonPressed);
+        _completeTutorialButton.onClick.RemoveListener(OnCompleteTutorialButtonPressed);
 
-        _currentPath = null;
-        _currentSegment = null;
-        _lineRender.ResetLinePoints();
-
-        _segmentPositionData.Clear();
-        
         _canvasEnvironment.SetActive(false);
     }
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
 
-    private void OnNextButtonClick()
+    private void OnNextSegmentButtonClick()
     {
-        _segmentIndicators[_selectedSegmentID].Toggle(false);
-        int newSegment = (_selectedSegmentID + 1) % _segmentPositionData.Count;
-        SwapSegment(newSegment);
+        int oldSegmentID = _selectedSegmentID;
+        _selectedSegmentID = (_selectedSegmentID + 1) % _segmentPositionData.Count;
+        UpdateSelectedSegment(oldSegmentID);
     }
 
-    private void OnPreviousButtonClick()
+    private void OnPreviousSegmentButtonClick()
     {
-        _segmentIndicators[_selectedSegmentID].Toggle(false);
-        int newSegment = (_selectedSegmentID - 1 + _segmentPositionData.Count) % _segmentPositionData.Count;
-        SwapSegment(newSegment);
+        int oldSegmentID = _selectedSegmentID;
+        _selectedSegmentID = (_selectedSegmentID - 1 + _segmentPositionData.Count) % _segmentPositionData.Count;
+        UpdateSelectedSegment(oldSegmentID);
     }
 
-    private void OnConfirmButtonPressed()
+    private void OnContinueButtonPressed()
     {
         AssessmentManager.Instance.ProceedToNextAssessmentStep();
     }
+    
+    private void OnBackButtonClicked()
+    {
+        AssessmentManager.Instance.GoToPreviousAssessmentStep();
+    }
 
-    private void OnContineButtonPressed()
+    private void OnCompleteTutorialButtonPressed()
     {
         _hasCompletedTutorial = true;
         _tutorialPanel.SetActive(false);
@@ -198,12 +201,7 @@ public class UISegmentObjectPosition : MonoBehaviour
         _currentSegment.CanvasObjectPosition = _draggableCanvasObject.GetCurrentPosition();
         AssessmentManager.Instance.SetPathSegmentObjectDistance(_currentSegment.PathSegmentData.SegmentID, _currentSegment.DistanceToObjective, _currentSegment.DistanceToRealObject);
    
-        foreach (SegmentObjectPositionData segmentObjectPosition in _segmentPositionData)
-        {
-            if (!segmentObjectPosition.ObjectPositioned)
-                return;
-        }
-        _confirmButton.interactable = true;
+        _continueButton.interactable = VerifyPositionValues();
     }
 
     
@@ -217,6 +215,7 @@ public class UISegmentObjectPosition : MonoBehaviour
         _currentSegment.DistanceToRealObject = -1;
         _draggableCanvasObject.UpdateSliderValues();
         _segmentIndicators[_selectedSegmentID].SetState(false);
+        _continueButton.interactable = false;
     }
 
     private void OnRightSmallButtonClicked()
@@ -284,20 +283,18 @@ public class UISegmentObjectPosition : MonoBehaviour
         }
     }
 
-    private void SwapSegment(int newSegmentID)
+    private void UpdateSelectedSegment(int oldSegmentID)
     {
-        Debug.Log($"SwapSegment() :: Switching segments: {_selectedSegmentID} -> {newSegmentID}.");
+        Debug.Log($"UpdateSelectedSegment() :: Switching segments: {oldSegmentID} -> {_selectedSegmentID}.");
 
-        if ( _selectedSegmentID != -1 && _currentSegment != null)
+        if (oldSegmentID != -1 && _currentSegment != null)
         {
-            _currentPath.GetPathSegment(_selectedSegmentID).gameObject.SetActive(false);
+            _segmentIndicators[_selectedSegmentID].Toggle(false);
+            _currentPath.GetPathSegment(oldSegmentID).gameObject.SetActive(false);
         }
 
-        _selectedSegmentID = newSegmentID;
-        _segmentPositionData.Find(data => data.PathSegmentData.SegmentID == _selectedSegmentID);
-        _currentPath.GetPathSegment(_selectedSegmentID).gameObject.SetActive(true);
-
         _currentSegment = _segmentPositionData[_selectedSegmentID];
+        _currentPath.GetPathSegment(_selectedSegmentID).gameObject.SetActive(true);
                 
         _textSelectedSegment.color = _currentSegment.PathSegmentData.SegmentColor;
         _textSelectedSegment.text = (_selectedSegmentID + 1).ToString();
@@ -353,4 +350,24 @@ public class UISegmentObjectPosition : MonoBehaviour
         return Math.Abs(_currentPath.GetPathSegment(_selectedSegmentID).gameObject.transform.position.x - _draggableObject.transform.position.x);     
     }
 
+    private bool VerifyPositionValues()
+    {
+        foreach (SegmentObjectPositionData segmentObjectPosition in _segmentPositionData)
+        {
+            if (segmentObjectPosition.DistanceToObjective <= 0)
+                return false;
+        }
+        return true;
+    }
+
+    public void ResetPanelData()
+    {
+        _currentPath = null;
+        _currentSegment = null;
+        _selectedSegmentID = -1;
+        _segmentIndicators.ForEach(i => Destroy(i.gameObject));
+        _segmentIndicators.Clear();
+        _segmentPositionData.Clear();
+        _continueButton.interactable = false;
+    }
 }

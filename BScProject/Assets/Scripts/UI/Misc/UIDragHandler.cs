@@ -126,7 +126,7 @@ public class UIDragHandler : MonoBehaviour, IDragHandler, IEndDragHandler
             newSliderValue = Mathf.Max(_sliderhorizontalPosition.value + adjustmentValue, _sliderhorizontalPosition.minValue);
         }
 
-        newPosition.x += adjustmentValue;
+        newPosition.x = newSliderValue;
 
         _sliderhorizontalPosition.value = newSliderValue;
         _rectTransform.anchoredPosition = newPosition;
@@ -147,7 +147,7 @@ public class UIDragHandler : MonoBehaviour, IDragHandler, IEndDragHandler
             newSliderValue = Mathf.Max(_sliderverticalPosition.value + adjustmentValue, _sliderverticalPosition.minValue);
         }
 
-        newPosition.y += adjustmentValue;
+        newPosition.y = newSliderValue;
 
         _sliderverticalPosition.value = newSliderValue;
         _rectTransform.anchoredPosition = newPosition;

@@ -7,7 +7,7 @@ public class UIPathSelectionHandler : MonoBehaviour
     [SerializeField] private Button _confirmButton;
     [SerializeField] private GameObject _pathSelectionPrefab;
     [SerializeField] private GameObject _selectionParent;
-    private List<PathSelectionOption> _pathOptions = new();
+    private readonly List<PathSelectionOption> _pathOptions = new();
 
     // ---------- Unity Methods --------------------------------------------------------------------------------------------------------------------------------
 

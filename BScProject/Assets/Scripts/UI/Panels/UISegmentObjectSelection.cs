@@ -6,21 +6,28 @@ using UnityEngine.UI;
 
 public class UISegmentObjectSelection : MonoBehaviour
 {
-    [SerializeField] private Transform _objectSelectionParent;
-    [SerializeField] private GameObject _objectSelectionPrefab;
+    [Header("Segment Selection")]
     [SerializeField] private Transform _segmentIndicatorParent;
     [SerializeField] private GameObject _segmentIndicatorPrefab;
-    [SerializeField] private Button _confirmButton;
-    [SerializeField] private Image _selectedPathImage;
     [SerializeField] private Button _buttonPrevious;
     [SerializeField] private Button _buttonNext;
     [SerializeField] private TMP_Text _textSelectedSegment;
+
+    [Header("Object Selection")]
+    [SerializeField] private Transform _objectSelectionParent;
+    [SerializeField] private GameObject _objectSelectionPrefab;
     [SerializeField] private GameObject _objectDisplay;
     [SerializeField] private Transform _objectDisplaySpawnpoint;
     [SerializeField] private ToggleGroup _toggleGroup;
+
+    [Header("Misc")]
+    [SerializeField] private Button _continueButton;
+    [SerializeField] private Button _backButton;
+    [SerializeField] private Image _selectedPathImage;
+
     private readonly List<GridObjectSelection> _selectionObjects = new();
-    private readonly List<UISegmentIndicator> _segmentIndicator = new();
-    private readonly List<PathSegmentObjectData> _segmentsToAssign = new();
+    private readonly List<UISegmentIndicator> _segmentIndicators = new();
+    private readonly List<PathSegmentObjectData> _segmentObjectData = new();
     private PathSegmentObjectData _currentSegment;
     private int _selectedSegmentID;
     private GameObject _displayObject;
@@ -29,22 +36,23 @@ public class UISegmentObjectSelection : MonoBehaviour
     
     private void OnEnable() 
     {
-        _buttonPrevious.onClick.AddListener(OnPreviousButtonClick);
-        _buttonNext.onClick.AddListener(OnNextButtonClick);
-        _confirmButton.onClick.AddListener(OnSegmentObjectiveObjectAssigned);
+        _buttonPrevious.onClick.AddListener(OnPreviousSegmentButtonClick);
+        _buttonNext.onClick.AddListener(OnNextSegmentButtonClick);
+        _continueButton.onClick.AddListener(OnContinueButtonClicked);
+        _backButton.onClick.AddListener(OnBackButtonClicked);
 
         _objectDisplay.SetActive(true);
-        _confirmButton.interactable = false;
-        _selectedSegmentID = 0;
 
-        AssessmentManager.Instance.CurrentPath.SegmentsData.ForEach(s =>
+        if (_segmentObjectData.Count == 0)
         {
-            _segmentsToAssign.Add(new PathSegmentObjectData(s));
-            UISegmentIndicator segmentIndicator = Instantiate(_segmentIndicatorPrefab, _segmentIndicatorParent).GetComponent<UISegmentIndicator>();
-            _segmentIndicator.Add(segmentIndicator);
-        });
-
-        UpdateSelectedSegment();
+            _selectedSegmentID = 0;
+            AssessmentManager.Instance.CurrentPath.SegmentsData.ForEach(s =>
+            {
+                _segmentObjectData.Add(new PathSegmentObjectData(s));
+                UISegmentIndicator segmentIndicator = Instantiate(_segmentIndicatorPrefab, _segmentIndicatorParent).GetComponent<UISegmentIndicator>();
+                _segmentIndicators.Add(segmentIndicator);
+            });
+        }
 
         foreach (var obj in ResourceManager.Instance.ShuffleSegmentObjects(420))
         {
@@ -52,9 +60,13 @@ public class UISegmentObjectSelection : MonoBehaviour
             objectSelection.Initialize(obj.ID, obj.RenderTexture, _toggleGroup);
             objectSelection.SelectedObjectChanged += OnObjectChanged;
             objectSelection.HoverObjectChanged += OnDisplayObjectChanged;
+            objectSelection.HoverObjectRemoved += OnDisplayObjectRemoved;
             _selectionObjects.Add(objectSelection);
         }
-        
+
+        UpdateSelectedSegment();
+
+        _continueButton.interactable = VerifySelectionValues();
         _selectedPathImage.sprite = AssessmentManager.Instance.CurrentPathAssessment.SelectedPathSprite;
     }
 
@@ -63,34 +75,46 @@ public class UISegmentObjectSelection : MonoBehaviour
         _objectDisplay.SetActive(false); 
         Destroy(_displayObject);
 
-        _buttonPrevious.onClick.RemoveListener(OnPreviousButtonClick);
-        _buttonNext.onClick.RemoveListener(OnNextButtonClick);
-        _confirmButton.onClick.RemoveListener(OnSegmentObjectiveObjectAssigned);
+        _buttonPrevious.onClick.RemoveListener(OnPreviousSegmentButtonClick);
+        _buttonNext.onClick.RemoveListener(OnNextSegmentButtonClick);
+        _continueButton.onClick.RemoveListener(OnContinueButtonClicked);
+        _backButton.onClick.RemoveListener(OnBackButtonClicked);
 
-        foreach (var selectionObj in _selectionObjects)
+        _selectionObjects.ForEach(obj => 
         {
-            selectionObj.SelectedObjectChanged -= OnObjectChanged;
-            selectionObj.HoverObjectChanged -= OnDisplayObjectChanged;
-            Destroy(selectionObj.gameObject);
-        }
+            obj.SelectedObjectChanged -= OnObjectChanged;
+            obj.HoverObjectChanged -= OnDisplayObjectChanged;
+            obj.HoverObjectRemoved -= OnDisplayObjectRemoved;
+            Destroy(obj.gameObject);
+        });
 
         _selectionObjects.Clear();
     }
     
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
 
-    private void OnNextButtonClick()
+    private void OnNextSegmentButtonClick()
     {
-        _segmentIndicator[_selectedSegmentID].Toggle(false);
-        _selectedSegmentID = (_selectedSegmentID + 1) % _segmentsToAssign.Count;
+        _segmentIndicators[_selectedSegmentID].Toggle(false);
+        _selectedSegmentID = (_selectedSegmentID + 1) % _segmentObjectData.Count;
         UpdateSelectedSegment();
     }
 
-    private void OnPreviousButtonClick()
+    private void OnPreviousSegmentButtonClick()
     {
-        _segmentIndicator[_selectedSegmentID].Toggle(false);
-        _selectedSegmentID = (_selectedSegmentID - 1 + _segmentsToAssign.Count) % _segmentsToAssign.Count;
+        _segmentIndicators[_selectedSegmentID].Toggle(false);
+        _selectedSegmentID = (_selectedSegmentID - 1 + _segmentObjectData.Count) % _segmentObjectData.Count;
         UpdateSelectedSegment();
+    }
+
+    private void OnContinueButtonClicked()
+    {
+        AssessmentManager.Instance.ProceedToNextAssessmentStep();
+    }
+
+    private void OnBackButtonClicked()
+    {
+        AssessmentManager.Instance.GoToPreviousAssessmentStep();
     }
 
     private void OnDisplayObjectChanged(int objectID)
@@ -100,48 +124,50 @@ public class UISegmentObjectSelection : MonoBehaviour
         UpdateDisplayObject(ResourceManager.Instance.GetSegmentObject(objectID));
     }
 
-    private void OnSegmentObjectiveObjectAssigned()
-    {
-        AssessmentManager.Instance.ProceedToNextAssessmentStep();
-    }
 
     private void OnObjectChanged(int objectID)
     {
         _currentSegment.SelectedObjectID = objectID;
         if (objectID == -1)
         {
-            _segmentIndicator[_selectedSegmentID].SetState(false);
-            _confirmButton.interactable = false;
+            _segmentIndicators[_selectedSegmentID].SetState(false);
+            _continueButton.interactable = false;
             return; 
         }
         
-        _segmentIndicator[_selectedSegmentID].SetState(true);
+        _segmentIndicators[_selectedSegmentID].SetState(true);
         AssessmentManager.Instance.AssignPathSegmentObject(_currentSegment.PathSegmentData.SegmentID, objectID);
         UpdateDisplayObject(ResourceManager.Instance.GetSegmentObject(objectID));
-        
-        foreach (PathSegmentObjectData segment in _segmentsToAssign)
-        {
-            if (segment.SelectedObjectID == -1)
-                return;
-        }
 
-        _confirmButton.interactable = true;
+        _continueButton.interactable = VerifySelectionValues();
     }
+
+    private void OnDisplayObjectRemoved()
+    {
+        if (_currentSegment.SelectedObjectID != -1)
+            return;
+        Destroy(_displayObject);
+    }
+
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
     private void UpdateSelectedSegment()
     {
-        GridObjectSelection currentGridSelection = _selectionObjects.Find(g => g.ObjectTextureID == _currentSegment.SelectedObjectID);
-        if (currentGridSelection != null)
+        // Making sure the "old" _currentSegment is not reseting its selection.
+        if (_currentSegment != null)
         {
-            currentGridSelection.IsSegmentSwap = true;
+            GridObjectSelection currentGridSelection = _selectionObjects.Find(g => g.ObjectTextureID == _currentSegment.SelectedObjectID);
+            if (currentGridSelection != null)
+            {
+                currentGridSelection.IsSegmentSwap = true;
+            }
         }
 
-        _currentSegment = _segmentsToAssign[_selectedSegmentID];
+        _currentSegment = _segmentObjectData[_selectedSegmentID];
         _textSelectedSegment.color = _currentSegment.PathSegmentData.SegmentColor;
         _textSelectedSegment.text = (_selectedSegmentID + 1).ToString();
-        _segmentIndicator[_selectedSegmentID].Toggle(true);
+        _segmentIndicators[_selectedSegmentID].Toggle(true);
 
         Toggle toggle = _toggleGroup.ActiveToggles().FirstOrDefault();
         if (toggle != null)
@@ -157,6 +183,7 @@ public class UISegmentObjectSelection : MonoBehaviour
         else
         { 
             UpdateDisplayObject(ResourceManager.Instance.GetSegmentObject(_currentSegment.SelectedObjectID));
+            _segmentIndicators[_selectedSegmentID].SetState(true);
             gridObjectSelection.Select();
         }
     }
@@ -172,4 +199,23 @@ public class UISegmentObjectSelection : MonoBehaviour
             _displayObject = Instantiate(obj, _objectDisplaySpawnpoint.position, Quaternion.identity, _objectDisplaySpawnpoint);
     }
 
+    private bool VerifySelectionValues()
+    {
+        foreach (PathSegmentObjectData segment in _segmentObjectData)
+        {
+            if (segment.SelectedObjectID == -1)
+                return false;
+        }
+        return true;
+    }
+
+    public void ResetPanelData()
+    {
+        _currentSegment = null;
+        _selectedSegmentID = -1;
+        _segmentIndicators.ForEach(i => Destroy(i.gameObject));
+        _segmentIndicators.Clear();
+        _segmentObjectData.Clear();
+        _continueButton.interactable = false;
+    }
 }

@@ -7,11 +7,12 @@ using UnityEngine.UI;
 public class PathSegmentDistanceData
 {
     public PathSegmentData PathSegmentData;
-    public float SelectedDistance = -1;
+    public float SelectedDistance;
 
     public PathSegmentDistanceData(PathSegmentData data)
     {
         PathSegmentData = data;
+        SelectedDistance = -1;
     }
 }
 
@@ -57,21 +58,24 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
     
     private void OnEnable() 
     {
-        _buttonPrevious.onClick.AddListener(OnPreviousButtonClick);
-        _buttonNext.onClick.AddListener(OnNextButtonClick);
+        _buttonPrevious.onClick.AddListener(OnPreviousSegmentButtonClick);
+        _buttonNext.onClick.AddListener(OnNextSegmentButtonClick);
         _confirmButton.onClick.AddListener(OnConfirmButtonClicked);
         InitializeNumpad();
 
-        _confirmButton.interactable = false;
-        _selectedSegmentID = 0;
-
-        AssessmentManager.Instance.CurrentPath.SegmentsData.ForEach(s =>
+        if (_segmentDistanceData.Count == 0)
         {
-            _segmentDistanceData.Add(new PathSegmentDistanceData(s));
-            UISegmentIndicator segmentIndicator = Instantiate(_segmentIndicatorPrefab, _segmentIndicatorParent).GetComponent<UISegmentIndicator>();
-            _segmentIndicators.Add(segmentIndicator);
-        });
+            _selectedSegmentID = 0;
 
+            AssessmentManager.Instance.CurrentPath.SegmentsData.ForEach(s =>
+            {
+                _segmentDistanceData.Add(new PathSegmentDistanceData(s));
+                UISegmentIndicator segmentIndicator = Instantiate(_segmentIndicatorPrefab, _segmentIndicatorParent).GetComponent<UISegmentIndicator>();
+                _segmentIndicators.Add(segmentIndicator);
+            });
+        }
+
+        _confirmButton.interactable = VerifyDistanceValues();
         _selectedPathImage.sprite = AssessmentManager.Instance.CurrentPathAssessment.SelectedPathSprite;
 
         UpdateSelectedSegment();
@@ -79,15 +83,16 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
 
     private void OnDisable() 
     {
-        _buttonPrevious.onClick.RemoveListener(OnPreviousButtonClick);
-        _buttonNext.onClick.RemoveListener(OnNextButtonClick);
+        _buttonPrevious.onClick.RemoveListener(OnPreviousSegmentButtonClick);
+        _buttonNext.onClick.RemoveListener(OnNextSegmentButtonClick);
         _confirmButton.onClick.RemoveListener(OnConfirmButtonClicked);
+        TerminateNumpad();
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
 
 
-    private void OnNextButtonClick()
+    private void OnNextSegmentButtonClick()
     {
         _segmentIndicators[_selectedSegmentID].Toggle(false);
         _selectedSegmentID = (_selectedSegmentID + 1) % _segmentDistanceData.Count;
@@ -95,7 +100,7 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
 
     }
 
-    private void OnPreviousButtonClick()
+    private void OnPreviousSegmentButtonClick()
     {
         _segmentIndicators[_selectedSegmentID].Toggle(false);
         _selectedSegmentID = (_selectedSegmentID - 1 + _segmentDistanceData.Count) % _segmentDistanceData.Count;
@@ -198,7 +203,8 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
         _buttonClear.onClick.AddListener(OnButtonClearClick);
         _buttonRemove.onClick.AddListener(OnButtonRemoveClick);
     }
-    private void RemoveNumpad()
+
+    private void TerminateNumpad()
     {
         _buttonComma.onClick.RemoveListener(OnButtonCommaClick);
         _buttonZero.onClick.RemoveListener(OnButtonZeroClick);
@@ -322,12 +328,21 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
         }
     }
 
-
     private void ResetNumpadInput()
     {
         _inputBuffer.Clear();
         _isDecimal = false;
         _selectionIndicator.color = Color.white;
+    }
+
+    public void ResetPanelData()
+    {
+        _currentSegment = null;
+        _selectedSegmentID = -1;
+        _segmentIndicators.ForEach(i => Destroy(i.gameObject));
+        _segmentIndicators.Clear();
+        _segmentDistanceData.Clear();
+        _confirmButton.interactable = false;
     }
 
 }
