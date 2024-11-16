@@ -108,32 +108,6 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
         ResetNumpadInput();
         AssessmentManager.Instance.ProceedToNextAssessmentStep();
     }
-    
-    private void InputChanged()
-    {
-        string input = _inputBuffer.ToString();
-        if (_currentSegment == null)
-        {
-            ResetNumpadInput();
-            return;
-        }
-
-        Debug.Log($"Change text to {input}m");
-
-        _textSegmentDistance.text = input + "m";
-
-        if (! float.TryParse(input, out float distanceValue))
-        {
-            Debug.LogError($"Could not parse numpad input into float.");
-            return;
-        }
-        
-        _segmentIndicators[_selectedSegmentID].SetState(true);
-
-        _currentSegment.SelectedDistance = distanceValue;
-        AssessmentManager.Instance.SetPathSegmentObjectiveDistance(_currentSegment.PathSegmentData.SegmentID, _currentSegment.SelectedDistance);
-        _confirmButton.interactable = VerifyDistanceValues();
-    }
 
     private void OnButtonZeroClick()
     {
@@ -192,10 +166,12 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
 
     private void OnButtonClearClick()
     {
-        _segmentIndicators[_selectedSegmentID].SetState(false);
         _inputBuffer.Clear();
         _isDecimal = false;
-        AddNumber(0);
+        _segmentIndicators[_selectedSegmentID].SetState(false);
+        _currentSegment.SelectedDistance = -1;
+        _textSegmentDistance.text = 0 + "m";
+        _confirmButton.interactable = false;
     }
 
     private void OnButtonRemoveClick()
@@ -237,6 +213,32 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
         _buttonNine.onClick.RemoveListener(OnButtonNineClick);
         _buttonClear.onClick.RemoveListener(OnButtonClearClick);
         _buttonRemove.onClick.RemoveListener(OnButtonRemoveClick);
+    }
+
+    private void NumpadInputChanged()
+    {
+        string input = _inputBuffer.ToString();
+        if (_currentSegment == null)
+        {
+            ResetNumpadInput();
+            return;
+        }
+
+        Debug.Log($"Change text to {input}m");
+
+        if (! float.TryParse(input, out float distanceValue))
+        {
+            Debug.LogError($"Could not parse numpad input into float.");
+            return;
+        }
+
+        _textSegmentDistance.text = input + "m";
+        
+        _segmentIndicators[_selectedSegmentID].SetState(true);
+
+        _currentSegment.SelectedDistance = distanceValue;
+        AssessmentManager.Instance.SetPathSegmentObjectiveDistance(_currentSegment.PathSegmentData.SegmentID, _currentSegment.SelectedDistance);
+        _confirmButton.interactable = VerifyDistanceValues();
     }
 
     private void UpdateSelectedSegment()
@@ -285,7 +287,7 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
             _inputBuffer.Append(number);
         }
 
-        InputChanged();
+        NumpadInputChanged();
     }
 
     private void AddDecimalPoint()
@@ -301,7 +303,7 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
             _isDecimal = true;
         }
 
-        InputChanged();
+        NumpadInputChanged();
     }
 
     private void RemoveLastInput()
@@ -314,8 +316,9 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
             {
                 _isDecimal = false;
             }
+            
             _inputBuffer.Remove(_inputBuffer.Length - 1, 1);
-            InputChanged();
+            NumpadInputChanged();
         }
     }
 

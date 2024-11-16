@@ -2968,7 +2968,7 @@ PrefabInstance:
       objectReference: {fileID: 6046162334353147602}
     - target: {fileID: 7714264092027446022, guid: 2ad9cf22f10a2224ba7ae2e4ee5a334d, type: 3}
       propertyPath: m_text
-      value: '-'
+      value: "\u2015"
       objectReference: {fileID: 0}
     - target: {fileID: 7742238091644160880, guid: 2ad9cf22f10a2224ba7ae2e4ee5a334d, type: 3}
       propertyPath: m_Name

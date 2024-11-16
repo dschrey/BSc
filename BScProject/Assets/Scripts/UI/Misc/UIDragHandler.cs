@@ -126,10 +126,8 @@ public class UIDragHandler : MonoBehaviour, IDragHandler, IEndDragHandler
             newSliderValue = Mathf.Max(_sliderhorizontalPosition.value + adjustmentValue, _sliderhorizontalPosition.minValue);
         }
 
-        // Adjust the RectTransform position by the actual adjustment value
         newPosition.x += adjustmentValue;
 
-        // Set the slider to the clamped new value
         _sliderhorizontalPosition.value = newSliderValue;
         _rectTransform.anchoredPosition = newPosition;
         UpdateWorldObjectPosition(newPosition);
@@ -149,10 +147,8 @@ public class UIDragHandler : MonoBehaviour, IDragHandler, IEndDragHandler
             newSliderValue = Mathf.Max(_sliderverticalPosition.value + adjustmentValue, _sliderverticalPosition.minValue);
         }
 
-        // Adjust the RectTransform position by the actual adjustment value
         newPosition.y += adjustmentValue;
 
-        // Set the slider to the clamped new value
         _sliderverticalPosition.value = newSliderValue;
         _rectTransform.anchoredPosition = newPosition;
         UpdateWorldObjectPosition(newPosition);
