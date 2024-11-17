@@ -32,6 +32,8 @@ public class ExperimentManager : MonoBehaviour
     public bool PathAvailable => CompletedPaths != Paths.Count;
 
 
+
+
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
     private void Awake()
@@ -119,13 +121,12 @@ public class ExperimentManager : MonoBehaviour
     {
         Debug.Log($"Starting assessment for path ID: {PathManager.Instance.CurrentPath.PathData.PathID}");
         AssessmentManager.Instance.StartPathAssessment(PathManager.Instance.CurrentPath.PathData);
-        _XROrigin.SetLocalPositionAndRotation(_evaluationRoomSpawnPoint.position, _evaluationRoomSpawnPoint.rotation);
+        TeleportXROrigin(_evaluationRoomSpawnPoint.position);
     }
 
     public void StopExperiment()
     {
         CompletedPaths = 0;
-        _XROrigin.SetPositionAndRotation(ExperimentSpawn.position, ExperimentSpawn.rotation);
         _UIExperimentPanelManager.ToggleRunningPanel(false);
         _UIExperimentPanelManager.ResetPanelPosition();
         _UIExperimentPanelManager.ShowSetupPanel();
@@ -138,5 +139,11 @@ public class ExperimentManager : MonoBehaviour
         LoadNextPath();
     }
 
+    public void TeleportXROrigin(Vector3 position)
+    {
+        _XROrigin.position = position;
+        XROrigin xROrigin = _XROrigin.GetComponent<XROrigin>();
+        xROrigin.CameraFloorOffsetObject.transform.localPosition = new(0, xROrigin.CameraFloorOffsetObject.transform.localPosition.y, 0);
+    }
 
 }

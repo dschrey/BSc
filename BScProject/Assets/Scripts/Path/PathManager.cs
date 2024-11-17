@@ -84,7 +84,7 @@ public class PathManager : MonoBehaviour
         CurrentPath = Instantiate(_pathPrefab, ExperimentManager.Instance.ExperimentSpawn.position, ExperimentManager.Instance.ExperimentSpawn.rotation).GetComponent<Path>();
         CurrentPath.Initialize(pathData);
 
-        TeleportPlayerToStart();
+        ExperimentManager.Instance.TeleportXROrigin(ExperimentManager.Instance.ExperimentSpawn.position);
         RevealNextPathSegment();
     }
 
@@ -101,19 +101,17 @@ public class PathManager : MonoBehaviour
         CurrentSegment = CurrentPath.Segments[_unlockedSegments];
         CurrentSegment.SegmentCompleted += OnSegmentCompleted;
         CurrentSegment.gameObject.SetActive(true);
-        if (CurrentPath == null)    
-            ExperimentManager.Instance._XROrigin.LookAt(CurrentSegment.gameObject.transform);
     }
 
     public void RestartSegment()
     {
         if (LastSegment != null)
         {
-            ExperimentManager.Instance._XROrigin.SetPositionAndRotation(LastSegment.gameObject.transform.position, LastSegment.gameObject.transform.rotation);
+            ExperimentManager.Instance.TeleportXROrigin(LastSegment.gameObject.transform.position);
         }
         else
         {
-            ExperimentManager.Instance._XROrigin.SetPositionAndRotation(ExperimentManager.Instance.ExperimentSpawn.position, ExperimentManager.Instance.ExperimentSpawn.rotation);
+            ExperimentManager.Instance.TeleportXROrigin(ExperimentManager.Instance.ExperimentSpawn.position);
         }
 
         CurrentSegment.ShowSegmentObjective();
@@ -127,11 +125,6 @@ public class PathManager : MonoBehaviour
             return;
         }
         CurrentSegment.PlaySegmentObjectiveHint();
-    }
-
-    private void TeleportPlayerToStart()
-    {
-        ExperimentManager.Instance._XROrigin.SetPositionAndRotation(ExperimentManager.Instance.ExperimentSpawn.position, ExperimentManager.Instance.ExperimentSpawn.rotation);
     }
 
     public void ClearPath()

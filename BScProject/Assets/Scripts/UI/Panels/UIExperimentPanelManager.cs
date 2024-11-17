@@ -1,3 +1,4 @@
+using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit.UI;
@@ -8,6 +9,7 @@ public class UIExperimentPanelManager : MonoBehaviour
     [SerializeField] private GameObject _experimentRunningPanel;
     [SerializeField] private GameObject _experimentFinishedPanel;
     [SerializeField] private InputActionProperty _activationButton;
+    [SerializeField] private Transform _playerCamera;
     [SerializeField] private Transform _panelSpawnpoint;
     [SerializeField] private bool _isBillboard = true;
     [SerializeField] private float _distanceFromPlayer = 1f;
@@ -29,7 +31,7 @@ public class UIExperimentPanelManager : MonoBehaviour
 
         if (_isBillboard && _menuVisible)
         {
-            transform.LookAt(ExperimentManager.Instance._XROrigin.position);
+            transform.LookAt(_playerCamera);
             transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y + 180, 0);
         }
     }
@@ -68,7 +70,8 @@ public class UIExperimentPanelManager : MonoBehaviour
     {
         LazyFollow lazyFollow = GetComponent<LazyFollow>();
         lazyFollow.enabled = false;
-        Transform playerTransform = ExperimentManager.Instance._XROrigin;
+        XROrigin xROrigin = ExperimentManager.Instance._XROrigin.GetComponent<XROrigin>();
+        Transform playerTransform = xROrigin.CameraFloorOffsetObject.transform;
         Vector3 targetPosition = playerTransform.position + playerTransform.forward * _distanceFromPlayer;
         targetPosition.y = _panelHeight;
         transform.position = targetPosition;

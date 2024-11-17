@@ -69,7 +69,6 @@ public class AssessmentManager : MonoBehaviour
                 break;
             case AssessmentStep.PATHSELECTION:
                 _activePanel = _pathSelectionPanel;
-                ExperimentManager.Instance._XROrigin.LookAt(_pathSelectionPanel.transform);
 				break;
             case AssessmentStep.OBJECTIVEDISTANCE:
                 _activePanel = _objectiveDistancePanel;

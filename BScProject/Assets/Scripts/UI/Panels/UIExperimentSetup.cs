@@ -57,8 +57,8 @@ public class UIExperimentSetup : MonoBehaviour
 
     private void OnSetSpawnButtonClicked()
     {
-        // _startPointHandler.SetExperimentStartPosition(ExperimentManager.Instance._XROrigin.transform);
-        ExperimentManager.Instance._XROrigin.SetPositionAndRotation(_startPointHandler.transform.position, _startPointHandler.transform.rotation);
+        
+        ExperimentManager.Instance.TeleportXROrigin(_startPointHandler.transform.position);
         _panelManager.ResetPanelPosition();
     }
 

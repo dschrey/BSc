@@ -2,17 +2,16 @@ using UnityEngine;
 
 public class CharacterControllerSync : MonoBehaviour
 {
-    [SerializeField] private CharacterController characterController;
-    [SerializeField] private Transform xrCamera;
+    [SerializeField] private CharacterController _characterController;
+    [SerializeField] private Transform _XRCameraOffset;
 
 
     private void Update()
     {
-        if (characterController == null || xrCamera == null)
+        if (_characterController == null || _XRCameraOffset == null)
             return;
 
-        // Match the Character Controller's position to the XR Camera's X and Z, keeping its original Y
-        Vector3 cameraPosition = xrCamera.position;
-        characterController.center = new Vector3(cameraPosition.x, characterController.center.y, cameraPosition.z);
+        Vector3 cameraPosition = _XRCameraOffset.localPosition;
+        _characterController.center = new Vector3(cameraPosition.x, _characterController.center.y, cameraPosition.z);
     }
 }
