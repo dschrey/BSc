@@ -47,7 +47,6 @@ public class UIExperimentSetup : MonoBehaviour
         }
     }
 
-
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
 
     private void OnStartButtonClicked()
@@ -57,8 +56,7 @@ public class UIExperimentSetup : MonoBehaviour
 
     private void OnSetSpawnButtonClicked()
     {
-        
-        ExperimentManager.Instance.TeleportXROrigin(_startPointHandler.transform.position);
+        ExperimentManager.Instance.MoveXROrigin(_startPointHandler.transform.position);
         _panelManager.ResetPanelPosition();
     }
 

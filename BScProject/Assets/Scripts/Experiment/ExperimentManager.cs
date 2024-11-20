@@ -121,12 +121,13 @@ public class ExperimentManager : MonoBehaviour
     {
         Debug.Log($"Starting assessment for path ID: {PathManager.Instance.CurrentPath.PathData.PathID}");
         AssessmentManager.Instance.StartPathAssessment(PathManager.Instance.CurrentPath.PathData);
-        TeleportXROrigin(_evaluationRoomSpawnPoint.position);
+        MoveXROrigin(_evaluationRoomSpawnPoint.position);
     }
 
     public void StopExperiment()
     {
         CompletedPaths = 0;
+        MoveXROrigin(ExperimentSpawn.position);
         _UIExperimentPanelManager.ToggleRunningPanel(false);
         _UIExperimentPanelManager.ResetPanelPosition();
         _UIExperimentPanelManager.ShowSetupPanel();
@@ -139,11 +140,17 @@ public class ExperimentManager : MonoBehaviour
         LoadNextPath();
     }
 
-    public void TeleportXROrigin(Vector3 position)
+    public void MoveXROrigin(Vector3 position)
     {
-        _XROrigin.position = position;
+        TeleportFade fadeQuad = FindObjectOfType<TeleportFade>();
+        StartCoroutine(fadeQuad.FadeAndTeleport(0, 1, position));
+    }
+
+    public void TeleportPlayer(Vector3 position)
+    {
         XROrigin xROrigin = _XROrigin.GetComponent<XROrigin>();
-        xROrigin.CameraFloorOffsetObject.transform.localPosition = new(0, xROrigin.CameraFloorOffsetObject.transform.localPosition.y, 0);
+        _XROrigin.position = position;
+        xROrigin.Camera.transform.localPosition = new(0, xROrigin.CameraFloorOffsetObject.transform.localPosition.y, 0);
     }
 
 }

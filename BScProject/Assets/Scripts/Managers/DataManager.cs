@@ -5,7 +5,7 @@ public class DataManager : MonoBehaviour
 {
 
     public static DataManager Instance { get; private set; }
-    [SerializeField] private ExperimentSettings _experimentData;
+    public ExperimentSettings ExperimentData;
     private string _experimentSettingsPath;
     private string _experimentResultsPath;
     private string _assessmentFilePath;
@@ -42,12 +42,13 @@ public class DataManager : MonoBehaviour
 
     public void SaveExperimentSettings()
     {
+        Debug.Log($"Saving experiment Settings");
         ExperimentSettingsData data = new()
         {
-            CompletedAssessments = _experimentData.CompletedAssessments,
-            PlayerDetectionRadius = _experimentData.PlayerDetectionRadius,
-            ObjectiveRevealTime = _experimentData.ObjectiveRevealTime,
-            MovementSpeedMultiplier = _experimentData.MovementSpeedMultiplier
+            CompletedAssessments = ExperimentData.CompletedAssessments,
+            PlayerDetectionRadius = ExperimentData.PlayerDetectionRadius,
+            ObjectiveRevealTime = ExperimentData.ObjectiveRevealTime,
+            MovementSpeedMultiplier = ExperimentData.MovementSpeedMultiplier
         };
 
         string json = JsonUtility.ToJson(data, true);
@@ -63,10 +64,10 @@ public class DataManager : MonoBehaviour
 
             ExperimentSettingsData data = JsonUtility.FromJson<ExperimentSettingsData>(json);
 
-            _experimentData.PlayerDetectionRadius = data.PlayerDetectionRadius;
-            _experimentData.ObjectiveRevealTime = data.ObjectiveRevealTime;
-            _experimentData.MovementSpeedMultiplier = data.MovementSpeedMultiplier;
-            _experimentData.CompletedAssessments = data.CompletedAssessments;
+            ExperimentData.PlayerDetectionRadius = data.PlayerDetectionRadius;
+            ExperimentData.ObjectiveRevealTime = data.ObjectiveRevealTime;
+            ExperimentData.MovementSpeedMultiplier = data.MovementSpeedMultiplier;
+            ExperimentData.CompletedAssessments = data.CompletedAssessments;
         } 
         else
         {

@@ -110,8 +110,9 @@ public class PathSegment : MonoBehaviour
 
     private void SpawnSegmentObstacle()
     {
-        SegmentObstacle = Instantiate(PathSegmentData.SegmentObstaclePrefab, PathSegmentData.SegmentObstaclePrefab.transform.position, 
-            PathSegmentData.SegmentObstaclePrefab.transform.rotation, transform);
+        Debug.Log($"Prefab pos {PathSegmentData.SegmentObstaclePrefab.transform.position}");
+        SegmentObstacle = Instantiate(PathSegmentData.SegmentObstaclePrefab, transform);
+        Debug.Log($"Spawned pos {SegmentObstacle.transform.position}");
     }
 
 }

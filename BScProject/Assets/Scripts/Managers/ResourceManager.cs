@@ -6,6 +6,7 @@ public class ResourceManager : MonoBehaviour
     public static ResourceManager Instance { get; private set; }
     public List<RenderObject> ObjectiveObjects = new();
     public List<RenderObject> SegmentObjects = new();
+    public List<PathData> LoadedPaths = new();
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
@@ -14,6 +15,7 @@ public class ResourceManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -32,6 +34,7 @@ public class ResourceManager : MonoBehaviour
     {
         LoadObjectiveObjects();
         LoadSegmentObjects();
+        LoadPaths();
     }
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
@@ -44,6 +47,12 @@ public class ResourceManager : MonoBehaviour
     private void LoadSegmentObjects()
     {
         SegmentObjects.AddRange(LoadRenderObjects("SegmentObjects"));
+    }
+
+    private void LoadPaths()
+    {
+        LoadedPaths.AddRange(Resources.LoadAll<PathData>("PathData"));
+        Debug.Log($"Loaded {LoadedPaths.Count} path data.");
     }
 
     private List<RenderObject> LoadRenderObjects(string resourcePath)

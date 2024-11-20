@@ -67,6 +67,7 @@ MonoBehaviour:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: 4116954447336496447, guid: 0be0028c24f2a4c14a96b6aa39055933, type: 3}
+  _playerCamera: {fileID: 0}
   _panelSpawnpoint: {fileID: 0}
   _isBillboard: 1
   _distanceFromPlayer: 1
@@ -476,7 +477,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7680006236052805357, guid: 54e7aaaf839dbae44ae5c3d569d0332d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 350
+      value: 594.031
       objectReference: {fileID: 0}
     - target: {fileID: 7680006236052805357, guid: 54e7aaaf839dbae44ae5c3d569d0332d, type: 3}
       propertyPath: m_SizeDelta.y
@@ -512,7 +513,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7680006236052805357, guid: 54e7aaaf839dbae44ae5c3d569d0332d, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 7680006236052805357, guid: 54e7aaaf839dbae44ae5c3d569d0332d, type: 3}
       propertyPath: m_AnchoredPosition.y
