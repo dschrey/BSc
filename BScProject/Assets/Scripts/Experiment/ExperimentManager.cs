@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
 
 public enum ExperimentState {IDLE, LOADPATH, RUNNING, ASSESSMENT, FINISHED, CANCELLED };
 
@@ -10,8 +11,8 @@ public class ExperimentManager : MonoBehaviour
     public static ExperimentManager Instance { get; private set; }
     public ExperimentSettings ExperimentSettings;
     public List<PathData> Paths = new();
+    public Transform AssessmentRoomSpawnPoint;
     [SerializeField] private UIExperimentPanelManager _UIExperimentPanelManager;
-    [SerializeField] private Transform _evaluationRoomSpawnPoint;
     public Transform _XROrigin;
     public Transform ExperimentSpawn;
     public Timer Timer;
@@ -121,13 +122,13 @@ public class ExperimentManager : MonoBehaviour
     {
         Debug.Log($"Starting assessment for path ID: {PathManager.Instance.CurrentPath.PathData.PathID}");
         AssessmentManager.Instance.StartPathAssessment(PathManager.Instance.CurrentPath.PathData);
-        MoveXROrigin(_evaluationRoomSpawnPoint.position);
+        MoveXROrigin(AssessmentRoomSpawnPoint);
     }
 
     public void StopExperiment()
     {
         CompletedPaths = 0;
-        MoveXROrigin(ExperimentSpawn.position);
+        MoveXROrigin(ExperimentSpawn);
         _UIExperimentPanelManager.ToggleRunningPanel(false);
         _UIExperimentPanelManager.ResetPanelPosition();
         _UIExperimentPanelManager.ShowSetupPanel();
@@ -140,17 +141,33 @@ public class ExperimentManager : MonoBehaviour
         LoadNextPath();
     }
 
-    public void MoveXROrigin(Vector3 position)
+    public void MoveXROrigin(Transform target)
     {
         TeleportFade fadeQuad = FindObjectOfType<TeleportFade>();
-        StartCoroutine(fadeQuad.FadeAndTeleport(0, 1, position));
+        StartCoroutine(fadeQuad.FadeAndTeleport(0, 1, target));
     }
 
-    public void TeleportPlayer(Vector3 position)
+    public void TeleportPlayer(Transform target)
     {
-        XROrigin xROrigin = _XROrigin.GetComponent<XROrigin>();
-        _XROrigin.position = position;
-        xROrigin.Camera.transform.localPosition = new(0, xROrigin.CameraFloorOffsetObject.transform.localPosition.y, 0);
+        TeleportRequest request = new()
+        {
+            requestTime = Time.time,
+            matchOrientation = MatchOrientation.TargetUpAndForward,
+
+            destinationPosition = target.position,
+            destinationRotation = target.rotation
+        };
+
+        Debug.Log($"Teleport to: {request.destinationPosition}");
+
+        TeleportationProvider m_TeleportationProvider = FindObjectOfType<TeleportationProvider>();
+        if (m_TeleportationProvider == null)
+        {
+            Debug.Log($"No teleport provider found");
+            return;
+        }
+        
+        m_TeleportationProvider.QueueTeleportRequest(request);
     }
 
 }

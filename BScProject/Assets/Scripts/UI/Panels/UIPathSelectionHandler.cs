@@ -5,9 +5,7 @@ using UnityEngine.UI;
 public class UIPathSelectionHandler : MonoBehaviour
 {
     [SerializeField] private Button _confirmButton;
-    [SerializeField] private GameObject _pathSelectionPrefab;
-    [SerializeField] private GameObject _selectionParent;
-    private readonly List<PathSelectionOption> _pathOptions = new();
+    [SerializeField] private List<PathSelectionOption> _pathOptions = new();
 
     // ---------- Unity Methods --------------------------------------------------------------------------------------------------------------------------------
 
@@ -16,35 +14,26 @@ public class UIPathSelectionHandler : MonoBehaviour
         _confirmButton.onClick.AddListener(OnPathSelectionConfirmed);
         _confirmButton.interactable = false;
 
-        List<Sprite> images = Utils.Shuffle(AssessmentManager.Instance.CurrentPath.PathImageSelection);
-
-        foreach (Sprite sprite in images)
+        List<int> pathLayoutIDs = new();
+        pathLayoutIDs.AddRange(AssessmentManager.Instance.CurrentPath.PathLayoutSelectionOrder);
+        for (int i = 0; i < pathLayoutIDs.Count; i++)
         {
-            PathSelectionOption pathOption = Instantiate(_pathSelectionPrefab, _selectionParent.transform).GetComponent<PathSelectionOption>();
-            pathOption.Initialize(sprite, _selectionParent.GetComponent<ToggleGroup>());
-            pathOption.PathSelectionChanged.AddListener(OnSelectedPathChanged);
-            _pathOptions.Add(pathOption);
+            _pathOptions[i].Initialize(pathLayoutIDs[i], PathLayoutManager.Instance.GetPathLayout(pathLayoutIDs[i]).LayoutRenderTexture);
+            _pathOptions[i].PathSelectionChanged.AddListener(OnSelectedPathChanged);
         }
-
     }
 
     private void OnDisable() 
     {
+        _pathOptions.ForEach(x => x.PathSelectionChanged.RemoveListener(OnSelectedPathChanged));
         _confirmButton.onClick.RemoveListener(OnPathSelectionConfirmed);
-
-        foreach (PathSelectionOption pathOption in _pathOptions)
-        {
-            pathOption.PathSelectionChanged.RemoveListener(OnSelectedPathChanged);
-            Destroy(pathOption.gameObject);
-        }
-        _pathOptions.Clear();
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
 
-    private void OnSelectedPathChanged(Sprite selectedPathImage)
+    private void OnSelectedPathChanged(int selectedPathLayoutID)
     {
-        if (selectedPathImage != null)
+        if (selectedPathLayoutID != -1)
         {
             _confirmButton.interactable = true;
         }
@@ -52,7 +41,7 @@ public class UIPathSelectionHandler : MonoBehaviour
         {
             _confirmButton.interactable = false;
         }
-        AssessmentManager.Instance.SetSelectedPathImage(selectedPathImage);
+        AssessmentManager.Instance.SetSelectedPathLayout(selectedPathLayoutID);
     }
 
     private void OnPathSelectionConfirmed()

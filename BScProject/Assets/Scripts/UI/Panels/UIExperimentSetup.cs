@@ -52,11 +52,12 @@ public class UIExperimentSetup : MonoBehaviour
     private void OnStartButtonClicked()
     {
         ExperimentManager.Instance.StartExperiment();
+        // ExperimentManager.Instance.TeleportPlayer(ExperimentManager.Instance.AssessmentRoomSpawnPoint);
     }
 
     private void OnSetSpawnButtonClicked()
     {
-        ExperimentManager.Instance.MoveXROrigin(_startPointHandler.transform.position);
+        ExperimentManager.Instance.MoveXROrigin(_startPointHandler.transform);
         _panelManager.ResetPanelPosition();
     }
 

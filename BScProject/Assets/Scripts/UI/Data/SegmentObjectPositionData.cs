@@ -1,5 +1,7 @@
+using System;
 using UnityEngine;
 
+[Obsolete("Class is deprecated and will be removed in the future.")]
 public class SegmentObjectPositionData
 {
     public PathSegmentData PathSegmentData;

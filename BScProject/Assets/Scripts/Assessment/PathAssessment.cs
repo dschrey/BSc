@@ -4,7 +4,9 @@ using UnityEngine;
 public class PathAssessment 
 {
     public PathData PathData { get; private set; }
-    public Sprite SelectedPathSprite;
+
+    // TODO fix everything related to the selected path layout
+    public int SelectedPathLayoutID;
     public List<PathSegmentAssessment> PathSegmentAssessments { get; private set; }
 
     public PathAssessment(PathData correctPath)
@@ -21,7 +23,7 @@ public class PathAssessment
 
     public bool EvaluateSelectedPathImage()
     {
-        return PathData.PathImage == SelectedPathSprite;
+        return PathData.PathLayoutID == SelectedPathLayoutID;
     }
 
 }

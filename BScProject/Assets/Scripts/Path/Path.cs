@@ -40,34 +40,26 @@ public class Path : MonoBehaviour
         Vector3 lastSegmentPosition = transform.position;
         foreach (PathSegmentData pathSegmentData in pathData.SegmentsData)
         {
-            Vector3 segmentSpawnpoint = lastSegmentPosition + pathSegmentData.RelativeSegmentPosition;
-            float segmentDistance = Vector3.Distance(lastSegmentPosition, segmentSpawnpoint);
+            float angleInRadians = pathSegmentData.AngleFromPreviousSegment * Mathf.Deg2Rad;
+            Vector3 relativePosition = new (
+                pathSegmentData.DistanceFromPreviousSegment * Mathf.Cos(angleInRadians),
+                0,
+                pathSegmentData.DistanceFromPreviousSegment * Mathf.Sin(angleInRadians)
+            );
+            Vector3 segmentSpawnpoint = lastSegmentPosition + relativePosition;
 
             PathSegment segment = Instantiate(_pathSegmentPrefab, segmentSpawnpoint, Quaternion.identity, transform).GetComponent<PathSegment>();
-            segment.Initialize(pathSegmentData, segmentDistance);
+            segment.Initialize(pathSegmentData);
             
-            if (pathData.Type == PathType.EXTENDED)
+            if ( pathData.Type == PathType.EXTENDED)
             {
                 segment.SpawnSegmentObjects();
             }
 
             Segments.Add(segment);
             lastSegmentPosition = segmentSpawnpoint;
+
             segment.gameObject.SetActive(false);
-        }
-    }
-
-    public void TogglePathPreview(bool state)
-    {
-        if (PathData == null)
-        {
-            Debug.LogWarning($"Cannot preview a path with no data.");
-            return;
-        }
-
-        foreach (PathSegment segment in Segments)
-        {
-            segment.gameObject.SetActive(state);
         }
     }
 

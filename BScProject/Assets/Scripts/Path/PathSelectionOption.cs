@@ -4,10 +4,11 @@ using UnityEngine.UI;
 
 public class PathSelectionOption : MonoBehaviour
 {
-    [SerializeField] private Image _image;
+    private int _layoutID = -1;
+    [SerializeField] private RawImage _image;
     [SerializeField] private Toggle _toggle;
-    private Sprite _pathImage;
-    public UnityEvent<Sprite> PathSelectionChanged;
+    public UnityEvent<int> PathSelectionChanged;
+
 
     // ---------- Unity Methods --------------------------------------------------------------------------------------------------------------------------------
 
@@ -27,21 +28,19 @@ public class PathSelectionOption : MonoBehaviour
     {
         if (state)
         {
-            PathSelectionChanged?.Invoke(_pathImage);
+            PathSelectionChanged?.Invoke(_layoutID);
         }
         else
         {
-            PathSelectionChanged?.Invoke(null);
+            PathSelectionChanged?.Invoke(-1);
         }
     }
 
     // ---------- Class Methods --------------------------------------------------------------------------------------------------------------------------------
 
-    public void Initialize(Sprite image, ToggleGroup group)
+    public void Initialize(int pathLayoutID, RenderTexture pathLayoutTexture)
     {
-        _toggle.group = group;
-        _image.sprite = image;
-        _pathImage = image;
+        _layoutID = pathLayoutID;
+        _image.texture = pathLayoutTexture;
     }
-
 }

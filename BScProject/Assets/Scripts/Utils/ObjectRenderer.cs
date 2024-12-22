@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class ObjectRenderer : MonoBehaviour
@@ -14,9 +13,9 @@ public class ObjectRenderer : MonoBehaviour
         spawnedObject.AddComponent<Rotate>();
         Utils.SetLayerRecursively(spawnedObject, LayerMask.NameToLayer("ObjectRendering"));
 
-        Bounds objectBounds = CalculateObjectBounds(spawnedObject);
+        Bounds objectBounds = Utils.CalculateObjectBounds(spawnedObject);
 
-        AdjustCameraToFitObject(objectBounds);
+        Utils.AdjustCameraToBounds(_renderCamera, objectBounds);
 
         _renderCamera.targetTexture = renderTexture;
         _renderCamera.clearFlags = CameraClearFlags.SolidColor;
@@ -24,27 +23,26 @@ public class ObjectRenderer : MonoBehaviour
         _renderCamera.cullingMask = LayerMask.GetMask("ObjectRendering");
     }
 
-    private Bounds CalculateObjectBounds(GameObject obj)
-    {
-        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
-        Bounds bounds = renderers[0].bounds;
+    // private Bounds CalculateObjectBounds(GameObject obj)
+    // {
+    //     Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
+    //     Bounds bounds = renderers[0].bounds;
 
-        foreach (Renderer renderer in renderers)
-        {
-            bounds.Encapsulate(renderer.bounds);
-        }
+    //     foreach (Renderer renderer in renderers)
+    //     {
+    //         bounds.Encapsulate(renderer.bounds);
+    //     }
 
-        return bounds;
-    }
+    //     return bounds;
+    // }
 
-    private void AdjustCameraToFitObject(Bounds objectBounds)
-    {
-        _renderCamera.orthographicSize = Mathf.Max(objectBounds.size.y, objectBounds.size.x) / 2f + 0.05f;
+    // private void AdjustCameraToFitObject(Bounds objectBounds)
+    // {
+    //     _renderCamera.orthographicSize = Mathf.Max(objectBounds.size.y, objectBounds.size.x) / 2f + 0.05f;
 
-        _renderCamera.transform.position = new Vector3(objectBounds.center.x, objectBounds.center.y, _renderCamera.transform.position.z);
-        _renderCamera.transform.LookAt(objectBounds.center);
-
-    }
+    //     _renderCamera.transform.position = new Vector3(objectBounds.center.x, objectBounds.center.y, _renderCamera.transform.position.z);
+    //     _renderCamera.transform.LookAt(objectBounds.center);
+    // }
 
     public RenderTexture GetRenderTexture()
     {

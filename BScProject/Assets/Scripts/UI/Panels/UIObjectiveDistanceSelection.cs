@@ -76,7 +76,7 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
         }
 
         _confirmButton.interactable = VerifyDistanceValues();
-        _selectedPathImage.sprite = AssessmentManager.Instance.CurrentPathAssessment.SelectedPathSprite;
+        // _selectedPathImage.sprite = AssessmentManager.Instance.CurrentPathAssessment.SelectedPathLayoutID;
 
         UpdateSelectedSegment();
     }
@@ -243,7 +243,7 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
         _segmentIndicators[_selectedSegmentID].SetState(true);
 
         _currentSegment.SelectedDistance = distanceValue;
-        AssessmentManager.Instance.SetPathSegmentObjectiveDistance(_currentSegment.PathSegmentData.SegmentID, _currentSegment.SelectedDistance);
+        AssessmentManager.Instance.SetSegmentObjectiveDistance(_currentSegment.PathSegmentData.SegmentID, _currentSegment.SelectedDistance);
         _confirmButton.interactable = VerifyDistanceValues();
     }
 

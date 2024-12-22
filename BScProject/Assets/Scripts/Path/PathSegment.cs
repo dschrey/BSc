@@ -31,22 +31,6 @@ public class PathSegment : MonoBehaviour
 
     }
 
-    private void OnDestroy()
-    {
-        // Debug.Log($"PathSegment :: OnDestroy() : Attempting release of render textures for segment (ID: {PathSegmentData.SegmentID}).");
-        // if (PathSegmentData.SegmentObjectRenderTexture != null)
-        // {
-        //     PathSegmentData.SegmentObjectRenderTexture.Release();
-        //     Debug.Log($" --- Released segment object texture.");
-        // }
-
-        // if (PathSegmentData.ObjectiveObjectRenderTexture != null)
-        // {
-        //     PathSegmentData.ObjectiveObjectRenderTexture.Release();
-        //     Debug.Log($" --- Released objective object texture.");
-        // }
-    }
-
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------------
 
     private void OnObjectiveCaptured()
@@ -66,10 +50,9 @@ public class PathSegment : MonoBehaviour
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------------
 
-    public void Initialize(PathSegmentData pathSegmentData, float distance)
+    public void Initialize(PathSegmentData pathSegmentData)
     {
         PathSegmentData = pathSegmentData;
-        PathSegmentData.DistanceToPreviousSegment = distance;
     }
 
     public void SetObjectiveInvisible()
@@ -90,29 +73,28 @@ public class PathSegment : MonoBehaviour
     public void SpawnSegmentObjects()
     {
         Debug.Log($"PathSegment :: SpawnSegmentObjects : Spawning objects for segment (ID: {PathSegmentData.SegmentID}).");
-        SpawnObjectiveObject();
-        SpawnSegmentObject();
+        SpawnHoverObject();
+        SpawnLandmarkObject();
         SpawnSegmentObstacle();
     }
 
-    private void SpawnObjectiveObject()
+    private void SpawnHoverObject()
     {
-        Objective.SpawnObject(ResourceManager.Instance.GetObjectiveObject(PathSegmentData.ObjectiveObjectID));
+        Objective.SpawnObject(ResourceManager.Instance.GetHoverObject(PathSegmentData.ObjectiveObjectID));
     }
 
-    private  void SpawnSegmentObject()
+    private  void SpawnLandmarkObject()
     {
         Vector3 objectSpawnpoint = transform.position + PathSegmentData.RelativeObjectPositionToObjective;
         
-        SegmentObject = Instantiate(ResourceManager.Instance.GetSegmentObject(PathSegmentData.SegmentObjectID), objectSpawnpoint, Quaternion.identity, transform);
-        PathSegmentData.ObjectDistanceToObjective = Vector3.Distance(transform.position, objectSpawnpoint);
+        SegmentObject = Instantiate(ResourceManager.Instance.GetLandmarkObject(PathSegmentData.LandmarkObjectID), objectSpawnpoint, Quaternion.identity, transform);
+        PathSegmentData.LandmarkObjectDistanceToObjective = Vector3.Distance(transform.position, objectSpawnpoint);
+        Debug.Log($"Spawned at {SegmentObject.transform.localPosition}");
     }
 
     private void SpawnSegmentObstacle()
     {
-        Debug.Log($"Prefab pos {PathSegmentData.SegmentObstaclePrefab.transform.position}");
         SegmentObstacle = Instantiate(PathSegmentData.SegmentObstaclePrefab, transform);
-        Debug.Log($"Spawned pos {SegmentObstacle.transform.position}");
     }
 
 }

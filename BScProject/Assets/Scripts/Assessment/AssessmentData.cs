@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class AssessmentData
 {
     public int AssessmentID;
+    public string ParticipantName;
     public string DateTime;
     public List<PathAssessmentData> Paths;
     public bool Completed;
@@ -17,9 +18,25 @@ public class AssessmentData
         Completed = false;
     }
 
+    public AssessmentData(int id, string participant, DateTime dateTime)
+    {
+        AssessmentID = id;
+        ParticipantName = participant;
+        DateTime = dateTime.ToString().Replace(" ", "_");
+        Paths = new();
+        Completed = false;
+    }
+
     public void AddPath(PathData pathData, int timeTaken)
     {
         PathAssessmentData pathAssessmentData = new(pathData, timeTaken);
+        Paths.Add(pathAssessmentData);
+    }
+
+    public void AddPath(PathData pathData)
+    {
+        // TODO Handle time
+        PathAssessmentData pathAssessmentData = new(pathData, 0);
         Paths.Add(pathAssessmentData);
     }
 
@@ -72,7 +89,7 @@ public class SegmentAssessmentData
     public bool CorrectObjectiveObjectSelected;
     public float SelectedObjectDistanceToObjective;
     public float CalculatedObjectDistanceToObjective;
-    public float ObjectDistanceToRealObject;
+    public float ObjectDifferenceToRealObject;
     public bool CorrectSegmentObjectSelected;
 
     public SegmentAssessmentData (int id)

@@ -4,8 +4,8 @@ using UnityEngine;
 public class ResourceManager : MonoBehaviour
 {
     public static ResourceManager Instance { get; private set; }
-    public List<RenderObject> ObjectiveObjects = new();
-    public List<RenderObject> SegmentObjects = new();
+    public List<RenderObject> HoverObjects = new();
+    public List<RenderObject> LandmarkObjects = new();
     public List<PathData> LoadedPaths = new();
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
@@ -25,8 +25,8 @@ public class ResourceManager : MonoBehaviour
 
     private void OnDestroy() 
     {
-        ObjectiveObjects.ForEach(x => x.RenderTexture.Release());
-        ObjectiveObjects.Clear();
+        HoverObjects.ForEach(x => x.RenderTexture.Release());
+        HoverObjects.Clear();
     }
 
 
@@ -41,12 +41,14 @@ public class ResourceManager : MonoBehaviour
 
     private void LoadObjectiveObjects()
     {
-        ObjectiveObjects.AddRange(LoadRenderObjects("ObjectiveObjects"));
+        HoverObjects.AddRange(LoadRenderObjects("ObjectiveObjects"));
+        Debug.Log($"Loaded {HoverObjects.Count} hover objects.");
     }
 
     private void LoadSegmentObjects()
     {
-        SegmentObjects.AddRange(LoadRenderObjects("SegmentObjects"));
+        LandmarkObjects.AddRange(LoadRenderObjects("SegmentObjects"));
+        Debug.Log($"Loaded {LandmarkObjects.Count} landmark objects.");
     }
 
     private void LoadPaths()
@@ -67,6 +69,8 @@ public class ResourceManager : MonoBehaviour
             objectiveObject.ID = count;
 
             ObjectRenderManager objectRenderManager = FindObjectOfType<ObjectRenderManager>();
+
+            // TODO initialize this only in ExperimentScene
             objectiveObject.RenderTexture = objectRenderManager.CreateNewRenderTexture(obj);
 
             renderObjects.Add(objectiveObject);
@@ -76,9 +80,9 @@ public class ResourceManager : MonoBehaviour
         return renderObjects;
     }
 
-    public RenderTexture GetObjectiveRenderTexture(int id)
+    public RenderTexture GetHoverObjectRenderTexture(int id)
     {
-        foreach (var obj in ObjectiveObjects)
+        foreach (var obj in HoverObjects)
         {
             if (obj.ID == id)
                 return obj.RenderTexture;
@@ -87,19 +91,19 @@ public class ResourceManager : MonoBehaviour
         return null;
     }
 
-    public GameObject GetObjectiveObject(int id)
+    public GameObject GetHoverObject(int id)
     {
-        return ObjectiveObjects.Find(obj => obj.ID == id).gameObject;
+        return HoverObjects.Find(obj => obj.ID == id).gameObject;
     }
 
-    public List<RenderObject> ShuffleObjectiveObjects(int seed = -1)
+    public List<RenderObject> ShuffleHoverObjects(int seed = -1)
     {
-        return Utils.Shuffle(ObjectiveObjects, seed);
+        return Utils.Shuffle(HoverObjects, seed);
     }
 
-    public RenderTexture GetSegmentRenderTexture(int id)
+    public RenderTexture GetLandmarkObjectRenderTexture(int id)
     {
-        foreach (var obj in SegmentObjects)
+        foreach (var obj in LandmarkObjects)
         {
             if (obj.ID == id)
                 return obj.RenderTexture;
@@ -108,13 +112,13 @@ public class ResourceManager : MonoBehaviour
         return null;
     }
 
-    public GameObject GetSegmentObject(int id)
+    public GameObject GetLandmarkObject(int id)
     {
-        return SegmentObjects.Find(obj => obj.ID == id).gameObject;
+        return LandmarkObjects.Find(obj => obj.ID == id).gameObject;
     }
 
-    public List<RenderObject> ShuffleSegmentObjects(int seed = -1)
+    public List<RenderObject> ShuffleLandmarkObjects(int seed = -1)
     {
-        return Utils.Shuffle(SegmentObjects, seed);
+        return Utils.Shuffle(LandmarkObjects, seed);
     }
 }

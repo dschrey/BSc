@@ -4,8 +4,7 @@ using UnityEngine;
 public class CanvasCameraHandler : MonoBehaviour
 {
 
-    private Camera _canvasCamera;
-    // Start is called before the first frame update
+    [SerializeField] private Camera _canvasCamera;
     
     void OnEnable()
     {
@@ -20,5 +19,10 @@ public class CanvasCameraHandler : MonoBehaviour
     public Vector3 WorldCoordinatesToScreenSpace(Vector3 worldPosition)
     {
         return  _canvasCamera.WorldToScreenPoint(worldPosition);
+    }
+
+    public Camera GetCamera()
+    {
+        return _canvasCamera;
     }
 }

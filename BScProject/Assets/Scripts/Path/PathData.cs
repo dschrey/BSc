@@ -9,11 +9,13 @@ public class PathData : ScriptableObject
     public int PathID;
     public PathType Type = PathType.DEFAULT;
     public Color PathColor;
-    public Sprite PathImage;
-    [Header("Path image selection options (at least 4)")]
-    public List<Sprite> PathImageSelection;
+    public List<int> PathLayoutSelectionOrder = new();
+    [HideInInspector] public int PathLayoutID = 0;
+    [Header("Fake Paths")]
+    public List<float> FakePathAngles1 = new();
+    public List<float> FakePathAngles2 = new();
+    public List<float> FakePathAngles3 = new();
     public List<PathSegmentData> SegmentsData = new();
-
     public PathSegmentData GetSegmentData(int id)
     {
         return SegmentsData.Find(s => s.SegmentID == id);

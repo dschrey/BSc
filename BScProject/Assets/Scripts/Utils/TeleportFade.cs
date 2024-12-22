@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class TeleportFade : MonoBehaviour
 {
@@ -13,7 +14,7 @@ public class TeleportFade : MonoBehaviour
         _fadeColor = _fadeMaterial.color;
     }
 
-    public IEnumerator FadeAndTeleport(float alphaIn, float alphaOut, Vector3 position)
+    public IEnumerator FadeAndTeleport(float alphaIn, float alphaOut, Transform target)
     {
         float time = 0;
 
@@ -30,7 +31,7 @@ public class TeleportFade : MonoBehaviour
         finalColor.a = alphaOut;
         _fadeMaterial.color = finalColor;
 
-        ExperimentManager.Instance.TeleportPlayer(position);
+        ExperimentManager.Instance.TeleportPlayer(target);
         FadeIn();
             
     }
@@ -52,10 +53,37 @@ public class TeleportFade : MonoBehaviour
         finalColor.a = alphaOut;
         _fadeMaterial.color = finalColor;
 
+
+    }
+    private IEnumerator FadeSceneSwitch(float alphaIn, float alphaOut, string SceneName)
+    {
+        float time = 0;
+
+        while (time <= _fadeDuration)
+        {
+            Color color = _fadeColor;
+            color.a = Mathf.Lerp(alphaIn, alphaOut, time / _fadeDuration);
+            _fadeMaterial.color = color;
+            time += Time.deltaTime;
+            yield return null;
+        }
+
+        Color finalColor = _fadeColor;
+        finalColor.a = alphaOut;
+        _fadeMaterial.color = finalColor;
+
+        
+        SceneManager.LoadSceneAsync(SceneName);
+
     }
 
     public void FadeIn()
     {
         StartCoroutine(Fade(1, 0));
+    }
+
+    public void FadeOutScene(string sceneName)
+    {
+        StartCoroutine(FadeSceneSwitch(0, 1, sceneName));
     }
 }

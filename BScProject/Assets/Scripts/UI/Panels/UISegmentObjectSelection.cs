@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+[Obsolete("Class is deprecated and will be removed in the future.")]
 public class UISegmentObjectSelection : MonoBehaviour
 {
     [Header("Segment Selection")]
@@ -54,7 +56,7 @@ public class UISegmentObjectSelection : MonoBehaviour
             });
         }
 
-        foreach (var obj in ResourceManager.Instance.ShuffleSegmentObjects(420))
+        foreach (var obj in ResourceManager.Instance.ShuffleLandmarkObjects(420))
         {
             GridObjectSelection objectSelection = Instantiate(_objectSelectionPrefab, _objectSelectionParent).GetComponent<GridObjectSelection>();
             objectSelection.Initialize(obj.ID, obj.RenderTexture, _toggleGroup);
@@ -67,7 +69,7 @@ public class UISegmentObjectSelection : MonoBehaviour
         UpdateSelectedSegment();
 
         _continueButton.interactable = VerifySelectionValues();
-        _selectedPathImage.sprite = AssessmentManager.Instance.CurrentPathAssessment.SelectedPathSprite;
+        // _selectedPathImage.sprite = AssessmentManager.Instance.CurrentPathAssessment.SelectedPathLayoutID;
     }
 
     private void OnDisable() 
@@ -121,7 +123,7 @@ public class UISegmentObjectSelection : MonoBehaviour
     {
         if (_currentSegment.SelectedObjectID != -1)
             return; 
-        UpdateDisplayObject(ResourceManager.Instance.GetSegmentObject(objectID));
+        UpdateDisplayObject(ResourceManager.Instance.GetLandmarkObject(objectID));
     }
 
 
@@ -136,8 +138,8 @@ public class UISegmentObjectSelection : MonoBehaviour
         }
         
         _segmentIndicators[_selectedSegmentID].SetState(true);
-        AssessmentManager.Instance.AssignPathSegmentObject(_currentSegment.PathSegmentData.SegmentID, objectID);
-        UpdateDisplayObject(ResourceManager.Instance.GetSegmentObject(objectID));
+        AssessmentManager.Instance.AssignSegmentLandmarkObject(_currentSegment.PathSegmentData.SegmentID, objectID);
+        UpdateDisplayObject(ResourceManager.Instance.GetLandmarkObject(objectID));
 
         _continueButton.interactable = VerifySelectionValues();
     }
@@ -182,7 +184,7 @@ public class UISegmentObjectSelection : MonoBehaviour
         }
         else
         { 
-            UpdateDisplayObject(ResourceManager.Instance.GetSegmentObject(_currentSegment.SelectedObjectID));
+            UpdateDisplayObject(ResourceManager.Instance.GetLandmarkObject(_currentSegment.SelectedObjectID));
             _segmentIndicators[_selectedSegmentID].SetState(true);
             gridObjectSelection.Select();
         }

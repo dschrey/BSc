@@ -1,76 +1,71 @@
 using System;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-[Obsolete("Class is deprecated and will be removed in the future.", true)]
+[RequireComponent(typeof(Toggle))]
 public class SegmentObjectSelection : MonoBehaviour
 {
-    [SerializeField] private Image _segmentLabelImage;
-    [SerializeField] private TMP_Text _segmentLabelText;
-    [SerializeField] private Button _buttonPrevious;
-    [SerializeField] private Button _buttonNext;
-    [SerializeField] private RawImage _selectedObjectImage;
-    [SerializeField] private Texture _emptyTexture;
+    public RectTransform RectTransform;
     public event Action<int> SelectedObjectChanged;
-    public List<RenderTexture> _objectRenderChoises = new();
-    private int _segmentID;
-    private int _selectedRenderTextureID = -1;
-    public bool ObjectSelected => _selectedRenderTextureID != -1;
+    public int SegmentID = -1;
+    public int ObjectID = -1;
+    public float DistanceToObjective;
+    public float DifferenceToRealPosition;
+    public GameObject WorldObject;
+    private Toggle _toggle;
+    [SerializeField] private Image _crosshair;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
-    private void OnEnable() 
+    void OnEnable() 
     {
-        _buttonPrevious.onClick.AddListener(OnPreviousButtonClick);
-        _buttonNext.onClick.AddListener(OnNextButtonClick);
+        RectTransform = GetComponent<RectTransform>();
+        _toggle = GetComponent<Toggle>();
+        _toggle.onValueChanged.AddListener(OnToggleSelected);
+    }
 
-        _selectedRenderTextureID = -1;
-        _selectedObjectImage.texture = _emptyTexture;
-        _objectRenderChoises.Clear();
+    void OnDestroy() 
+    {
+        _toggle.onValueChanged.AddListener(OnToggleSelected);
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
 
-    private void OnNextButtonClick()
+    private void OnToggleSelected(bool state)
     {
-        _selectedRenderTextureID = (_selectedRenderTextureID + 1) % _objectRenderChoises.Count;
-        UpdateObjectImage();
-    }
-
-    private void OnPreviousButtonClick()
-    {
-        _selectedRenderTextureID = (_selectedRenderTextureID - 1 + _objectRenderChoises.Count) % _objectRenderChoises.Count;
-        UpdateObjectImage();
+        if (state)
+        {
+            SelectedObjectChanged?.Invoke(SegmentID);
+        }
+        _crosshair.gameObject.SetActive(state);
+        _toggle.targetGraphic.gameObject.SetActive(! state);
+        ToggleWorldObject(! state);
     }
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
-    public void Initialize(int segmentID, Color segmentColor)
+    public void Initialize(int segmentID, int objectID, ToggleGroup toggleGroup)
     {
-        _segmentID = segmentID;
-        _segmentLabelImage.color = segmentColor;
-        if (_segmentLabelText != null)
-        {
-            _segmentLabelText.color = segmentColor;
-            _segmentLabelText.text = (segmentID + 1).ToString();
-        }
+        SegmentID = segmentID;
+        ObjectID = objectID;
+        _toggle.group = toggleGroup;
+        DistanceToObjective = 0f;
+        DifferenceToRealPosition = 0f;
+        WorldObject = null;  
     }
 
-    public void AddObjectChoices(List<RenderTexture> textures)
+    public void InstantiateWorldObject(Vector3 Position, Transform parent)
     {
-        _objectRenderChoises.AddRange(textures);
+        WorldObject = Instantiate(ResourceManager.Instance.GetLandmarkObject(ObjectID),
+            Position, Quaternion.identity, parent);
     }
 
-    private void UpdateObjectImage()
+    public void UpdateWorldObjectPosition(Vector3 newWorldPosition)
     {
-        _selectedObjectImage.texture = _objectRenderChoises[_selectedRenderTextureID];
-        SelectedObjectChanged?.Invoke(_segmentID);
+        if (WorldObject == null) return;
+        newWorldPosition.y = WorldObject.transform.localScale.y / 2;
+        WorldObject.transform.position = newWorldPosition;
     }
 
-    public RenderTexture GetSelectedRenderTexture()
-    {
-        return _objectRenderChoises[_selectedRenderTextureID];
-    }
+    private void ToggleWorldObject(bool state) => WorldObject.SetActive(state);
 }

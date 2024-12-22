@@ -84,7 +84,9 @@ public class PathManager : MonoBehaviour
         CurrentPath = Instantiate(_pathPrefab, ExperimentManager.Instance.ExperimentSpawn.position, ExperimentManager.Instance.ExperimentSpawn.rotation).GetComponent<Path>();
         CurrentPath.Initialize(pathData);
 
-        ExperimentManager.Instance.MoveXROrigin(ExperimentManager.Instance.ExperimentSpawn.position);
+        // TODO uncomment the teleport
+        // ExperimentManager.Instance.MoveXROrigin(ExperimentManager.Instance.ExperimentSpawn);
+        PathLayoutManager.Instance.PreparePathPreviews(CurrentPath.PathData);
         RevealNextPathSegment();
     }
 
@@ -107,11 +109,11 @@ public class PathManager : MonoBehaviour
     {
         if (LastSegment != null)
         {
-            ExperimentManager.Instance.MoveXROrigin(LastSegment.gameObject.transform.position);
+            ExperimentManager.Instance.MoveXROrigin(LastSegment.gameObject.transform);
         }
         else
         {
-            ExperimentManager.Instance.MoveXROrigin(ExperimentManager.Instance.ExperimentSpawn.position);
+            ExperimentManager.Instance.MoveXROrigin(ExperimentManager.Instance.ExperimentSpawn);
         }
 
         CurrentSegment.ShowSegmentObjective();

@@ -5,11 +5,10 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+[Obsolete("Class is deprecated and will be removed in the future.")]
 public class UISegmentObjectPosition : MonoBehaviour
 {
-
     [Header("Tutorial")]
-
     [SerializeField] private GameObject _tutorialPanel;
     [SerializeField] private GameObject _instructionPanel;
     [SerializeField] private GameObject _inputPanel;
@@ -118,7 +117,7 @@ public class UISegmentObjectPosition : MonoBehaviour
         }
         
         _continueButton.interactable = VerifyPositionValues();
-        _selectedPathImage.sprite = AssessmentManager.Instance.CurrentPathAssessment.SelectedPathSprite;
+        // _selectedPathImage.sprite = AssessmentManager.Instance.CurrentPathAssessment.SelectedPathLayoutID;
 
         UpdateSelectedSegment(-1);
     }
@@ -199,7 +198,7 @@ public class UISegmentObjectPosition : MonoBehaviour
         _segmentIndicators[_selectedSegmentID].SetState(true);
         _currentSegment.WorldObjectPosition = _draggableObject.transform.position;
         _currentSegment.CanvasObjectPosition = _draggableCanvasObject.GetCurrentPosition();
-        AssessmentManager.Instance.SetPathSegmentObjectDistance(_currentSegment.PathSegmentData.SegmentID, _currentSegment.DistanceToObjective, _currentSegment.DistanceToRealObject);
+        AssessmentManager.Instance.SetSegmentLandmarkObjectDistance(_currentSegment.PathSegmentData.SegmentID, _currentSegment.DistanceToObjective, _currentSegment.DistanceToRealObject);
    
         _continueButton.interactable = VerifyPositionValues();
     }

@@ -22,21 +22,12 @@ public class PathSegmentAssessment
 
     public bool AssessSegmentObject()
     {
-        return SelectedSegmentObjectID == _pathSegment.SegmentObjectID;
+        return SelectedSegmentObjectID == _pathSegment.LandmarkObjectID;
     }
 
     public bool AssessObjectiveObject()
     {
         return SelectedObjectiveObjectID == _pathSegment.ObjectiveObjectID;
-    }
-    
-    public bool EvaluateSegmnetDistanceAssignment()
-    {
-        if (SelectedDistanceToPreviousSegment == _pathSegment.DistanceToPreviousSegment)
-        {
-            return true;
-        }
-        return false;
     }
 
     public int GetSegmentID()

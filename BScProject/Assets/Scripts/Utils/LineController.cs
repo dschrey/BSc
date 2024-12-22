@@ -5,7 +5,7 @@ using UnityEngine;
 public class LineController : MonoBehaviour
 {
 
-    private LineRenderer _lineRenderer;
+    [SerializeField] private LineRenderer _lineRenderer;
     private List<Transform> _points = new();
 
 
