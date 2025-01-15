@@ -35,7 +35,7 @@ public class DataManager : MonoBehaviour
         {
             Directory.CreateDirectory(_experimentResultsPath);
         }
-        LoadExperimentSettings();
+        // LoadExperimentSettings();
     }
 
    // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------

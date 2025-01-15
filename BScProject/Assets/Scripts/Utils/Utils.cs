@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 class Utils
@@ -131,5 +130,20 @@ class Utils
         {
             renderer.enabled = state;
         }
+    }
+
+    /// <summary>
+    /// Calculates the boundaries of a given linerenderer.
+    /// </summary>
+    /// <param name="lineRenderer"></param>
+    /// <returns></returns>
+    public static Bounds CalculateLineRendererBounds(LineRenderer lineRenderer)
+    {
+        Bounds bounds = new(lineRenderer.GetPosition(0), Vector3.zero);
+        for (int i = 1; i < lineRenderer.positionCount; i++)
+        {
+            bounds.Encapsulate(lineRenderer.GetPosition(i));
+        }
+        return bounds;
     }
 }

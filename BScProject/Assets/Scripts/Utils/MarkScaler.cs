@@ -4,7 +4,7 @@ public class MarkScaler : MonoBehaviour
 {
 
     [Header("Optional Particles")]
-    [SerializeField] private GameObject _particles;
+    [SerializeField] private GameObject[] _particles;
 
     private void OnEnable() 
     {
@@ -16,15 +16,16 @@ public class MarkScaler : MonoBehaviour
         };
         transform.localScale = newScale;
 
-        if (_particles != null)
+
+        foreach (GameObject particle in _particles)
         {
             Vector3 particleScale = new()
             {
-                x = ExperimentManager.Instance.ExperimentSettings.PlayerDetectionRadius,
-                y = _particles.transform.localScale.y,
-                z = ExperimentManager.Instance.ExperimentSettings.PlayerDetectionRadius
+                x = 2 *ExperimentManager.Instance.ExperimentSettings.PlayerDetectionRadius,
+                y = particle.transform.localScale.y,
+                z = 2 *ExperimentManager.Instance.ExperimentSettings.PlayerDetectionRadius
             };
-            _particles.transform.localScale = particleScale;
+            particle.transform.localScale = particleScale;
         }
     }
 }

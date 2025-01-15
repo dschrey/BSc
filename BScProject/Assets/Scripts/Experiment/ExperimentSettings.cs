@@ -15,8 +15,7 @@ public class ExperimentSettings : ScriptableObject
     [Tooltip("Time (in seconds) it takes to reaveal an objective")]
     public float ObjectiveRevealTime = 1.5f;
     public float DefaultObjectiveRevealTime = 1.5f;
-
-    [Tooltip("Paths to be played per iteration.")]
+    public float DefaultSegmentLength = 2.0f;
     public List<PathData> paths;
 
     [Header("Assessment Settings")]

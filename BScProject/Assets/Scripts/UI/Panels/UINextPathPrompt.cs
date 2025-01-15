@@ -27,7 +27,7 @@ public class UINextPathPrompt : MonoBehaviour
 
     private void OnNextPathRequested()
     {
-        AssessmentManager.Instance.ResetPanelData();
+        PathLayoutManager.Instance.PathLayouts.ForEach(layout => layout.ClearPath());
         AssessmentManager.Instance.ProceedToNextAssessmentStep();
     }
 

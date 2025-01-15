@@ -4,7 +4,7 @@ using UnityEngine.Events;
 
 public enum AssessmentStep {IDLE, PATHSELECTION, OBJECTIVEDISTANCE, OBJECTSELECTION,
                             OBJECTDISTANCE, OBJECTIVEOBJECTSELECTION, NEXTPATH, COMPLETED,
-                            OBJECTASSIGN, OBJECTPOSITION}
+                            OBJECTASSIGN, OBJECTPOSITION, SEGMENTDISTANCE}
 
 public class AssessmentManager : MonoBehaviour
 {
@@ -27,13 +27,13 @@ public class AssessmentManager : MonoBehaviour
     [SerializeField] private GameObject _objectDistancePanel;
     [SerializeField] private GameObject _objectAssignPanel;
     [SerializeField] private GameObject _objectPositionPanel;
+    [SerializeField] private GameObject _segmentDistancePanel;
     [SerializeField] private GameObject _nextPathPanel;
     private GameObject _activePanel;
     private int _currentAssessmentStep;
 
-    [Header("Assessment Results")]
+    [Header("Assessment")]
     public PathData CurrentPath;
-
     public PathAssessment CurrentPathAssessment;
     private AssessmentData Assessment;
 
@@ -45,7 +45,6 @@ public class AssessmentManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -59,6 +58,11 @@ public class AssessmentManager : MonoBehaviour
         _assessmentStep = AssessmentStep.IDLE;
         CurrentPathAssessment = null;
         Assessment = null;
+    }
+
+    private void OnDestroy() 
+    {
+        _assessmentStepChanged.RemoveListener(OnEvaluationStepChanged);
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
@@ -92,6 +96,9 @@ public class AssessmentManager : MonoBehaviour
 				break;
             case AssessmentStep.OBJECTPOSITION:
                 _activePanel = _objectPositionPanel;
+				break;
+            case AssessmentStep.SEGMENTDISTANCE:
+                _activePanel = _segmentDistancePanel;
 				break;
             case AssessmentStep.NEXTPATH:
                 _activePanel = _nextPathPanel;
@@ -133,7 +140,7 @@ public class AssessmentManager : MonoBehaviour
                         AssessmentStep = AssessmentStep.PATHSELECTION;
                         break;
                     case 1:
-                        AssessmentStep = AssessmentStep.OBJECTIVEDISTANCE;
+                        AssessmentStep = AssessmentStep.SEGMENTDISTANCE;
                         break;
                     case 2:
                         AssessmentStep = AssessmentStep.NEXTPATH;
@@ -150,13 +157,13 @@ public class AssessmentManager : MonoBehaviour
                         AssessmentStep = AssessmentStep.PATHSELECTION;
                         break;
                     case 1:
-                        AssessmentStep = AssessmentStep.OBJECTASSIGN;
+                        AssessmentStep = AssessmentStep.SEGMENTDISTANCE;
                         break;
                     case 2:
-                        AssessmentStep = AssessmentStep.OBJECTPOSITION;
+                        AssessmentStep = AssessmentStep.OBJECTASSIGN;
                         break;
                     case 3:
-                        // AssessmentStep = AssessmentStep.OBJECTDISTANCE;
+                        AssessmentStep = AssessmentStep.OBJECTPOSITION;
                         break;
                     case 4:
                         AssessmentStep = AssessmentStep.NEXTPATH;
@@ -218,7 +225,7 @@ public class AssessmentManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Assigns the selected objective distance to the specified segment for assessment. 
+    /// Save the selected distance from current segment to previous. 
     /// </summary>
     /// <param name="segmentID"></param>
     /// <param name="distanceValue"></param>
@@ -234,12 +241,12 @@ public class AssessmentManager : MonoBehaviour
 
         SegmentAssessmentData segmentAssessmentData = Assessment.GetPath(CurrentPath.PathID).GetSegment(segmentID);
         segmentAssessmentData.SelectedDistanceToPreviousSegment = distanceValue;
-        segmentAssessmentData.CalculatedDistanceToPreviousSegment = CurrentPath.GetSegmentData(segmentID).DistanceFromPreviousSegment;
-        segmentAssessmentData.SegmentDistanceDifference = Math.Abs(segmentAssessmentData.CalculatedDistanceToPreviousSegment - distanceValue);
+        segmentAssessmentData.ActualDistanceToPreviousSegment = CurrentPath.GetSegmentData(segmentID).DistanceFromPreviousSegment;
+        segmentAssessmentData.SegmentDistanceDifference = Math.Abs(segmentAssessmentData.ActualDistanceToPreviousSegment - distanceValue);
     }
 
     /// <summary>
-    /// Assigns the selected distance of the object distance to the objective for the specified segment for assessment. 
+    /// Saves the selected distance of the object to the objective for the specified segment. 
     /// </summary>
     /// <param name="segmentID"></param>
     /// <param name="distanceToObjective"></param>
@@ -262,7 +269,7 @@ public class AssessmentManager : MonoBehaviour
     }
      
     /// <summary>
-    /// Assigns the selected objective object to the specified segment for assessment. 
+    /// Assigns the selected objective object to the specified segment. 
     /// </summary>
     /// <param name="segmentID"></param>
     /// <param name="objectID"></param>
@@ -281,7 +288,7 @@ public class AssessmentManager : MonoBehaviour
     }
      
     /// <summary>
-    /// Assigns the selected segment object to the specified segment for assessment. 
+    /// Assigns the selected landmark object to the specified segment. 
     /// </summary>
     /// <param name="segmentID"></param>
     /// <param name="objectID"></param>
@@ -307,6 +314,7 @@ public class AssessmentManager : MonoBehaviour
         Assessment = null;
     }
 
+    [Obsolete("Function might be removed in the future.")]
     public void ResetPanelData()
     {
         _objectiveDistancePanel.GetComponent<UIObjectiveDistanceSelection>().ResetPanelData();

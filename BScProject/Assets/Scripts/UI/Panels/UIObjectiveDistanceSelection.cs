@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+[Obsolete("Class is deprecated and will be removed in the future.")]
 public class PathSegmentDistanceData
 {
     public PathSegmentData PathSegmentData;
@@ -15,7 +17,7 @@ public class PathSegmentDistanceData
         SelectedDistance = -1;
     }
 }
-
+[Obsolete("Class is deprecated and will be removed in the future.")]
 public class UIObjectiveDistanceSelection : MonoBehaviour
 {
         
@@ -229,8 +231,6 @@ public class UIObjectiveDistanceSelection : MonoBehaviour
             ResetNumpadInput();
             return;
         }
-
-        Debug.Log($"Change text to {input}m");
 
         if (! float.TryParse(input, out float distanceValue))
         {
