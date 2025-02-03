@@ -27,4 +27,14 @@ public class LineController : MonoBehaviour
     {
         _points = points;
     }
+
+    public void ResetPointList()
+    {
+        _points.Clear();
+    }
+
+    public LineRenderer GetLineRenderer()
+    {
+        return _lineRenderer;
+    }
 }

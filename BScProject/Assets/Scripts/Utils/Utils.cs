@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 class Utils
 {
@@ -145,5 +146,24 @@ class Utils
             bounds.Encapsulate(lineRenderer.GetPosition(i));
         }
         return bounds;
+    }
+
+    /// <summary>
+    /// Sets min, max and current value for a given Slider.
+    /// </summary>
+    /// <param name="slider"></param>
+    /// <param name="minValue"></param>
+    /// <param name="maxValue"></param>
+    /// <param name="currentValue"></param>
+    public static void SetSliderSettings(Slider slider, float minValue, float maxValue, float currentValue)
+    {
+        slider.minValue = minValue;
+        slider.maxValue = maxValue;
+        if (currentValue > maxValue)
+            slider.value = maxValue;
+        else if (currentValue < minValue)
+            slider.value = minValue;
+        else
+            slider.value = currentValue;
     }
 }

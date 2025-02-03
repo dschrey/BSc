@@ -8,11 +8,6 @@ public class UISegmentDistances : MonoBehaviour
 {
     [Header("Path")]
     [SerializeField] private PathLayoutCreator _pathPreviewCreator;
-    
-    [Header("Indicator")]
-    [SerializeField] private Transform _segmentIndicatorParent;
-    [SerializeField] private GameObject _segmentIndicatorPrefab;
-    private readonly List<UISegmentIndicator> _segmentIndicators;
 
     [Header("Adjustments")]
     [SerializeField] private Slider _sliderDistance;
@@ -51,6 +46,11 @@ public class UISegmentDistances : MonoBehaviour
 
         SetSliderSettings(_sliderDistance, 0.5f, 10f, 0.5f);
         OnSelectedSegmentChanged(0);
+
+        foreach (var segment in _segmentDistanceData)
+        {
+            AssessmentManager.Instance.SetSegmentObjectiveDistance(_selectedSegment.SegmentID, DataManager.Instance.ExperimentData.DefaultSegmentLength);
+        }
     }
 
 
@@ -62,7 +62,7 @@ public class UISegmentDistances : MonoBehaviour
 
         _segmentDistanceData.ForEach(segmentData => {
             segmentData.SelectedSegmentChanged -= OnSelectedSegmentChanged;
-            Destroy(segmentData);
+            Destroy(segmentData.gameObject);
         });
         _segmentDistanceData.Clear();
     }

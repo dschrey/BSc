@@ -13,6 +13,7 @@ public class ObjectSelectionSocket : MonoBehaviour
     public event Action<int, int, GameObject> OnSocketObjectChanged;
     public GameObject SocketObject = null;
     public bool isOccupied = false;
+    public float angle = 0.0f;
     [SerializeField] private Image _socketIndicator;
     private XRSocketInteractor _socket;
 
@@ -69,7 +70,6 @@ public class ObjectSelectionSocket : MonoBehaviour
                 GameObject placedObject = interactable.transform.gameObject;
                 if (placedObject != null)
                 {
-                    Debug.Log($"Deleting obecjt {placedObject.name} of socket {SocketID}");
                     Destroy(placedObject);
                 }
             }

@@ -197,6 +197,7 @@ public class UIObjectSelection : MonoBehaviour
                 Vector3 canvasPos = socket.GetComponent<RectTransform>().anchoredPosition;
                 segmentObjectData.CanvasSocketPosition = canvasPos;
                 segmentObjectData.AssignedLandmarkObjectID = socketObject.GetComponent<RenderObject>().ID;
+                segmentObjectData.SocketOffsetAngle = socket.angle;
                 AssessmentManager.Instance.AssignSegmentLandmarkObject(belongsToSegment, socketObject.GetComponent<RenderObject>().ID);
             }
         }
@@ -390,21 +391,34 @@ public class UIObjectSelection : MonoBehaviour
     private void CreateSocketInteractors()
     {
         List<Vector3> offsets = new();
+        float offsetDistance = 0.5f;
+
         if (_selectionMode == SelectionMode.Landmark)
         {
-            offsets.Add(new (0.75f, 0, 0));
-            offsets.Add(new (0.75f, 0, 0.75f));
-            offsets.Add(new (-0.75f, 0, 0));
-            offsets.Add(new (-0.75f, 0, 0.75f));
-            offsets.Add(new (0, 0, 0.75f));
-            offsets.Add(new (0, 0, -0.75f));
-            offsets.Add(new (0.75f, 0, -0.75f));
-            offsets.Add(new (-0.75f, 0, -0.75f));
+            for (int i = 0; i < 8; i++)
+            {
+                float angle = i * 45f;
+                float radians = Mathf.Deg2Rad * angle;
+                // Compute the circular offset.
+                float offsetX = Mathf.Sin(radians) * offsetDistance;
+                float offsetZ = Mathf.Cos(radians) * offsetDistance;
+                Vector3 offset = new(offsetX, 0, offsetZ);
+                
+                // Map the circular offset to a square:
+                float maxComponent = Mathf.Max(Mathf.Abs(offset.x), Mathf.Abs(offset.z));
+                if (maxComponent > 0)
+                {
+                    offset = offset / maxComponent * offsetDistance;
+                }
+                
+                offsets.Add(offset);
+            }
         }
         else if (_selectionMode == SelectionMode.Hover)
         {
-            offsets.Add(new (0, 0, 0));
-        };
+            offsets.Add(new Vector3(0, 0, 0));
+        }
+
 
         foreach (SegmentObjectData segment in _pathPreviewCreator.SpawnedSegments)
         {
@@ -418,18 +432,22 @@ public class UIObjectSelection : MonoBehaviour
             foreach (Vector3 offset in offsets)
             {
                 Vector3 localWorldPosition = referenceLocalPosition + offset;
-                if (localWorldPosition.x > DataManager.Instance.ExperimentData.MovementArea.x / 2   || 
-                    localWorldPosition.x < - DataManager.Instance.ExperimentData.MovementArea.x / 2 || 
-                    localWorldPosition.z > DataManager.Instance.ExperimentData.MovementArea.y / 2   || 
-                    localWorldPosition.z < - DataManager.Instance.ExperimentData.MovementArea.y / 2 )
+                if (! ValidatePosition(localWorldPosition))
+                {
                     continue;
+                }
 
                 Vector3 socketWorldPosition = referencePosition + offset;
                 Vector2 canvasPosition = _pathPreviewCreator.RenderCamera.WorldCoordinatesToScreenSpace(socketWorldPosition);
+                
+                float angle = Mathf.Atan2(offset.z, offset.x) * Mathf.Rad2Deg;
+                if (angle < 0) angle += 360;
+                if (angle >= 360) angle -= 360;
 
                 ObjectSelectionSocket socketInteractor = Instantiate(_socketInteractorPrefab, _socketSelectionHolder.transform).GetComponent<ObjectSelectionSocket>();
                 Color segmentColor = PathManager.Instance.CurrentPath.Segments.Find(s => s.PathSegmentData.SegmentID == segment.SegmentID).PathSegmentData.SegmentColor;
                 socketInteractor.Initialize(segment.SegmentID, sockets.Count(), segmentColor);
+                socketInteractor.angle = angle;
                 socketInteractor.OnSocketObjectChanged += OnSocketObjectChanged;
                 RectTransform socketRect = socketInteractor.GetComponent<RectTransform>();
                 socketRect.anchoredPosition = canvasPosition;
@@ -446,6 +464,24 @@ public class UIObjectSelection : MonoBehaviour
                 _hoverObjectSocketData.Add(new SegmentSocketSelection(segment.SegmentID, sockets));
             }
         }
+    }
+
+
+    private bool ValidatePosition(Vector3 position)
+    {
+        float halfWidth = DataManager.Instance.ExperimentData.MovementArea.x / 2;
+        float halfHeight = DataManager.Instance.ExperimentData.MovementArea.y / 2;
+
+        if (position.z < - halfWidth || position.z > halfWidth)
+        {
+            return false;
+        }
+        else if(position.x < - halfHeight || position.x > halfHeight )
+        {
+            return false;
+        }
+
+        return true;
     }
 
     private void CreateHoverObjectSelectionGrid()

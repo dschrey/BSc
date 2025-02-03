@@ -11,9 +11,13 @@ public class SegmentObjectSelection : MonoBehaviour
     public int ObjectID = -1;
     public float DistanceToObjective;
     public float DifferenceToRealPosition;
+    public float MovementAngle;
+    public Vector3 MovementDirection;
+    public Vector3 MaxLocalPosition = Vector3.zero;
     public GameObject WorldObject;
     private Toggle _toggle;
     [SerializeField] private Image _crosshair;
+
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
@@ -44,13 +48,14 @@ public class SegmentObjectSelection : MonoBehaviour
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
-    public void Initialize(int segmentID, int objectID, ToggleGroup toggleGroup)
+    public void Initialize(int segmentID, int objectID, float movementAngle, ToggleGroup toggleGroup)
     {
         SegmentID = segmentID;
         ObjectID = objectID;
         _toggle.group = toggleGroup;
         DistanceToObjective = 0f;
         DifferenceToRealPosition = 0f;
+        MovementAngle = movementAngle;
         WorldObject = null;  
     }
 

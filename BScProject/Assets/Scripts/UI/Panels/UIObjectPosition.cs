@@ -9,17 +9,9 @@ public class UIObjectPosition : MonoBehaviour
 {
     [Header("Path")]
     [SerializeField] private PathLayoutCreator _pathPreviewCreator;
-    
-    [Header("Indicator")]
-    [SerializeField] private Transform _segmentIndicatorParent;
-    [SerializeField] private GameObject _segmentIndicatorPrefab;
-    private readonly List<UISegmentIndicator> _segmentIndicators;
 
     [Header("Object Positioning")]
-    [SerializeField] private TMP_Text _textHorizontalPosition;
-    [SerializeField] private Slider _sliderhorizontalPosition;
-    [SerializeField] private TMP_Text _textVerticalPosition;
-    [SerializeField] private Slider _sliderverticalPosition;
+    [SerializeField] private Slider _sliderDistanceValue;
     [SerializeField] private LineController _lineRender;
 
     [Header("Object Info")]
@@ -42,6 +34,8 @@ public class UIObjectPosition : MonoBehaviour
     private readonly List<SegmentObjectSelection> _objectPositionData = new();
     private SegmentObjectSelection _selectedSegmentObject;
 
+    private GameObject _cachedObjective = null;
+
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
     void OnEnable()
@@ -55,19 +49,15 @@ public class UIObjectPosition : MonoBehaviour
 
         CreateSegmentObjectData();
 
-        _sliderhorizontalPosition.onValueChanged.AddListener(OnHorizontalPositionChanged);
-        _sliderverticalPosition.onValueChanged.AddListener(OnVerticalPositionChanged);
+        _sliderDistanceValue.onValueChanged.AddListener(OnHorizontalPositionChanged);
 
-        SetSliderSettings(_sliderhorizontalPosition, 0, ExperimentManager.Instance.ExperimentSettings.MovementArea.x * 100, 0f);
-        SetSliderSettings(_sliderverticalPosition, 0, ExperimentManager.Instance.ExperimentSettings.MovementArea.y * 100, 0f);
+        Utils.SetSliderSettings(_sliderDistanceValue, 0, ExperimentManager.Instance.ExperimentSettings.MovementArea.x, 0f);
     }
-
 
     void OnDisable() 
     {
         _continueButton.onClick.RemoveListener(OnContinueButtonPressed);
-        _sliderhorizontalPosition.onValueChanged.RemoveListener(OnHorizontalPositionChanged);
-        _sliderverticalPosition.onValueChanged.RemoveListener(OnVerticalPositionChanged);
+        _sliderDistanceValue.onValueChanged.RemoveListener(OnHorizontalPositionChanged);
 
         foreach (SegmentObjectSelection objectSelection in _objectPositionData)
         {
@@ -77,6 +67,7 @@ public class UIObjectPosition : MonoBehaviour
 
         }
         _objectPositionData.Clear();
+        _lineRender.ResetPointList();
     }
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
 
@@ -84,18 +75,27 @@ public class UIObjectPosition : MonoBehaviour
     {
         if (_objectPositionData.Count < 1) return;
         _selectedSegmentObject = _objectPositionData.Find(data => data.SegmentID == segmentID);
+        _cachedObjective = _pathPreviewCreator.SpawnedSegments.Find(objective => objective.SegmentID == segmentID).gameObject;
+
+        _selectedSegmentObject.DistanceToObjective = CalculateDistance(_cachedObjective, _selectedSegmentObject.WorldObject);
 
         _textSegmentID.text = _selectedSegmentObject.SegmentID.ToString();
         _textDistanceValue.text = _selectedSegmentObject.DistanceToObjective.ToString("F2", CultureInfo.InvariantCulture) + " m";
         _textDistanceValueBig.text = _selectedSegmentObject.DistanceToObjective.ToString("F2", CultureInfo.InvariantCulture) + " m";
         _objectPreview.texture = ResourceManager.Instance.GetLandmarkObjectRenderTexture(_selectedSegmentObject.ObjectID);
 
-        SetSliderSettings(_sliderhorizontalPosition, 0, ExperimentManager.Instance.ExperimentSettings.MovementArea.x * 100, _selectedSegmentObject.RectTransform.anchoredPosition.x);
-        SetSliderSettings(_sliderverticalPosition, 0, ExperimentManager.Instance.ExperimentSettings.MovementArea.y * 100, _selectedSegmentObject.RectTransform.anchoredPosition.y);
-        _textHorizontalPosition.text = GetHorizontalValue().ToString("F2", CultureInfo.InvariantCulture) + " m";
-        _textVerticalPosition.text =  GetVerticalValue().ToString("F2", CultureInfo.InvariantCulture) + "m";
+        Vector3 lastValidGlobalPosition = _lineRender.transform.parent.TransformPoint(_selectedSegmentObject.MaxLocalPosition);
+
+        LineRenderer line = _lineRender.GetLineRenderer();
+        line.SetPosition(0, _cachedObjective.transform.position);
+        line.SetPosition(1, lastValidGlobalPosition);
+
+        float maxDistance = Vector3.Distance(_cachedObjective.transform.position, lastValidGlobalPosition);
+        maxDistance = Mathf.Round(maxDistance * 10f) / 10f;
+        Utils.SetSliderSettings(_sliderDistanceValue, 0, maxDistance, _selectedSegmentObject.DistanceToObjective);
     }
 
+    [Obsolete]
     private void OnVerticalPositionChanged(float value)
     {
         if (_selectedSegmentObject == null) return;
@@ -109,10 +109,13 @@ public class UIObjectPosition : MonoBehaviour
     private void OnHorizontalPositionChanged(float value)
     {
         if (_selectedSegmentObject == null) return;
-        Vector2 newPosition = _selectedSegmentObject.RectTransform.anchoredPosition;
-        newPosition.x = value;
+        if (_cachedObjective == null) return;
+        Transform socketObject = _selectedSegmentObject.WorldObject.transform;
+
+        socketObject.position = _cachedObjective.transform.position + (_selectedSegmentObject.MovementDirection * value);
+
+        Vector3 newPosition = _canvasCamera.WorldCoordinatesToScreenSpace(socketObject.transform.position);
         _selectedSegmentObject.RectTransform.anchoredPosition = newPosition;
-        _selectedSegmentObject.UpdateWorldObjectPosition(_canvasCamera.ScreenCoordinatesToWorldSpace(newPosition));
         UpdateSegmentData();
     }
 
@@ -137,55 +140,41 @@ public class UIObjectPosition : MonoBehaviour
             {
                 continue;
             }
+
             SegmentObjectSelection objectSelection = Instantiate(_selectionObjectPrefab, _movementArea).GetComponent<SegmentObjectSelection>();
             objectSelection.GetComponent<RectTransform>().anchoredPosition = segmentData.CanvasSocketPosition;
-            objectSelection.Initialize(segmentData.SegmentID, segmentData.AssignedLandmarkObjectID, _toggleGroup);
+            objectSelection.Initialize(segmentData.SegmentID, segmentData.AssignedLandmarkObjectID, segmentData.SocketOffsetAngle, _toggleGroup);
             Vector3 worldPosition = _canvasCamera.ScreenCoordinatesToWorldSpace(segmentData.CanvasSocketPosition);
             worldPosition.y = 1;
             objectSelection.InstantiateWorldObject(worldPosition, _pathPreviewCreator.gameObject.transform);
             objectSelection.SelectedObjectChanged += OnSelectedObjectChanged;
-            _objectPositionData.Add(objectSelection);            
+            _objectPositionData.Add(objectSelection); 
+
+            float radians = Mathf.Deg2Rad * segmentData.SocketOffsetAngle;
+            Vector3 direction = new Vector3(Mathf.Cos(radians), 0, Mathf.Sin(radians)).normalized;
+            objectSelection.MovementDirection = direction;
+
+            objectSelection.MaxLocalPosition = CalculateLastValidPosition(segmentData.transform.localPosition, direction);
         }
     }
 
     private void UpdateSegmentData()
     {
-        GameObject objective = _pathPreviewCreator.SpawnedSegments.Find(objective => objective.SegmentID == _selectedSegmentObject.SegmentID).gameObject;
-        _selectedSegmentObject.DistanceToObjective = CalculateDistance(objective, _selectedSegmentObject.WorldObject);
-        Vector3 realSpawnpoint = objective.transform.position + AssessmentManager.Instance.CurrentPath.GetSegmentData(_selectedSegmentObject.SegmentID).RelativeObjectPositionToObjective;
+        _selectedSegmentObject.DistanceToObjective = CalculateDistance(_cachedObjective, _selectedSegmentObject.WorldObject);
+        Vector3 realSpawnpoint = _cachedObjective.transform.position + AssessmentManager.Instance.CurrentPath.GetSegmentData(_selectedSegmentObject.SegmentID).RelativeObjectPositionToObjective;
         Vector3 objectPosition = _selectedSegmentObject.WorldObject.transform.position;
         objectPosition.y = 0;
         _selectedSegmentObject.DifferenceToRealPosition = Vector3.Distance(realSpawnpoint, objectPosition);
 
         AssessmentManager.Instance.SetSegmentLandmarkObjectDistance(_selectedSegmentObject.SegmentID, _selectedSegmentObject.DistanceToObjective, _selectedSegmentObject.DifferenceToRealPosition);
 
-        _textHorizontalPosition.text = GetHorizontalValue().ToString("F2", CultureInfo.InvariantCulture) + "m";
-        _textVerticalPosition.text =  GetVerticalValue().ToString("F2", CultureInfo.InvariantCulture) + "m";
 
         _textDistanceValue.text = _selectedSegmentObject.DistanceToObjective.ToString("F2", CultureInfo.InvariantCulture) + " m";
         _textDistanceValueBig.text = _selectedSegmentObject.DistanceToObjective.ToString("F2", CultureInfo.InvariantCulture) + " m";
 
-        List<Transform> lineTransforms = new()
-        {
-            objective.transform,
-            _selectedSegmentObject.WorldObject.transform
-        };
-        _lineRender.SetLinePoints(lineTransforms);
-
         _continueButton.interactable = VerifyPositionValues();
     }
 
-    private void SetSliderSettings(Slider slider, float minValue, float maxValue, float currentValue)
-    {
-        slider.minValue = minValue;
-        slider.maxValue = maxValue;
-        if (currentValue > maxValue)
-            slider.value = maxValue;
-        else if (currentValue < minValue)
-            slider.value = minValue;
-        else
-            slider.value = currentValue;
-    }
 
     public float CalculateDistance(GameObject from, GameObject to)
     {
@@ -194,16 +183,6 @@ public class UIObjectPosition : MonoBehaviour
         Vector3 ToPos = to.transform.position;
         ToPos.y = 0f; 
         return Vector3.Distance(fromPos, ToPos);
-    }
-
-    public float GetHorizontalValue()
-    {
-        return Math.Abs(_pathPreviewCreator.SpawnedSegments.Find(objective => objective.SegmentID == _selectedSegmentObject.SegmentID).gameObject.transform.position.z - _selectedSegmentObject.WorldObject.transform.position.z);     
-    }
-
-    public float GetVerticalValue()
-    {
-        return Math.Abs(_pathPreviewCreator.SpawnedSegments.Find(objective => objective.SegmentID == _selectedSegmentObject.SegmentID).gameObject.transform.position.x - _selectedSegmentObject.WorldObject.transform.position.x);     
     }
 
     private bool VerifyPositionValues()
@@ -218,5 +197,29 @@ public class UIObjectPosition : MonoBehaviour
 
     public void ResetPanelData()
     {
+    }
+
+    /// <summary>
+    /// Calculates the last valid positon of an object within the movement boundary.
+    /// </summary>
+    /// <param name="currentPosition"></param>
+    /// <param name="direction"></param>
+    /// <returns>Last valid position in local space.</returns>
+    private Vector3 CalculateLastValidPosition(Vector3 currentPosition, Vector3 direction)
+    {
+        float halfWidth = DataManager.Instance.ExperimentData.MovementArea.x / 2;
+        float halfHeight = DataManager.Instance.ExperimentData.MovementArea.y / 2;
+
+        while (true)
+        {
+            Vector3 nextPosition = currentPosition + direction * 0.1f;
+            if (nextPosition.z < - halfWidth  || nextPosition.z > halfWidth || 
+                nextPosition.x < - halfHeight || nextPosition.x > halfHeight )
+            {
+                Debug.DrawLine(currentPosition, currentPosition, Color.red, 1f);
+                return currentPosition;
+            }
+            currentPosition = nextPosition;
+        }
     }
 }

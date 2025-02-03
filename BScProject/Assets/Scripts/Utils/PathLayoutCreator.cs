@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class SegmentObjectData : MonoBehaviour
@@ -10,11 +11,12 @@ public class SegmentObjectData : MonoBehaviour
     public int AssignedHoverObjectID = -1;
     public int AssignedLandmarkObjectSocketID = -1;
     public int AssignedLandmarkObjectID = -1;
-    public Vector3 CanvasSocketPosition = Vector3.zero;
     public float AngleFromPrevSegmentRad;
     public LineRenderer ArrowRenderer;
     public Vector3 ArrowDirection;
     private ParticleSystem _particleSystem;
+    public Vector3 CanvasSocketPosition = Vector3.zero;
+    public float SocketOffsetAngle;
 
     private void OnEnable()
     {
@@ -162,6 +164,8 @@ public class PathLayoutCreator : MonoBehaviour
         RenderCamera.GetCamera().transform.position = new Vector3(_previewArea.transform.position.x, 3, _previewArea.transform.position.z);
     }
 
+    // ---------- Segment Distance Functions ------------------------------------------------------------------------------------------------------
+
     public (Vector3 position, Vector2 size) CalculateSelectorProperties(LineRenderer lineRenderer)
     {
         Bounds bounds = Utils.CalculateLineRendererBounds(lineRenderer);
@@ -212,10 +216,10 @@ public class PathLayoutCreator : MonoBehaviour
 
         SegmentBoundaryStatusUpdate?.Invoke(segmentID, false);
 
-        return await PerformAdjustments(segment, newSegmentPosition, arrowBase, arrowHead, segmentDistanceData);
+        return await PerformSegmentdjustment(segment, newSegmentPosition, arrowBase, arrowHead, segmentDistanceData);
     }
 
-    private async Task<bool> PerformAdjustments(SegmentObjectData segment, Vector3 newSegmentPosition, Vector3 arrowBase,  Vector3 arrowHead, List<SegmentArrowSelection> segmentDistanceData)
+    private async Task<bool> PerformSegmentdjustment(SegmentObjectData segment, Vector3 newSegmentPosition, Vector3 arrowBase,  Vector3 arrowHead, List<SegmentArrowSelection> segmentDistanceData)
     {
         bool success = await AdjustSegment(segment.SegmentID + 1, newSegmentPosition, segmentDistanceData);
 
@@ -329,6 +333,5 @@ public class PathLayoutCreator : MonoBehaviour
         return true;
     }
 
-
-
+    // ---------- Landmark Position Functions ------------------------------------------------------------------------------------------------------
 }
