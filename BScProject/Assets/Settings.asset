@@ -10,11 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 100f3ec79643803448528201b5ad4fc9, type: 3}
-  m_Name: ExperimentSettings
+  m_Name: Settings
   m_EditorClassIdentifier: 
   MovementArea: {x: 10, y: 6}
-  PlayerDetectionRadius: 0.35
-  ObjectiveRevealTime: 1.5
+  PlayerDetectionRadius: 0.25
+  DefaultPlayerDetectionRadius: 0.35
+  ObjectiveRevealTime: 0.1
+  DefaultObjectiveRevealTime: 1.5
+  DefaultSegmentLength: 2
   paths:
   - {fileID: 11400000, guid: 339499dcea41ed54e831a5cae5a1ff15, type: 2}
   MovementSpeedStepSize: 0.25

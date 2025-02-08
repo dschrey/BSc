@@ -7,6 +7,7 @@ public class ResourceManager : MonoBehaviour
     public List<RenderObject> HoverObjects = new();
     public List<RenderObject> LandmarkObjects = new();
     public List<PathData> LoadedPaths = new();
+    public List<ParticipantData> ExperimentData = new();
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
@@ -23,21 +24,41 @@ public class ResourceManager : MonoBehaviour
         }
     }
 
-    private void OnDestroy() 
+    private void OnDestroy()
     {
-        HoverObjects.ForEach(x => x.RenderTexture.Release());
-        HoverObjects.Clear();
+        HoverObjects.ForEach(x =>
+        {
+            if (x.RenderTexture != null)
+            {
+                x.RenderTexture.Release();
+            }
+        });
+
+        LandmarkObjects.ForEach(x =>
+        {
+            if (x.RenderTexture != null)
+            {
+                x.RenderTexture.Release();
+            }
+        });
     }
 
 
-    private void Start() 
+    private void Start()
     {
+        LoadParticipantSequences();
         LoadObjectiveObjects();
         LoadSegmentObjects();
         LoadPaths();
     }
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
+
+    private void LoadParticipantSequences()
+    {
+        ExperimentData.AddRange(LoadParticipantData("ParticipantData"));
+        Debug.Log($"Loaded {ExperimentData.Count} sequences.");
+    }
 
     private void LoadObjectiveObjects()
     {
@@ -57,9 +78,9 @@ public class ResourceManager : MonoBehaviour
         Debug.Log($"Loaded {LoadedPaths.Count} path data.");
     }
 
-    private List<RenderObject> LoadRenderObjects(string resourcePath)
+    private List<RenderObject> LoadRenderObjects(string jsonFileName)
     {
-        GameObject[] objectiveObj = Resources.LoadAll<GameObject>(resourcePath);
+        GameObject[] objectiveObj = Resources.LoadAll<GameObject>(jsonFileName);
 
         List<RenderObject> renderObjects = new();
         int count = 0;
@@ -68,16 +89,28 @@ public class ResourceManager : MonoBehaviour
             RenderObject objectiveObject = obj.GetComponent<RenderObject>();
             objectiveObject.ID = count;
 
-            ObjectRenderManager objectRenderManager = FindObjectOfType<ObjectRenderManager>();
-
             // TODO initialize this only in ExperimentScene
-            objectiveObject.RenderTexture = objectRenderManager.CreateNewRenderTexture(obj);
+            // ObjectRenderManager objectRenderManager = FindObjectOfType<ObjectRenderManager>();
+            // objectiveObject.RenderTexture = objectRenderManager.CreateNewRenderTexture(obj);
 
             renderObjects.Add(objectiveObject);
             count++;
         }
 
         return renderObjects;
+    }
+
+    public void InitializeRenderObjects()
+    {
+        ObjectRenderManager objectRenderManager = FindObjectOfType<ObjectRenderManager>();
+        if (objectRenderManager == null)
+        {
+            Debug.LogError("Could not find ObjectRenderManager.");
+            return;
+        }
+
+        LandmarkObjects.ForEach(r => r.RenderTexture = objectRenderManager.CreateNewObjectRender(r.gameObject));
+        HoverObjects.ForEach(r => r.RenderTexture = objectRenderManager.CreateNewObjectRender(r.gameObject));
     }
 
     public RenderTexture GetHoverObjectRenderTexture(int id)
@@ -121,4 +154,66 @@ public class ResourceManager : MonoBehaviour
     {
         return Utils.Shuffle(LandmarkObjects, seed);
     }
+
+
+    /// <summary>
+    /// Loads the participant data from a JSON file in the Resources folder.
+    /// </summary>
+    /// <param name="jsonFileName">Name of the JSON file without extension, e.g. "Participants"</param>
+    /// <returns>List of ExperimentData with the settings loaded from JSON.</returns>
+    private List<ParticipantData> LoadParticipantData(string jsonFileName)
+    {
+        TextAsset jsonTextAsset = Resources.Load<TextAsset>(jsonFileName);
+        if (jsonTextAsset == null)
+        {
+            Debug.LogError("Could not find " + jsonFileName + " in the Resources folder.");
+            return null;
+        }
+
+        ParticipantDataWrapper wrapper = JsonUtility.FromJson<ParticipantDataWrapper>(jsonTextAsset.text);
+        if (wrapper == null || wrapper.participants == null)
+        {
+            Debug.LogError("Failed to parse participants from JSON.");
+            return null;
+        }
+
+        foreach (ParticipantData experimentData in wrapper.participants)
+        {
+            if (experimentData.paths != null)
+            {
+                foreach (Trail trail in experimentData.paths)
+                {
+                    string floor = trail.floor == 0 ? "Reg" : "Omni";
+                    trail.selectionName = $"{experimentData.id}_{trail.name}_{floor}";
+                }
+            }
+            else
+            {
+                Debug.LogWarning("No trials found in the experiment data.");
+            }
+        }
+        return wrapper.participants;
+    }
+
+    public ParticipantData GetExperimentData(int ID)
+    {
+        return ExperimentData.Find(d => d.id == ID); ;
+    }
+
+    public PathData LoadPathData(string pathName)
+    {
+        return LoadedPaths.Find(p => p.Name == pathName);
+    }
+
+    public Trail LoadTrail(int dataID, string pathName)
+    {
+        ParticipantData data = ExperimentData.Find(d => d.id == dataID);
+        foreach (Trail trail in data.paths)
+        {
+            if (trail.name == pathName)
+                return trail;
+        }
+        return null;
+    }
+    
 }

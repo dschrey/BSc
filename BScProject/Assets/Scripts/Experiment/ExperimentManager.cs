@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.Events;
@@ -9,12 +9,9 @@ public enum ExperimentState {IDLE, LOADPATH, RUNNING, ASSESSMENT, FINISHED, CANC
 public class ExperimentManager : MonoBehaviour
 {
     public static ExperimentManager Instance { get; private set; }
-    public ExperimentSettings ExperimentSettings;
-    public List<PathData> Paths = new();
-    public Transform AssessmentRoomSpawnPoint;
     [SerializeField] private UIExperimentPanelManager _UIExperimentPanelManager;
     public Transform _XROrigin;
-    public Transform ExperimentSpawn;
+    public Transform ExperimentSpawnpoint;
     public Timer Timer;
     public UnityEvent PathCompletion = new();
     private UnityEvent<ExperimentState> _experimentStateChanged = new();
@@ -22,17 +19,16 @@ public class ExperimentManager : MonoBehaviour
     public ExperimentState ExperimentState
     {
         get => _experimentState;
-        set 
+        set
         {
             _experimentState = value;
             _experimentStateChanged?.Invoke(value);
         }
     }
-    
-    public int CompletedPaths;
-    public bool PathAvailable => CompletedPaths != Paths.Count;
 
-
+    private Transform _assessmentSpawnPoint;
+    public PathData _currentPath;
+    public ExperimentData CurrentExperiment;
 
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
@@ -42,6 +38,7 @@ public class ExperimentManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -49,20 +46,13 @@ public class ExperimentManager : MonoBehaviour
         }
     }
 
-    private void Start() 
+    private void Start()
     {
-        _XROrigin = FindObjectOfType<XROrigin>().transform;
-        if (_XROrigin == null)
-        {
-            Debug.LogError("ExperimentManager :: Start() : Could not find XROrigin.");
-            return;
-        }
-
+        FindOrigin();
         PathCompletion.AddListener(OnPathCompletion);
         _experimentStateChanged.AddListener(OnExperimentStateChanged);
         _experimentState = ExperimentState.IDLE;
     }
-
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
 
@@ -76,13 +66,13 @@ public class ExperimentManager : MonoBehaviour
                 break;
             case ExperimentState.ASSESSMENT:
                 StartAssessment();
-				break;
+                break;
             case ExperimentState.FINISHED:
                 AssessmentManager.Instance.FinishAssessment();
                 PathManager.Instance.ClearPath();
                 StopExperiment();
                 break;
-		}
+        }
     }
 
     private void OnPathCompletion()
@@ -91,60 +81,101 @@ public class ExperimentManager : MonoBehaviour
         ExperimentState = ExperimentState.ASSESSMENT;
     }
 
-    
+
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
-    
+
+    public void SetupExperimentScene()
+    {
+        SpawnPoint[] spawnpoints = FindObjectsOfType<SpawnPoint>();
+        foreach (SpawnPoint spawnPoint in spawnpoints)
+        {
+            if (spawnPoint.type == SpawnPointType.ASSESSMENT)
+                _assessmentSpawnPoint = spawnPoint.transform;
+            else if (spawnPoint.type == SpawnPointType.EXPERIMENT)
+                ExperimentSpawnpoint = spawnPoint.transform;
+            else
+            {
+                _assessmentSpawnPoint = null;
+                ExperimentSpawnpoint = null;
+            }
+        }
+        FindOrigin();
+    }
+
+    public void PrepareExperiment(ExperimentData experiment, PathData path)
+    {
+        if (_XROrigin == null)
+        {
+            return;
+        }
+
+        CurrentExperiment = experiment;
+        _currentPath = path;
+        PathManager.Instance.StartNewPath(path, ExperimentSpawnpoint);
+        ExperimentState = ExperimentState.RUNNING;
+    }
+
+    [Obsolete("Function is deprecated and will be removed in the future.", true)] 
     public void StartExperiment()
     {
         Debug.Log($"ExperimentManager :: StartExperiment() : Starting Experiment..");
         _UIExperimentPanelManager.CloseSetupPanel();
-        CompletedPaths = 0;
-        PathManager.Instance.StartNewPath(Paths[CompletedPaths]);
+        // CompletedPaths = 0;
+        // PathManager.Instance.StartNewPath(Paths[CompletedPaths]);
         ExperimentState = ExperimentState.RUNNING;
     }
 
+    [Obsolete("Function is deprecated and will be removed in the future.", true)] 
     private void LoadNextPath()
     {
-        CompletedPaths++;
-        if (! PathAvailable)
+        // CompletedPaths++;
+        if (true)
         {
             ExperimentState = ExperimentState.FINISHED;
             return;
         }
         Debug.Log($"ExperimentManager :: StartNextPath() : Getting next Path.");
         Timer.Reset();
-        PathManager.Instance.StartNewPath(Paths[CompletedPaths]);
+        // PathManager.Instance.StartNewPath(Paths[CompletedPaths]);
         
         ExperimentState = ExperimentState.RUNNING;
     }
 
     private void StartAssessment()
     {
-        Debug.Log($"Starting assessment for path ID: {PathManager.Instance.CurrentPath.PathData.PathID}");
-        AssessmentManager.Instance.StartPathAssessment(PathManager.Instance.CurrentPath.PathData);
-        MoveXROrigin(AssessmentRoomSpawnPoint);
+        Debug.Log($"Starting assessment for path ID: {_currentPath.PathID}");
+        AssessmentManager.Instance.StartAssessment();
+        MoveXROrigin(_assessmentSpawnPoint);
     }
 
     public void StopExperiment()
     {
-        CompletedPaths = 0;
-        MoveXROrigin(ExperimentSpawn);
-        _UIExperimentPanelManager.ToggleRunningPanel(false);
-        _UIExperimentPanelManager.ResetPanelPosition();
-        _UIExperimentPanelManager.ShowSetupPanel();
+        Timer.Reset();
+        AssessmentManager.Instance.ResetAssessment();
+        SceneManager.Instance.LoadStartScene(ExperimentState.CANCELLED);
         ExperimentState = ExperimentState.IDLE;
     }
 
     public void PathAssessmentCompleted()
     {
         ExperimentState = ExperimentState.IDLE;
-        LoadNextPath();
+        SceneManager.Instance.LoadStartScene(ExperimentState);
     }
 
-    public void MoveXROrigin(Transform target)
+    public void MoveXROrigin(Transform destination)
     {
-        TeleportFade fadeQuad = FindObjectOfType<TeleportFade>();
-        StartCoroutine(fadeQuad.FadeAndTeleport(0, 1, target));
+        XRFadeTransition fadeQuad = FindObjectOfType<XRFadeTransition>();
+        StartCoroutine(fadeQuad.FadeAndTeleport(destination));
+    }
+
+    public void FindOrigin()
+    {
+        _XROrigin = FindObjectOfType<XROrigin>().transform;
+        if (_XROrigin == null)
+        {
+            Debug.LogError("ExperimentManager :: Start() : Could not find XROrigin.");
+            return;
+        }
     }
 
     public void TeleportPlayer(Transform target)
@@ -157,8 +188,6 @@ public class ExperimentManager : MonoBehaviour
             destinationPosition = target.position,
             destinationRotation = target.rotation
         };
-
-        Debug.Log($"Teleport to: {request.destinationPosition}");
 
         TeleportationProvider m_TeleportationProvider = FindObjectOfType<TeleportationProvider>();
         if (m_TeleportationProvider == null)

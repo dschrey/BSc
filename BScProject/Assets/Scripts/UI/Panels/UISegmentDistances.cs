@@ -49,7 +49,7 @@ public class UISegmentDistances : MonoBehaviour
 
         foreach (var segment in _segmentDistanceData)
         {
-            AssessmentManager.Instance.SetSegmentObjectiveDistance(_selectedSegment.SegmentID, DataManager.Instance.ExperimentData.DefaultSegmentLength);
+            AssessmentManager.Instance.SetSegmentObjectiveDistance(_selectedSegment.SegmentID, DataManager.Instance.Settings.DefaultSegmentLength);
         }
     }
 
@@ -129,7 +129,7 @@ public class UISegmentDistances : MonoBehaviour
             }
 
             SegmentArrowSelection segmentSelection = Instantiate(_selectionObjectPrefab, _selectionObjectsHolder).GetComponent<SegmentArrowSelection>();
-            segmentSelection.Initialize(segmentData.SegmentID, DataManager.Instance.ExperimentData.DefaultSegmentLength, _toggleGroup);
+            segmentSelection.Initialize(segmentData.SegmentID, DataManager.Instance.Settings.DefaultSegmentLength, _toggleGroup);
             (Vector3 position, Vector2 size) =  _pathPreviewCreator.CalculateSelectorProperties(segmentData.ArrowRenderer);
             segmentSelection.RectTransform.anchoredPosition = position;
             segmentSelection.RectTransform.sizeDelta = size;

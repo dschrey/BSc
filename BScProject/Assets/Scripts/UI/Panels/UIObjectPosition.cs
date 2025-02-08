@@ -51,7 +51,7 @@ public class UIObjectPosition : MonoBehaviour
 
         _sliderDistanceValue.onValueChanged.AddListener(OnHorizontalPositionChanged);
 
-        Utils.SetSliderSettings(_sliderDistanceValue, 0, ExperimentManager.Instance.ExperimentSettings.MovementArea.x, 0f);
+        Utils.SetSliderSettings(_sliderDistanceValue, 0, DataManager.Instance.Settings.MovementArea.x, 0f);
     }
 
     void OnDisable() 
@@ -207,8 +207,8 @@ public class UIObjectPosition : MonoBehaviour
     /// <returns>Last valid position in local space.</returns>
     private Vector3 CalculateLastValidPosition(Vector3 currentPosition, Vector3 direction)
     {
-        float halfWidth = DataManager.Instance.ExperimentData.MovementArea.x / 2;
-        float halfHeight = DataManager.Instance.ExperimentData.MovementArea.y / 2;
+        float halfWidth = DataManager.Instance.Settings.MovementArea.x / 2;
+        float halfHeight = DataManager.Instance.Settings.MovementArea.y / 2;
 
         while (true)
         {

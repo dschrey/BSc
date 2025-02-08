@@ -14,7 +14,7 @@ public class MovementDetection : MonoBehaviour
     private void OnEnable() 
     {
         _collider = GetComponent<SphereCollider>();
-        _collider.radius = ExperimentManager.Instance.ExperimentSettings.PlayerDetectionRadius;
+        _collider.radius = DataManager.Instance.Settings.PlayerDetectionRadius;
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------------

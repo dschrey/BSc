@@ -25,13 +25,13 @@ public class Objective : MonoBehaviour
     {
         _audioSource = GetComponent<AudioSource>();
         _collider = GetComponent<CapsuleCollider>();
-        _collider.radius = ExperimentManager.Instance.ExperimentSettings.PlayerDetectionRadius;
+        _collider.radius = DataManager.Instance.Settings.PlayerDetectionRadius;
     }
 
     void OnDrawGizmos()
     {
         Gizmos.color = Color.magenta;
-        Gizmos.DrawWireSphere(transform.position, ExperimentManager.Instance.ExperimentSettings.PlayerDetectionRadius);
+        Gizmos.DrawWireSphere(transform.position, DataManager.Instance.Settings.PlayerDetectionRadius);
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ public class Objective : MonoBehaviour
 
     private IEnumerator CaptureObjective()
     {
-        yield return new WaitForSeconds(ExperimentManager.Instance.ExperimentSettings.ObjectiveRevealTime);
+        yield return new WaitForSeconds(DataManager.Instance.Settings.ObjectiveRevealTime);
         SetObjectiveCaptured();
     }
 

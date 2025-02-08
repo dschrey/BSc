@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 [Serializable]
 public class AssessmentData
 {
     public int AssessmentID;
-    public string ParticipantName;
+    // public string ParticipantName;
     public string DateTime;
     public List<PathAssessmentData> Paths;
     public bool Completed;
@@ -18,61 +19,48 @@ public class AssessmentData
         Completed = false;
     }
 
-    public AssessmentData(int id, string participant, DateTime dateTime)
+    public void AddPath(PathData pathData, FloorType floor, string timeTaken)
     {
-        AssessmentID = id;
-        ParticipantName = participant;
-        DateTime = dateTime.ToString().Replace(" ", "_");
-        Paths = new();
-        Completed = false;
-    }
-
-    public void AddPath(PathData pathData, int timeTaken)
-    {
-        PathAssessmentData pathAssessmentData = new(pathData, timeTaken);
-        Paths.Add(pathAssessmentData);
-    }
-
-    public void AddPath(PathData pathData)
-    {
-        // TODO Handle time
-        PathAssessmentData pathAssessmentData = new(pathData, 0);
+        Debug.Log($"Added path (ID: {pathData.PathID}) to assessment {AssessmentID}");
+        PathAssessmentData pathAssessmentData = new(pathData, floor, timeTaken);
         Paths.Add(pathAssessmentData);
     }
 
     public PathAssessmentData GetPath(int pathID)
     {
-        return Paths.Find(p => p.PathAssessmentID == pathID);
+        return Paths.Find(p => p.PathID == pathID);
     }
 }
 
 [Serializable]
 public class PathAssessmentData
 {
-    public int PathAssessmentID;
-    public PathType Type;
+    public int PathID;
+    public string Name;
+    public FloorType FloorType;
     public int Length;
-    public int Time;
-    public bool CorrentPathImageSelected;
+    public string Time;
+    public bool CorrentPathLayoutSelected;
     public List<SegmentAssessmentData> PathSegments;
 
-    public PathAssessmentData(PathData pathData, int timeTaken)
+    public PathAssessmentData(PathData pathData, FloorType floor, string timeTaken)
     {
         PathSegments = new();
-        PathAssessmentID = pathData.PathID;
-        Type = pathData.Type;
+        Name = pathData.name;
+        PathID = pathData.PathID;
+        FloorType = floor;
         Length = pathData.SegmentsData.Count;
         Time = timeTaken;
+
         foreach (PathSegmentData pathSegment in pathData.SegmentsData)
         {
-            SegmentAssessmentData segmentAssessmentData = new(pathSegment.SegmentID);
-            PathSegments.Add(segmentAssessmentData);
+            PathSegments.Add(new(pathSegment.SegmentID));
         }
     }
 
-    public SegmentAssessmentData GetSegment(int segmentAssessmentID)
+    public SegmentAssessmentData GetSegment(int segmentID)
     {
-        return PathSegments.Find(s => s.SegmentAssessmentID == segmentAssessmentID);
+        return PathSegments.Find(s => s.SegmentID == segmentID);
     }
 
 }
@@ -80,21 +68,19 @@ public class PathAssessmentData
 [Serializable]
 public class SegmentAssessmentData
 {
-    public int SegmentAssessmentID;
+    public int SegmentID;
     public float SelectedDistanceToPreviousSegment;
     public float ActualDistanceToPreviousSegment;
-    public float SegmentDistanceDifference;
-
-    // Extented Path Assessment Data
-    public bool CorrectObjectiveObjectSelected;
-    public float SelectedObjectDistanceToObjective;
-    public float CalculatedObjectDistanceToObjective;
-    public float ObjectDifferenceToRealObject;
-    public bool CorrectSegmentObjectSelected;
+    public float SegmentDistanceError;
+    public bool CorrectHoverObjectSelected;
+    public float SelectedLandmarkDistanceToObjective;
+    public float ActualLandmarkDistanceToObjective;
+    public float LandmarkDifferenceToRealObject;
+    public bool CorrectLandmarkObjectSelected;
 
     public SegmentAssessmentData (int id)
     {
-        SegmentAssessmentID = id;
+        SegmentID = id;
     }
 
 

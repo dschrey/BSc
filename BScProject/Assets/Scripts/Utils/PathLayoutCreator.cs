@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Unity.Mathematics;
 using UnityEngine;
 
 public class SegmentObjectData : MonoBehaviour
@@ -27,16 +26,16 @@ public class SegmentObjectData : MonoBehaviour
             return;
         }
 
-        SetParticleScale();
+        // SetParticleScale();
     }
 
     public void SetParticleScale()
     {
         Vector3 particleScale = new()
         {
-            x = 2 * ExperimentManager.Instance.ExperimentSettings.PlayerDetectionRadius,
+            x = 2 * DataManager.Instance.Settings.PlayerDetectionRadius,
             y = _particleSystem.transform.localScale.y,
-            z = 2 * ExperimentManager.Instance.ExperimentSettings.PlayerDetectionRadius
+            z = 2 * DataManager.Instance.Settings.PlayerDetectionRadius
         };
         _particleSystem.transform.localScale = particleScale;
     }
@@ -74,12 +73,13 @@ public class PathLayoutCreator : MonoBehaviour
 
     public void CreatePathLayout(List<PathSegmentData> pathSegments, List<float> fakeSegmentAngles = null)
     {
-        _arrowOffest = DataManager.Instance.ExperimentData.PlayerDetectionRadius; 
+        _arrowOffest = DataManager.Instance.Settings.PlayerDetectionRadius; 
 
         List<GameObject> displayObjects = new();
         Vector3 currentPosition = transform.position;
         SegmentObjectData pathStart = Instantiate(_pathSegmentPrefab, currentPosition,
             Quaternion.identity, transform).AddComponent<SegmentObjectData>();
+        pathStart.SetParticleScale();
         pathStart.SetColor(Color.white);
         SpawnedSegments.Add(pathStart);
         displayObjects.Add(pathStart.gameObject);
@@ -99,9 +99,9 @@ public class PathLayoutCreator : MonoBehaviour
             }
             
             Vector3 relativePosition = new (
-                DataManager.Instance.ExperimentData.DefaultSegmentLength * Mathf.Cos(angleInRadians),
+                DataManager.Instance.Settings.DefaultSegmentLength * Mathf.Cos(angleInRadians),
                 0,
-                DataManager.Instance.ExperimentData.DefaultSegmentLength * Mathf.Sin(angleInRadians)
+                DataManager.Instance.Settings.DefaultSegmentLength * Mathf.Sin(angleInRadians)
             );
 
             Vector3 spawnPosition = currentPosition + relativePosition;
@@ -117,6 +117,7 @@ public class PathLayoutCreator : MonoBehaviour
 
             SegmentObjectData segment = Instantiate(_pathSegmentPrefab, spawnPosition, Quaternion.identity, transform).AddComponent<SegmentObjectData>();
             segment.SegmentID = pathSegmentData.SegmentID;
+            segment.SetParticleScale();
             segment.SetColor(pathSegmentData.SegmentColor);
             segment.ArrowRenderer = lineRenderer;
             segment.ArrowDirection = direction;
@@ -305,10 +306,10 @@ public class PathLayoutCreator : MonoBehaviour
 
     private bool ValidatePosition(Vector3 objectPosition)
     {
-        float halfWidth = DataManager.Instance.ExperimentData.MovementArea.x / 2;
-        float halfHeight = DataManager.Instance.ExperimentData.MovementArea.y / 2;
+        float halfWidth = DataManager.Instance.Settings.MovementArea.x / 2;
+        float halfHeight = DataManager.Instance.Settings.MovementArea.y / 2;
 
-        float objectRadius = DataManager.Instance.ExperimentData.PlayerDetectionRadius;
+        float objectRadius = DataManager.Instance.Settings.PlayerDetectionRadius;
 
         Vector3[] cornerPositions =
         {

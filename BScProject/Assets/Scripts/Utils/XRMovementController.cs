@@ -16,8 +16,8 @@ public class XRMovementController : MonoBehaviour
             // scaledMovement.y = transform.position.y;
             // transform.position += scaledMovement;
             Vector3 currentPos = transform.position;
-            currentPos.x = transform.position.x * ExperimentManager.Instance.ExperimentSettings.MovementSpeedMultiplier;
-            currentPos.z = transform.position.z * ExperimentManager.Instance.ExperimentSettings.MovementSpeedMultiplier;
+            currentPos.x = transform.position.x * DataManager.Instance.Settings.MovementSpeedMultiplier;
+            currentPos.z = transform.position.z * DataManager.Instance.Settings.MovementSpeedMultiplier;
             transform.position = currentPos;
         }
 

@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 65adc9aaa9d7bce49bfd2f0b5a84c077, type: 3}
-  m_Name: Default
+  m_Name: Default L3
   m_EditorClassIdentifier: 
   PathID: 0
-  Name: A
+  Name: B
   Type: 0
   PathColor: {r: 1, g: 0, b: 0, a: 1}
   PathLayoutSelectionOrder: 

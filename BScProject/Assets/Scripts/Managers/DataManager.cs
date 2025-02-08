@@ -5,7 +5,7 @@ public class DataManager : MonoBehaviour
 {
 
     public static DataManager Instance { get; private set; }
-    public ExperimentSettings ExperimentData;
+    public Settings Settings;
     private string _experimentSettingsPath;
     private string _experimentResultsPath;
     private string _assessmentFilePath;
@@ -25,7 +25,7 @@ public class DataManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        _experimentSettingsPath = Application.persistentDataPath + "experimentSettings.json";
+        _experimentSettingsPath = Application.persistentDataPath + "/Settings.json";
         _experimentResultsPath = Application.persistentDataPath + "/Assessments";
     }
 
@@ -35,20 +35,21 @@ public class DataManager : MonoBehaviour
         {
             Directory.CreateDirectory(_experimentResultsPath);
         }
-        // LoadExperimentSettings();
+        LoadSettings();
     }
 
    // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
-    public void SaveExperimentSettings()
+    public void SaveSettings()
     {
         Debug.Log($"Saving experiment Settings");
         ExperimentSettingsData data = new()
         {
-            CompletedAssessments = ExperimentData.CompletedAssessments,
-            PlayerDetectionRadius = ExperimentData.PlayerDetectionRadius,
-            ObjectiveRevealTime = ExperimentData.ObjectiveRevealTime,
-            MovementSpeedMultiplier = ExperimentData.MovementSpeedMultiplier
+            CompletedAssessments = Settings.CompletedExperiments,
+            PlayerDetectionRadius = Settings.PlayerDetectionRadius,
+            ObjectiveRevealTime = Settings.ObjectiveRevealTime,
+            MovementSpeedMultiplier = Settings.MovementSpeedMultiplier,
+            TransitionDuration = Settings.TransitionDuration
         };
 
         string json = JsonUtility.ToJson(data, true);
@@ -56,7 +57,7 @@ public class DataManager : MonoBehaviour
     }
 
 
-    public void LoadExperimentSettings()
+    public void LoadSettings()
     {
         if (File.Exists(_experimentSettingsPath))
         {
@@ -64,14 +65,15 @@ public class DataManager : MonoBehaviour
 
             ExperimentSettingsData data = JsonUtility.FromJson<ExperimentSettingsData>(json);
 
-            ExperimentData.PlayerDetectionRadius = data.PlayerDetectionRadius;
-            ExperimentData.ObjectiveRevealTime = data.ObjectiveRevealTime;
-            ExperimentData.MovementSpeedMultiplier = data.MovementSpeedMultiplier;
-            ExperimentData.CompletedAssessments = data.CompletedAssessments;
+            Settings.PlayerDetectionRadius = data.PlayerDetectionRadius;
+            Settings.ObjectiveRevealTime = data.ObjectiveRevealTime;
+            Settings.MovementSpeedMultiplier = data.MovementSpeedMultiplier;
+            Settings.CompletedExperiments = data.CompletedAssessments;
+            Settings.TransitionDuration = data.TransitionDuration;
         } 
         else
         {
-            SaveExperimentSettings();
+            SaveSettings();
         }
     }
 
@@ -79,16 +81,11 @@ public class DataManager : MonoBehaviour
     {
         string jsonData = JsonUtility.ToJson(data, true);
  
-        string filePath = _experimentResultsPath + "/" + $"Assessment_{ExperimentManager.Instance.ExperimentSettings.CompletedAssessments}.json";
+        string filePath = _experimentResultsPath + "/" + $"Assessment_{data.AssessmentID}.json";
         File.WriteAllText(filePath, jsonData);
         _assessmentFilePath = filePath;
 
         Debug.Log($"Assessment data saved to: {filePath}");
-    }
-
-    public void ResetAssessmentFilePath()
-    {
-        _assessmentFilePath = null;
     }
 
 }

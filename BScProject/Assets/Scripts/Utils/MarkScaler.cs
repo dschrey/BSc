@@ -10,9 +10,9 @@ public class MarkScaler : MonoBehaviour
     {
         Vector3 newScale = new()
         {
-            x = ExperimentManager.Instance.ExperimentSettings.PlayerDetectionRadius,
+            x = DataManager.Instance.Settings.PlayerDetectionRadius,
             y = transform.localScale.y,
-            z = ExperimentManager.Instance.ExperimentSettings.PlayerDetectionRadius
+            z = DataManager.Instance.Settings.PlayerDetectionRadius
         };
         transform.localScale = newScale;
 
@@ -21,9 +21,9 @@ public class MarkScaler : MonoBehaviour
         {
             Vector3 particleScale = new()
             {
-                x = 2 *ExperimentManager.Instance.ExperimentSettings.PlayerDetectionRadius,
+                x = 2 *DataManager.Instance.Settings.PlayerDetectionRadius,
                 y = particle.transform.localScale.y,
-                z = 2 *ExperimentManager.Instance.ExperimentSettings.PlayerDetectionRadius
+                z = 2 *DataManager.Instance.Settings.PlayerDetectionRadius
             };
             particle.transform.localScale = particleScale;
         }

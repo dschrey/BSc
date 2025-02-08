@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2048711566058659752}
   - component: {fileID: 3236772292724004883}
   m_Layer: 0
-  m_Name: NotCapturedFloorParticles
+  m_Name: FloorParticles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4842,7 +4842,7 @@ GameObject:
   - component: {fileID: 748835618604503202}
   - component: {fileID: 8230269518979212252}
   m_Layer: 0
-  m_Name: NotCapturedParticles
+  m_Name: Particles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4946,7 +4946,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 3
+      scalar: 2.5
       minScalar: 5
       maxCurve:
         serializedVersion: 2

@@ -18,10 +18,10 @@ public class UIExperimentSetup : MonoBehaviour
         _buttonSetSpawn.onClick.AddListener(OnSetSpawnButtonClicked);
         _buttonStart.onClick.AddListener(OnStartButtonClicked);
         _sliderMovementSpeed.onValueChanged.AddListener(OnMovementSpeedChanged);
-        SetSliderSettings(_sliderMovementSpeed, ExperimentManager.Instance.ExperimentSettings.MinMovementSpeedMultiplier, 
-            ExperimentManager.Instance.ExperimentSettings.MaxMovementSpeedMultiplier, ExperimentManager.Instance.ExperimentSettings.MovementSpeedMultiplier);
-        _textMovementSpeed.text = GetSliderStepValue(ExperimentManager.Instance.ExperimentSettings.MovementSpeedMultiplier, 
-            ExperimentManager.Instance.ExperimentSettings.MovementSpeedStepSize).ToString();
+        SetSliderSettings(_sliderMovementSpeed, DataManager.Instance.Settings.MinMovementSpeedMultiplier, 
+            DataManager.Instance.Settings.MaxMovementSpeedMultiplier, DataManager.Instance.Settings.MovementSpeedMultiplier);
+        _textMovementSpeed.text = GetSliderStepValue(DataManager.Instance.Settings.MovementSpeedMultiplier, 
+            DataManager.Instance.Settings.MovementSpeedStepSize).ToString();
     }  
 
     private void OnDisable()
@@ -34,6 +34,7 @@ public class UIExperimentSetup : MonoBehaviour
 
     private void Update() 
     {
+        return;
         if (ExperimentManager.Instance.ExperimentState == ExperimentState.IDLE)
         {
             if (_startPointHandler.ExperimentReadyToStart)
@@ -51,7 +52,7 @@ public class UIExperimentSetup : MonoBehaviour
 
     private void OnStartButtonClicked()
     {
-        ExperimentManager.Instance.StartExperiment();
+        // ExperimentManager.Instance.StartExperiment();
         // ExperimentManager.Instance.TeleportPlayer(ExperimentManager.Instance.AssessmentRoomSpawnPoint);
     }
 
@@ -63,9 +64,9 @@ public class UIExperimentSetup : MonoBehaviour
 
     private void OnMovementSpeedChanged(float value)
     {
-        _sliderMovementSpeed.value = GetSliderStepValue(value, ExperimentManager.Instance.ExperimentSettings.MovementSpeedStepSize);
-        ExperimentManager.Instance.ExperimentSettings.MovementSpeedMultiplier = GetSliderStepValue(value, ExperimentManager.Instance.ExperimentSettings.MovementSpeedStepSize);
-        _textMovementSpeed.text = GetSliderStepValue(value, ExperimentManager.Instance.ExperimentSettings.MovementSpeedStepSize).ToString();
+        _sliderMovementSpeed.value = GetSliderStepValue(value, DataManager.Instance.Settings.MovementSpeedStepSize);
+        DataManager.Instance.Settings.MovementSpeedMultiplier = GetSliderStepValue(value, DataManager.Instance.Settings.MovementSpeedStepSize);
+        _textMovementSpeed.text = GetSliderStepValue(value, DataManager.Instance.Settings.MovementSpeedStepSize).ToString();
     }
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
@@ -79,7 +80,7 @@ public class UIExperimentSetup : MonoBehaviour
         else if (currentValue < minValue)
             slider.value = minValue;
         else
-            slider.value = GetSliderStepValue(currentValue, ExperimentManager.Instance.ExperimentSettings.MovementSpeedStepSize);
+            slider.value = GetSliderStepValue(currentValue, DataManager.Instance.Settings.MovementSpeedStepSize);
     }
 
     private float GetSliderStepValue(float value, float stepSize)

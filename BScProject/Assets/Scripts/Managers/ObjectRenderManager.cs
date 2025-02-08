@@ -9,7 +9,7 @@ public class ObjectRenderManager : MonoBehaviour
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
-    public RenderTexture CreateNewRenderTexture(GameObject objectPrefab)
+    public RenderTexture CreateNewObjectRender(GameObject objectPrefab)
     {
         RenderTexture renderTexture = new(256, 256, 24);
         

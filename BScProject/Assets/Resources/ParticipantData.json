@@ -1,0 +1,117 @@
+{
+    "participants": [
+        {
+            "id": 0,
+            "paths": [
+                { "name": "B", "floor": 1 },
+                { "name": "A", "floor": 0 }
+            ]
+        },
+        {
+            "id": 1,
+            "paths": [
+                { "name": "A", "floor": 0 },
+                { "name": "B", "floor": 1 }
+            ]
+        },
+        {
+            "id": 2,
+            "paths": [
+                { "name": "A", "floor": 0 },
+                { "name": "B", "floor": 1 }
+            ]
+        },
+        {
+            "id": 3,
+            "paths": [
+                { "name": "B", "floor": 0 },
+                { "name": "A", "floor": 1 }
+            ]
+        },
+        {
+            "id": 4,
+            "paths": [
+                { "name": "A", "floor": 0 },
+                { "name": "C", "floor": 1 }
+            ]
+        },
+        {
+            "id": 5,
+            "paths": [
+                { "name": "C", "floor": 0 },
+                { "name": "A", "floor": 1 }
+            ]
+        },
+        {
+            "id": 6,
+            "paths": [
+                { "name": "A", "floor": 0 },
+                { "name": "D", "floor": 1 }
+            ]
+        },
+        {
+            "id": 7,
+            "paths": [
+                { "name": "D", "floor": 0 },
+                { "name": "A", "floor": 1 }
+            ]
+        },
+        {
+            "id": 8,
+            "paths": [
+                { "name": "B", "floor": 0 },
+                { "name": "C", "floor": 1 }
+            ]
+        },
+        {
+            "id": 9,
+            "paths": [
+                { "name": "C", "floor": 0 },
+                { "name": "B", "floor": 1 }
+            ]
+        },
+        {
+            "id": 10,
+            "paths": [
+                { "name": "B", "floor": 0 },
+                { "name": "D", "floor": 1 }
+            ]
+        },
+        {
+            "id": 11,
+            "paths": [
+                { "name": "B", "floor": 0 },
+                { "name": "D", "floor": 1 }
+            ]
+        },
+        {
+            "id": 12,
+            "paths": [
+                { "name": "D", "floor": 0 },
+                { "name": "B", "floor": 1 }
+            ]
+        },
+        {
+            "id": 13,
+            "paths": [
+                { "name": "C", "floor": 0 },
+                { "name": "D", "floor": 1 }
+            ]
+        },
+        {
+            "id": 14,
+            "paths": [
+                { "name": "C", "floor": 0 },
+                { "name": "D", "floor": 1 }
+            ]
+        },
+        {
+            "id": 15,
+            "paths": [
+                { "name": "D", "floor": 0 },
+                { "name": "C", "floor": 1 }
+            ]
+        }
+    ]
+}
+  

@@ -469,8 +469,8 @@ public class UIObjectSelection : MonoBehaviour
 
     private bool ValidatePosition(Vector3 position)
     {
-        float halfWidth = DataManager.Instance.ExperimentData.MovementArea.x / 2;
-        float halfHeight = DataManager.Instance.ExperimentData.MovementArea.y / 2;
+        float halfWidth = DataManager.Instance.Settings.MovementArea.x / 2;
+        float halfHeight = DataManager.Instance.Settings.MovementArea.y / 2;
 
         if (position.z < - halfWidth || position.z > halfWidth)
         {

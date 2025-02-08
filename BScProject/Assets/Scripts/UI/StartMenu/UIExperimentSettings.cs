@@ -6,12 +6,13 @@ using UnityEngine.UI;
 
 public class UIExperimentSettings : MonoBehaviour
 {
-    [SerializeField] private ExperimentSettings _settings;
+    [SerializeField] private Settings _settings;
     
     [SerializeField] private Slider _sliderPlayerDetectionRadius;
     [SerializeField] private TMP_InputField _inputPlayerDetectionValue;
     [SerializeField] private TMP_InputField _inputRevealTime;
-    [SerializeField] private Button _ButtonReset;
+    [SerializeField] private TMP_InputField _inputTransitionDuration;
+    [SerializeField] private Button _buttonReset;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
@@ -20,7 +21,8 @@ public class UIExperimentSettings : MonoBehaviour
         _sliderPlayerDetectionRadius.onValueChanged.AddListener(OnPlayerDetectionRadiusChanged);
         _inputPlayerDetectionValue.onEndEdit.AddListener(OnPlayerDetectionInputChanged);
         _inputRevealTime.onEndEdit.AddListener(OnRevealTimeChanged);
-        _ButtonReset.onClick.AddListener(OnResetButtonPressed);
+        _inputTransitionDuration.onEndEdit.AddListener(OnTransitionDurationChanged);
+        _buttonReset.onClick.AddListener(OnResetButtonPressed);
     }
 
 
@@ -29,8 +31,18 @@ public class UIExperimentSettings : MonoBehaviour
         _inputPlayerDetectionValue.onValueChanged.RemoveListener(OnPlayerDetectionInputChanged);
         _inputPlayerDetectionValue.onEndEdit.RemoveListener(OnPlayerDetectionInputChanged);
         _inputRevealTime.onEndEdit.RemoveListener(OnRevealTimeChanged);
-        _ButtonReset.onClick.RemoveListener(OnResetButtonPressed);
-        DataManager.Instance.SaveExperimentSettings();
+        _inputTransitionDuration.onEndEdit.RemoveListener(OnTransitionDurationChanged);
+        _buttonReset.onClick.RemoveListener(OnResetButtonPressed);
+        DataManager.Instance.SaveSettings();
+    }
+
+    private void OnTransitionDurationChanged(string input)
+    {
+        input = input.Replace(",", ".");
+        input = input.Replace("s", "");
+        float.TryParse(input, NumberStyles.Float, CultureInfo.InvariantCulture, out float value);
+        _inputTransitionDuration.text = value.ToString(CultureInfo.InvariantCulture) + "s";
+        _settings.TransitionDuration = value;
     }
 
     private void Start() 
@@ -39,6 +51,7 @@ public class UIExperimentSettings : MonoBehaviour
         _inputRevealTime.text = _settings.ObjectiveRevealTime.ToString(CultureInfo.InvariantCulture) + "s";
         _sliderPlayerDetectionRadius.value = _settings.PlayerDetectionRadius;
         _inputPlayerDetectionValue.text = _settings.PlayerDetectionRadius.ToString(CultureInfo.InvariantCulture) + "s";
+        _inputTransitionDuration.text = _settings.TransitionDuration.ToString(CultureInfo.InvariantCulture) + "s";
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
@@ -76,6 +89,8 @@ public class UIExperimentSettings : MonoBehaviour
         _inputPlayerDetectionValue.text = _settings.DefaultPlayerDetectionRadius.ToString("F2", CultureInfo.InvariantCulture) + "m";
         _inputRevealTime.text = _settings.DefaultObjectiveRevealTime.ToString(CultureInfo.InvariantCulture) + "s";
         _settings.ObjectiveRevealTime = _settings.DefaultObjectiveRevealTime;
+        _inputTransitionDuration.text = _settings.DefaultTransitionDuration.ToString(CultureInfo.InvariantCulture) + "s";
+        _settings.TransitionDuration = _settings.DefaultTransitionDuration;
     }
     
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------

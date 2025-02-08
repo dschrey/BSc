@@ -3,7 +3,7 @@ using UnityEngine;
 
 
 [CreateAssetMenu(fileName = "ExperimentSettings", menuName = "ExperimentSettings")]
-public class ExperimentSettings : ScriptableObject
+public class Settings : ScriptableObject
 {
     [Header("Experiment Settings")]
     [Tooltip("Size of the movement area")]
@@ -24,7 +24,9 @@ public class ExperimentSettings : ScriptableObject
     public float MovementSpeedMultiplier = 1;
     public float MinMovementSpeedMultiplier = 0.25f;
     public float MaxMovementSpeedMultiplier = 3;
-    public int CompletedAssessments = 0;
+    public int CompletedExperiments = 0;
+    public float TransitionDuration = 0.75f;
+    public float DefaultTransitionDuration = 0.75f;
 
 }
 
@@ -34,4 +36,5 @@ public class ExperimentSettingsData
     public float PlayerDetectionRadius;
     public float ObjectiveRevealTime;
     public float MovementSpeedMultiplier;
+    public float TransitionDuration;
 }

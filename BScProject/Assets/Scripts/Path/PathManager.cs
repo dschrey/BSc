@@ -49,12 +49,9 @@ public class PathManager : MonoBehaviour
         _unlockedSegments++;
         if (_unlockedSegments == CurrentPath.Segments.Count)
         {
-            Debug.Log($"Path {CurrentPath.PathData.PathID} completed.");
-
             ExperimentManager.Instance.PathCompletion?.Invoke();
             return;
         }
-        Debug.Log($"PathManager :: OnSegmentCompleted() : Revealing new segment.");
         RevealNextPathSegment();
     }
 
@@ -74,18 +71,17 @@ public class PathManager : MonoBehaviour
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
-    public void StartNewPath(PathData pathData)
+    public void StartNewPath(PathData pathData, Transform spawnpoint)
     {
+        Debug.Log($"Trying to start new path..");
         if (CurrentPath != null)
         {
             ClearPath();
         }
         ExperimentManager.Instance.Timer.StartTimer();
-        CurrentPath = Instantiate(_pathPrefab, ExperimentManager.Instance.ExperimentSpawn.position, ExperimentManager.Instance.ExperimentSpawn.rotation).GetComponent<Path>();
+        CurrentPath = Instantiate(_pathPrefab, spawnpoint.position, spawnpoint.rotation).GetComponent<Path>();
         CurrentPath.Initialize(pathData);
 
-        // TODO uncomment the teleport
-        // ExperimentManager.Instance.MoveXROrigin(ExperimentManager.Instance.ExperimentSpawn);
         PathLayoutManager.Instance.PreparePathPreviews(CurrentPath.PathData);
         RevealNextPathSegment();
     }
@@ -113,7 +109,7 @@ public class PathManager : MonoBehaviour
         }
         else
         {
-            ExperimentManager.Instance.MoveXROrigin(ExperimentManager.Instance.ExperimentSpawn);
+            ExperimentManager.Instance.MoveXROrigin(ExperimentManager.Instance.ExperimentSpawnpoint);
         }
 
         CurrentSegment.ShowSegmentObjective();

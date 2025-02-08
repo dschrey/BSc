@@ -101,8 +101,8 @@ public class UISegmentObjectPosition : MonoBehaviour
 
         _draggableCanvasObject.DraggableWorldObject = _draggableObject;
 
-        SetSliderSettings(_sliderhorizontalPosition, 0, ExperimentManager.Instance.ExperimentSettings.MovementArea.x * 100, 0f);
-        SetSliderSettings(_sliderverticalPosition, 0, ExperimentManager.Instance.ExperimentSettings.MovementArea.y * 100, 0f);
+        SetSliderSettings(_sliderhorizontalPosition, 0, DataManager.Instance.Settings.MovementArea.x * 100, 0f);
+        SetSliderSettings(_sliderverticalPosition, 0, DataManager.Instance.Settings.MovementArea.y * 100, 0f);
 
         if (_segmentPositionData.Count == 0)
         {

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Extented
   m_EditorClassIdentifier: 
   PathID: 1
+  Name: B
   Type: 1
   PathColor: {r: 0, g: 0.06795311, b: 1, a: 1}
   PathLayoutSelectionOrder: 02000000010000000000000003000000

@@ -7,9 +7,9 @@ public class Timer : MonoBehaviour
     private float _endTime;
     private bool _isActive;
     
-    public void StartTimer() 
+    public void StartTimer()
     {
-        if (! _isActive)
+        if (!_isActive)
         {
             _isActive = true;
             _startTime = Time.time;
@@ -35,9 +35,9 @@ public class Timer : MonoBehaviour
 
     public void Reset()
     {
+        _isActive = false;
         _startTime = 0f;
         _endTime = 0f;
-        _isActive = false;
     }
 
     public string GetElapsedTimeFormated()
@@ -45,7 +45,6 @@ public class Timer : MonoBehaviour
         float time;
         if (_isActive)
         {
-            Debug.LogWarning("Timer still running. Returning current elapsed time.");
             time =  Time.time - _startTime;
         }
         else
@@ -69,7 +68,6 @@ public class Timer : MonoBehaviour
     {
         if (_isActive)
         {
-            Debug.LogWarning("Time still running. Returning current elapsed time.");
             return Time.time - _startTime;
         }
         else

@@ -1,5 +1,4 @@
-using System;
-using System.Collections.Generic;
+  using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,48 +9,47 @@ public class UINewExperiment : MonoBehaviour
     [SerializeField] private Button _buttonEditExperimentID;
     [SerializeField] private TMP_Dropdown _pathDropdown;
 
-    [SerializeField] private TMP_InputField _inputPerticipantName;
-    [SerializeField] private Button _buttonConfigureStartPosition;
+    [SerializeField] private TMP_InputField _inputParticipantName;
     [SerializeField] private Button _buttonStartExperiment;
 
+    [SerializeField] private Toggle _toggleResetExperimentCount;
+    private Trail _selectedTrail;
     private PathData _selectedPath;
     private int _experimentID;
     private string _participantName;
-   
-   
-   // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
+    private ExperimentData _experiment;
+
+    private bool _overwriteCompletedExperiments = false;
+
+
+    // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
     private void OnEnable()
     {
         _inputExperimentID.onEndEdit.AddListener(OnExperimentIDChanged);
-        _inputPerticipantName.onEndEdit.AddListener(OnParticipantNameChanged);
+        // _inputParticipantName.onEndEdit.AddListener(OnParticipantNameChanged);
         _buttonEditExperimentID.onClick.AddListener(OnEditExperimentIDClicked);
-        _buttonConfigureStartPosition.onClick.AddListener(OnConfigureStartPositionClicked);
         _buttonStartExperiment.onClick.AddListener(OnStartExperimentClicked);
         _pathDropdown.onValueChanged.AddListener(OnPathSelectionChanged);
+        _toggleResetExperimentCount.onValueChanged.AddListener(OnResetExperimentCount);
     }
 
-    private void OnDisable() 
+    private void OnDisable()
     {
         _inputExperimentID.onEndEdit.RemoveListener(OnExperimentIDChanged);
-        _inputPerticipantName.onEndEdit.RemoveListener(OnParticipantNameChanged);
+        // _inputParticipantName.onEndEdit.RemoveListener(OnParticipantNameChanged);
         _buttonEditExperimentID.onClick.RemoveListener(OnEditExperimentIDClicked);
-        _buttonConfigureStartPosition.onClick.RemoveListener(OnConfigureStartPositionClicked);
         _buttonStartExperiment.onClick.RemoveListener(OnStartExperimentClicked);
         _pathDropdown.onValueChanged.RemoveListener(OnPathSelectionChanged);
+        _toggleResetExperimentCount.onValueChanged.RemoveListener(OnResetExperimentCount);
     }
 
     void Start()
     {
-        _experimentID = DataManager.Instance.ExperimentData.CompletedAssessments;
+        _experimentID = DataManager.Instance.Settings.CompletedExperiments;
         _inputExperimentID.text = _experimentID.ToString();
-
-        List<string> options = new();
-        ResourceManager.Instance.LoadedPaths.ForEach(p =>
-        {
-            options.Add(p.name);
-        });
-        _pathDropdown.AddOptions(options);
+        PopulatePathOptions();
+        OnPathSelectionChanged(0);
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
@@ -60,12 +58,15 @@ public class UINewExperiment : MonoBehaviour
     {
         int.TryParse(input, out int value);
         _experimentID = value;
+        PopulatePathOptions();
+        OnPathSelectionChanged(0);
     }
 
     private void OnEditExperimentIDClicked()
     {
+        _toggleResetExperimentCount.gameObject.SetActive(true);
         bool enabled = _inputExperimentID.interactable;
-        _inputExperimentID.interactable = ! enabled;
+        _inputExperimentID.interactable = !enabled;
     }
 
     private void OnParticipantNameChanged(string input)
@@ -73,20 +74,71 @@ public class UINewExperiment : MonoBehaviour
         _participantName = input;
     }
 
-    private void OnConfigureStartPositionClicked()
-    {
-        throw new NotImplementedException();
-    }
 
     private void OnStartExperimentClicked()
     {
-        AssessmentManager.Instance.CreateNewAssessment(_experimentID, _participantName, _selectedPath);
+        if (_overwriteCompletedExperiments)
+        {
+            DataManager.Instance.Settings.CompletedExperiments = _experimentID;
+            DataManager.Instance.SaveSettings();
+        }
+        
+        _experiment.paths.Remove(_selectedTrail);
+        SceneManager.Instance.LoadExperimentScene(_experiment, _selectedPath, _selectedTrail);
+        gameObject.SetActive(false);
     }
 
     private void OnPathSelectionChanged(int index)
     {
-        _selectedPath = ResourceManager.Instance.LoadedPaths[index];
-        Debug.Log($"Selected Path: {ResourceManager.Instance.LoadedPaths[index].name}");
+        string trailName = _pathDropdown.options[index].text;
+
+        _selectedTrail = _experiment.GetTrailData(trailName);
+        if (_selectedTrail == null)
+        {
+            Debug.LogError("Failed to load selected trail data.");
+            return;
+        }
+        _selectedPath = _experiment.GetPathData(trailName);
+        if (_selectedPath == null)
+        {
+            Debug.LogError("Failed to load selected path data.");
+            return;
+        }
+
+        Debug.Log($"Experiment {_experiment.id} selected Path: {_selectedPath.PathID} - {_selectedPath.name}");
     }
+
+    private void OnResetExperimentCount(bool state)
+    {
+        _overwriteCompletedExperiments = state;
+    }
+
+    // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
+
+    private void PopulatePathOptions()
+    {
+        _pathDropdown.ClearOptions();
+        List<string> options = new();
+        ParticipantData data = ResourceManager.Instance.GetExperimentData(_experimentID);
+        if (data == null)
+        {
+            Debug.LogError($"Failed to load experiment data for id: {_experimentID}.");
+            options.Add("No path found");
+            _pathDropdown.AddOptions(options);
+            return;
+        }
+
+        _experiment = new(_experimentID);
+
+        foreach (Trail trail in data.paths)
+        {
+            options.Add(trail.selectionName);
+            PathData path = ResourceManager.Instance.LoadPathData(trail.name);
+            _experiment.paths.Add(trail, path);
+        }
+        _pathDropdown.AddOptions(options);
+    }
+
+
 
 }

@@ -89,7 +89,6 @@ public class PathSegment : MonoBehaviour
         
         SegmentObject = Instantiate(ResourceManager.Instance.GetLandmarkObject(PathSegmentData.LandmarkObjectID), objectSpawnpoint, Quaternion.identity, transform);
         PathSegmentData.LandmarkObjectDistanceToObjective = Vector3.Distance(transform.position, objectSpawnpoint);
-        Debug.Log($"Spawned at {SegmentObject.transform.localPosition}");
     }
 
     private void SpawnSegmentObstacle()

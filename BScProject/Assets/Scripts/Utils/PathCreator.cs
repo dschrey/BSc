@@ -13,7 +13,7 @@ public class PathCreator : MonoBehaviour
     private void Start() 
     {
         pathData.SegmentsData.ForEach(data => SegmentsData.Add(data));
-        _createdPath = Instantiate(_pathPrefabObject, ExperimentManager.Instance.ExperimentSpawn.position, ExperimentManager.Instance.ExperimentSpawn.rotation).GetComponent<Path>();
+        _createdPath = Instantiate(_pathPrefabObject, ExperimentManager.Instance.ExperimentSpawnpoint.position, ExperimentManager.Instance.ExperimentSpawnpoint.rotation).GetComponent<Path>();
         _createdPath.Initialize(pathData);
     }
 
