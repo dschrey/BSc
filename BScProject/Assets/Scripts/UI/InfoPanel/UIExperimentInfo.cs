@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,25 +26,25 @@ public class UIExperimentInfo : MonoBehaviour
 
 
 
-    private bool _infoShown;
+    public bool IsPanelShown;
     private Timer _timer;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
     void Update() 
     {
-        if (_infoShown && _timer != null)
+        if (IsPanelShown && _timer != null)
         {
             _textTime.text = _timer.GetElapsedTimeFormated();
             _textStatus.text = GetCurrentStatus();
-            _textID.text = ExperimentManager.Instance.CurrentExperiment.id.ToString();
             _textSegmentID.text = PathManager.Instance.CurrentSegment.PathSegmentData.SegmentID.ToString();
+            _textID.text = ExperimentManager.Instance.CurrentExperiment.id.ToString();
         }
     }
 
     void OnEnable()
     {
-        _infoShown = false;
+        IsPanelShown = false;
         _buttonExpand.onClick.AddListener(OnExpandExpermintInfo);
         _buttonMinimize.onClick.AddListener(OnMinimizeExpermintInfo);
 
@@ -68,18 +69,18 @@ public class UIExperimentInfo : MonoBehaviour
     private void OnExpandExpermintInfo()
     {
         _timer = ExperimentManager.Instance.Timer;
-        _infoShown = true;
-        _infoPanelMinimized.SetActive(!_infoShown);
-        _infoPanelExpanded.SetActive(_infoShown);
+        IsPanelShown = true;
+        _infoPanelMinimized.SetActive(!IsPanelShown);
+        _infoPanelExpanded.SetActive(IsPanelShown);
 
-        _textPathName.text = PathManager.Instance.CurrentPath.PathData.Name;
+        _textPathName.text = PathManager.Instance.CurrentPath.PathData.PathName;
     }
 
     private void OnMinimizeExpermintInfo()
     {
-        _infoShown = false;
-        _infoPanelExpanded.SetActive(_infoShown);   
-        _infoPanelMinimized.SetActive(! _infoShown);
+        IsPanelShown = false;
+        _infoPanelExpanded.SetActive(IsPanelShown);   
+        _infoPanelMinimized.SetActive(! IsPanelShown);
     }
     
     private void OnRestartSegmentButtonClicked()
@@ -130,4 +131,10 @@ public class UIExperimentInfo : MonoBehaviour
         return "ERROR";
     }
 
+    public void ClosePanel()
+    {
+        IsPanelShown = false;
+        _infoPanelExpanded.SetActive(IsPanelShown);   
+        _infoPanelMinimized.SetActive(IsPanelShown);
+    }
 }

@@ -1,10 +1,9 @@
-using System;
 using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
 
-public enum ExperimentState {IDLE, LOADPATH, RUNNING, ASSESSMENT, FINISHED, CANCELLED };
+public enum ExperimentState {IDLE, RUNNING, ASSESSMENT, FINISHED, CANCELLED };
 
 public class ExperimentManager : MonoBehaviour
 {
@@ -68,9 +67,8 @@ public class ExperimentManager : MonoBehaviour
                 StartAssessment();
                 break;
             case ExperimentState.FINISHED:
-                AssessmentManager.Instance.FinishAssessment();
-                PathManager.Instance.ClearPath();
-                StopExperiment();
+                _experimentState = ExperimentState.IDLE;
+                SceneManager.Instance.LoadStartScene(ExperimentState);
                 break;
         }
     }
@@ -115,32 +113,6 @@ public class ExperimentManager : MonoBehaviour
         ExperimentState = ExperimentState.RUNNING;
     }
 
-    [Obsolete("Function is deprecated and will be removed in the future.", true)] 
-    public void StartExperiment()
-    {
-        Debug.Log($"ExperimentManager :: StartExperiment() : Starting Experiment..");
-        _UIExperimentPanelManager.CloseSetupPanel();
-        // CompletedPaths = 0;
-        // PathManager.Instance.StartNewPath(Paths[CompletedPaths]);
-        ExperimentState = ExperimentState.RUNNING;
-    }
-
-    [Obsolete("Function is deprecated and will be removed in the future.", true)] 
-    private void LoadNextPath()
-    {
-        // CompletedPaths++;
-        if (true)
-        {
-            ExperimentState = ExperimentState.FINISHED;
-            return;
-        }
-        Debug.Log($"ExperimentManager :: StartNextPath() : Getting next Path.");
-        Timer.Reset();
-        // PathManager.Instance.StartNewPath(Paths[CompletedPaths]);
-        
-        ExperimentState = ExperimentState.RUNNING;
-    }
-
     private void StartAssessment()
     {
         Debug.Log($"Starting assessment for path ID: {_currentPath.PathID}");
@@ -158,8 +130,7 @@ public class ExperimentManager : MonoBehaviour
 
     public void PathAssessmentCompleted()
     {
-        ExperimentState = ExperimentState.IDLE;
-        SceneManager.Instance.LoadStartScene(ExperimentState);
+        ExperimentState = ExperimentState.FINISHED;
     }
 
     public void MoveXROrigin(Transform destination)

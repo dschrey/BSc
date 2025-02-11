@@ -14,17 +14,19 @@ public class ExperimentUIManager : MonoBehaviour
             return;
         }
         if (experiment.paths.Count > 0)
-            {
-                _continueExperimentPanel.gameObject.SetActive(true);
-                _continueExperimentPanel.ContinueExperiment(experiment);
-                return;
-            }
+        {
+            _newExperimentPanel.gameObject.SetActive(false);
+            _continueExperimentPanel.gameObject.SetActive(true);
+            _continueExperimentPanel.ContinueExperiment(experiment, assessmentData);
+            return;
+        }
 
         if (assessmentData == null)
         {
             Debug.LogError($"Assessment data is null..");
             return;
         }
+        _newExperimentPanel.gameObject.SetActive(false);
         assessmentData.Completed = true;
         DataManager.Instance.Settings.CompletedExperiments++;
         DataManager.Instance.SaveAssessmentData(assessmentData);

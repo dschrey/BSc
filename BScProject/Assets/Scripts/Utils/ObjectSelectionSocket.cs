@@ -70,6 +70,7 @@ public class ObjectSelectionSocket : MonoBehaviour
                 GameObject placedObject = interactable.transform.gameObject;
                 if (placedObject != null)
                 {
+                    Debug.Log($"Destroying object {placedObject.name} of socket {SocketID}");
                     Destroy(placedObject);
                 }
             }

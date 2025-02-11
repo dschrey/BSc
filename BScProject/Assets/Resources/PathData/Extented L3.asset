@@ -13,8 +13,7 @@ MonoBehaviour:
   m_Name: Extented L3
   m_EditorClassIdentifier: 
   PathID: 1
-  Name: B
-  Type: 1
+  PathName: B
   PathColor: {r: 0, g: 0.98956347, b: 1, a: 1}
   PathLayoutSelectionOrder: 02000000010000000000000003000000
   PathLayoutID: 0
@@ -64,12 +63,12 @@ MonoBehaviour:
     RelativeObjectPositionToObjective: {x: 0, y: 0, z: -2.5}
     LandmarkObjectDistanceToObjective: 2.5
     SegmentObstaclePrefab: {fileID: 5922394165845742374, guid: 6e3e6be3b8706124e8dd25f763eba862, type: 3}
-  - SegmentID: 0
+  - SegmentID: 2
     SegmentColor: {r: 0.9056604, g: 0.13243146, b: 0.8347217, a: 1}
     DistanceFromPreviousSegment: 4.5
     AngleFromPreviousSegment: 270
     ObjectiveObjectID: 3
     LandmarkObjectID: 1
-    RelativeObjectPositionToObjective: {x: 2, y: 0, z: 2}
-    LandmarkObjectDistanceToObjective: 2
-    SegmentObstaclePrefab: {fileID: 5922394165845742374, guid: 6e3e6be3b8706124e8dd25f763eba862, type: 3}
+    RelativeObjectPositionToObjective: {x: -2, y: 0, z: 2}
+    LandmarkObjectDistanceToObjective: 2.828427
+    SegmentObstaclePrefab: {fileID: 0}

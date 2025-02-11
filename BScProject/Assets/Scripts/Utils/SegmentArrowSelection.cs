@@ -39,10 +39,11 @@ public class SegmentArrowSelection : MonoBehaviour
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
-    public void Initialize(int segmentID, float defaultLength, ToggleGroup toggleGroup)
+    public void Initialize(int segmentID, float defaultLength, ToggleGroup toggleGroup, bool autoEnable)
     {
         SegmentID = segmentID;
         _toggle.group = toggleGroup;
         Length = defaultLength;
+        _toggle.isOn = autoEnable;
     }
 }

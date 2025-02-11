@@ -9,7 +9,7 @@ class Utils
         System.Random rng;
         if (seed == -1)
         {
-           rng = new();
+            rng = new();
         }
         else
         {
@@ -66,7 +66,7 @@ class Utils
 
             foreach (Renderer renderer in renderers)
             {
-                if (! initialized)
+                if (!initialized)
                 {
                     combinedBounds = renderer.bounds;
                     initialized = true;
@@ -110,7 +110,7 @@ class Utils
     /// </summary>
     /// <param name="gameObject"></param>
     /// <param name="state"></param>
-    public static void ToggleObjectColliders(GameObject gameObject, bool state)
+    public static void SetObjectColliders(GameObject gameObject, bool state)
     {
         Collider[] colliders = gameObject.GetComponentsInChildren<Collider>(true);
         foreach (Collider collider in colliders)

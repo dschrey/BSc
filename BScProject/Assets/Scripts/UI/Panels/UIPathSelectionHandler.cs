@@ -33,6 +33,7 @@ public class UIPathSelectionHandler : MonoBehaviour
 
     private void OnSelectedPathChanged(int selectedPathLayoutID)
     {
+        
         if (selectedPathLayoutID != -1)
         {
             _confirmButton.interactable = true;

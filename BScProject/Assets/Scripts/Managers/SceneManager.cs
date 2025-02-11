@@ -29,13 +29,13 @@ public class SceneManager : MonoBehaviour
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
-    public void LoadExperimentScene(ExperimentData experiment, PathData selectedPath, Trail selectedTrail)
+    public void LoadExperimentScene(ExperimentData experiment, PathData selectedPath, Trail selectedTrail, AssessmentData assessment)
     {
         StartCoroutine(TransitionToScene("ExperimentScene"));
         _cachedExperiment = experiment;
         _cachedPath = selectedPath;
         _cacheTrail = selectedTrail;
-
+        _cachedAssessmentData = assessment;
     }
 
     public void LoadStartScene(ExperimentState state)
@@ -79,7 +79,7 @@ public class SceneManager : MonoBehaviour
             ResourceManager.Instance.InitializeRenderObjects();
             ExperimentManager.Instance.SetupExperimentScene();
             ExperimentManager.Instance.PrepareExperiment(_cachedExperiment, _cachedPath);
-            AssessmentManager.Instance.CreateNewAssessment(_cachedExperiment.id, _cachedPath, _cacheTrail.floor);
+            AssessmentManager.Instance.PrepareAssessment(_cachedExperiment.id, _cachedPath, _cacheTrail.floor, _cachedAssessmentData);
         }
 
         if (currentScene == "StartScene")

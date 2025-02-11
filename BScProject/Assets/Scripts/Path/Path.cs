@@ -50,12 +50,7 @@ public class Path : MonoBehaviour
 
             PathSegment segment = Instantiate(_pathSegmentPrefab, segmentSpawnpoint, Quaternion.identity, transform).GetComponent<PathSegment>();
             segment.Initialize(pathSegmentData);
-            
-            if ( pathData.Type == PathType.EXTENDED)
-            {
-                segment.SpawnSegmentObjects();
-            }
-
+            segment.SpawnSegmentObjects();
             Segments.Add(segment);
             lastSegmentPosition = segmentSpawnpoint;
 

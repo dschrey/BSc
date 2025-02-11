@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
 
-public class PathAssessment 
+// TODO Remove class
+[Obsolete("Class is deprecated and will be removed in the future", true)]
+public class PathAssessment
 {
     public PathData PathData { get; private set; }
     public int SelectedPathLayoutID;
@@ -11,7 +14,7 @@ public class PathAssessment
         PathData = correctPath;
         PathSegmentAssessments = new();
 
-    foreach (PathSegmentData segment in correctPath.SegmentsData)
+        foreach (PathSegmentData segment in correctPath.SegmentsData)
         {
             PathSegmentAssessment pathSegmentAssessment = new(segment);
             PathSegmentAssessments.Add(pathSegmentAssessment);

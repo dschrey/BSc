@@ -72,7 +72,7 @@ public class PathSegment : MonoBehaviour
 
     public void SpawnSegmentObjects()
     {
-        Debug.Log($"PathSegment :: SpawnSegmentObjects : Spawning objects for segment (ID: {PathSegmentData.SegmentID}).");
+        Debug.Log($"Spawning objects for segment (ID: {PathSegmentData.SegmentID}).");
         SpawnHoverObject();
         SpawnLandmarkObject();
         SpawnSegmentObstacle();
@@ -80,19 +80,37 @@ public class PathSegment : MonoBehaviour
 
     private void SpawnHoverObject()
     {
-        Objective.SpawnObject(ResourceManager.Instance.GetHoverObject(PathSegmentData.ObjectiveObjectID));
+        GameObject prefab = ResourceManager.Instance.GetHoverObject(PathSegmentData.ObjectiveObjectID);
+        if (prefab == null)
+        {
+            Debug.LogWarning($"Objective object found.");
+            return;
+        }
+        Objective.SpawnObject(prefab);
     }
 
     private  void SpawnLandmarkObject()
     {
         Vector3 objectSpawnpoint = transform.position + PathSegmentData.RelativeObjectPositionToObjective;
         
-        SegmentObject = Instantiate(ResourceManager.Instance.GetLandmarkObject(PathSegmentData.LandmarkObjectID), objectSpawnpoint, Quaternion.identity, transform);
+        GameObject prefab = ResourceManager.Instance.GetLandmarkObject(PathSegmentData.LandmarkObjectID);
+        if (prefab == null)
+        {
+            Debug.LogWarning($"Landmark object found.");
+            return;
+        }
+
+        SegmentObject = Instantiate(prefab, objectSpawnpoint, Quaternion.identity, transform);
         PathSegmentData.LandmarkObjectDistanceToObjective = Vector3.Distance(transform.position, objectSpawnpoint);
     }
 
     private void SpawnSegmentObstacle()
     {
+        if (PathSegmentData.SegmentObstaclePrefab == null)
+        {
+            Debug.LogWarning($"Obstacle object found.");
+            return;
+        }
         SegmentObstacle = Instantiate(PathSegmentData.SegmentObstaclePrefab, transform);
     }
 

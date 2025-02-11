@@ -1,4 +1,5 @@
-  using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,7 +28,6 @@ public class UINewExperiment : MonoBehaviour
     private void OnEnable()
     {
         _inputExperimentID.onEndEdit.AddListener(OnExperimentIDChanged);
-        // _inputParticipantName.onEndEdit.AddListener(OnParticipantNameChanged);
         _buttonEditExperimentID.onClick.AddListener(OnEditExperimentIDClicked);
         _buttonStartExperiment.onClick.AddListener(OnStartExperimentClicked);
         _pathDropdown.onValueChanged.AddListener(OnPathSelectionChanged);
@@ -37,7 +37,6 @@ public class UINewExperiment : MonoBehaviour
     private void OnDisable()
     {
         _inputExperimentID.onEndEdit.RemoveListener(OnExperimentIDChanged);
-        // _inputParticipantName.onEndEdit.RemoveListener(OnParticipantNameChanged);
         _buttonEditExperimentID.onClick.RemoveListener(OnEditExperimentIDClicked);
         _buttonStartExperiment.onClick.RemoveListener(OnStartExperimentClicked);
         _pathDropdown.onValueChanged.RemoveListener(OnPathSelectionChanged);
@@ -69,12 +68,6 @@ public class UINewExperiment : MonoBehaviour
         _inputExperimentID.interactable = !enabled;
     }
 
-    private void OnParticipantNameChanged(string input)
-    {
-        _participantName = input;
-    }
-
-
     private void OnStartExperimentClicked()
     {
         if (_overwriteCompletedExperiments)
@@ -82,9 +75,9 @@ public class UINewExperiment : MonoBehaviour
             DataManager.Instance.Settings.CompletedExperiments = _experimentID;
             DataManager.Instance.SaveSettings();
         }
-        
+
         _experiment.paths.Remove(_selectedTrail);
-        SceneManager.Instance.LoadExperimentScene(_experiment, _selectedPath, _selectedTrail);
+        SceneManager.Instance.LoadExperimentScene(_experiment, _selectedPath, _selectedTrail, new(_experimentID, DateTime.Now));
         gameObject.SetActive(false);
     }
 
@@ -139,6 +132,14 @@ public class UINewExperiment : MonoBehaviour
         _pathDropdown.AddOptions(options);
     }
 
+    // Called on button press
+    public void NewExperiment()
+    {
+        _experimentID = DataManager.Instance.Settings.CompletedExperiments;
+        _inputExperimentID.text = _experimentID.ToString();
 
+        PopulatePathOptions();
+        OnPathSelectionChanged(0);
+    }
 
 }

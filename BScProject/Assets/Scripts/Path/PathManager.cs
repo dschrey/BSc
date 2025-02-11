@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 
@@ -34,8 +35,9 @@ public class PathManager : MonoBehaviour
         }
         _experimentSpawnMovementDetection.ExitedDectectionZone += OnExitedDectectionZoneSpawn;
 
-        CurrentSegment = null;
-        LastSegment = null;
+        // TODO Uncomment
+        // CurrentSegment = null;
+        // LastSegment = null;
         _unlockedSegments = 0;
     }
 
@@ -73,11 +75,10 @@ public class PathManager : MonoBehaviour
 
     public void StartNewPath(PathData pathData, Transform spawnpoint)
     {
-        Debug.Log($"Trying to start new path..");
-        if (CurrentPath != null)
-        {
-            ClearPath();
-        }
+        // if (CurrentPath != null)
+        // {
+        //     ClearPath();
+        // }
         ExperimentManager.Instance.Timer.StartTimer();
         CurrentPath = Instantiate(_pathPrefab, spawnpoint.position, spawnpoint.rotation).GetComponent<Path>();
         CurrentPath.Initialize(pathData);
@@ -125,11 +126,12 @@ public class PathManager : MonoBehaviour
         CurrentSegment.PlaySegmentObjectiveHint();
     }
 
+    [Obsolete]
     public void ClearPath()
     {
         ObjectRenderManager objectRenderManager = FindObjectOfType<ObjectRenderManager>();
-        objectRenderManager.ClearRenderObjects(); 
-        if (CurrentPath != null) 
+        objectRenderManager.ClearRenderObjects();
+        if (CurrentPath != null)
             Destroy(CurrentPath.gameObject);
         CurrentPath = null;
         CurrentSegment = null;

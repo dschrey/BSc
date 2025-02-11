@@ -48,7 +48,7 @@ public class ResourceManager : MonoBehaviour
     {
         LoadParticipantSequences();
         LoadObjectiveObjects();
-        LoadSegmentObjects();
+        LoadLandmarkObjects();
         LoadPaths();
     }
 
@@ -66,9 +66,9 @@ public class ResourceManager : MonoBehaviour
         Debug.Log($"Loaded {HoverObjects.Count} hover objects.");
     }
 
-    private void LoadSegmentObjects()
+    private void LoadLandmarkObjects()
     {
-        LandmarkObjects.AddRange(LoadRenderObjects("SegmentObjects"));
+        LandmarkObjects.AddRange(LoadRenderObjects("LandmarkObjects"));
         Debug.Log($"Loaded {LandmarkObjects.Count} landmark objects.");
     }
 
@@ -88,10 +88,6 @@ public class ResourceManager : MonoBehaviour
         {
             RenderObject objectiveObject = obj.GetComponent<RenderObject>();
             objectiveObject.ID = count;
-
-            // TODO initialize this only in ExperimentScene
-            // ObjectRenderManager objectRenderManager = FindObjectOfType<ObjectRenderManager>();
-            // objectiveObject.RenderTexture = objectRenderManager.CreateNewRenderTexture(obj);
 
             renderObjects.Add(objectiveObject);
             count++;
@@ -202,7 +198,7 @@ public class ResourceManager : MonoBehaviour
 
     public PathData LoadPathData(string pathName)
     {
-        return LoadedPaths.Find(p => p.Name == pathName);
+        return LoadedPaths.Find(p => p.PathName == pathName);
     }
 
     public Trail LoadTrail(int dataID, string pathName)

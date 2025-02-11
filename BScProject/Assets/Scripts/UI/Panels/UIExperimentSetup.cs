@@ -1,7 +1,9 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+[Obsolete("Class is deprecated and will be removed in the future.")]
 public class UIExperimentSetup : MonoBehaviour
 {
     [SerializeField] private Button _buttonSetSpawn;
@@ -18,21 +20,21 @@ public class UIExperimentSetup : MonoBehaviour
         _buttonSetSpawn.onClick.AddListener(OnSetSpawnButtonClicked);
         _buttonStart.onClick.AddListener(OnStartButtonClicked);
         _sliderMovementSpeed.onValueChanged.AddListener(OnMovementSpeedChanged);
-        SetSliderSettings(_sliderMovementSpeed, DataManager.Instance.Settings.MinMovementSpeedMultiplier, 
+        SetSliderSettings(_sliderMovementSpeed, DataManager.Instance.Settings.MinMovementSpeedMultiplier,
             DataManager.Instance.Settings.MaxMovementSpeedMultiplier, DataManager.Instance.Settings.MovementSpeedMultiplier);
-        _textMovementSpeed.text = GetSliderStepValue(DataManager.Instance.Settings.MovementSpeedMultiplier, 
+        _textMovementSpeed.text = GetSliderStepValue(DataManager.Instance.Settings.MovementSpeedMultiplier,
             DataManager.Instance.Settings.MovementSpeedStepSize).ToString();
-    }  
+    }
 
     private void OnDisable()
     {
         _buttonSetSpawn.onClick.RemoveListener(OnSetSpawnButtonClicked);
         _buttonStart.onClick.RemoveListener(OnStartButtonClicked);
         _sliderMovementSpeed.onValueChanged.RemoveListener(OnMovementSpeedChanged);
-    }      
+    }
 
 
-    private void Update() 
+    private void Update()
     {
         return;
         if (ExperimentManager.Instance.ExperimentState == ExperimentState.IDLE)

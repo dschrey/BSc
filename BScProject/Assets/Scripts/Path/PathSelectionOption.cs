@@ -4,15 +4,17 @@ using UnityEngine.UI;
 
 public class PathSelectionOption : MonoBehaviour
 {
-    private int _layoutID = -1;
+    public int LayoutID = -1;
     [SerializeField] private RawImage _image;
     [SerializeField] private Toggle _toggle;
     public UnityEvent<int> PathSelectionChanged;
 
+    public bool IsInitialized = false;
+
 
     // ---------- Unity Methods --------------------------------------------------------------------------------------------------------------------------------
 
-    private void OnEnable() 
+    private void OnEnable()
     {
         _toggle.onValueChanged.AddListener(OnToggleSelected);
     }
@@ -28,7 +30,7 @@ public class PathSelectionOption : MonoBehaviour
     {
         if (state)
         {
-            PathSelectionChanged?.Invoke(_layoutID);
+            PathSelectionChanged?.Invoke(LayoutID);
         }
         else
         {
@@ -40,7 +42,8 @@ public class PathSelectionOption : MonoBehaviour
 
     public void Initialize(int pathLayoutID, RenderTexture pathLayoutTexture)
     {
-        _layoutID = pathLayoutID;
+        IsInitialized = true;
+        LayoutID = pathLayoutID;
         _image.texture = pathLayoutTexture;
     }
 }

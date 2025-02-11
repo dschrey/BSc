@@ -7,8 +7,8 @@ public enum PathType {DEFAULT, EXTENDED}
 public class PathData : ScriptableObject
 {
     public int PathID;
-    public string Name;
-    public PathType Type = PathType.DEFAULT;
+    public string PathName;
+    // public PathType Type = PathType.DEFAULT;
     public Color PathColor;
     public List<int> PathLayoutSelectionOrder = new();
     [HideInInspector] public int PathLayoutID = 0;

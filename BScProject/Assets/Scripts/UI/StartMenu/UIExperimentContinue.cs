@@ -21,6 +21,7 @@ public class UIExperimentContinue : MonoBehaviour
     private Trail _selectedTrail;
     private PathData _selectedPath;
     private ExperimentData _experiment;
+    private AssessmentData _assessment;
 
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
@@ -60,7 +61,7 @@ public class UIExperimentContinue : MonoBehaviour
     private void OnContinueExperimentClicked()
     {
         _experiment.paths.Remove(_selectedTrail);
-        SceneManager.Instance.LoadExperimentScene(_experiment, _selectedPath, _selectedTrail);
+        SceneManager.Instance.LoadExperimentScene(_experiment, _selectedPath, _selectedTrail, _assessment);
         gameObject.SetActive(false);
     }
 
@@ -101,9 +102,11 @@ public class UIExperimentContinue : MonoBehaviour
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
-    public void ContinueExperiment(ExperimentData experiment)
+    public void ContinueExperiment(ExperimentData experiment, AssessmentData assessment)
     {
         _experiment = experiment;
+        _assessment = assessment;
+        _experimentID.text = experiment.id.ToString();
         PopulatePathOptions(experiment.paths.Keys);
         OnPathSelectionChanged(0);
     }

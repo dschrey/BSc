@@ -17,17 +17,19 @@ public class UIGridObjectSpawner : MonoBehaviour
     public Action<int> ObjectGrabbed;
     private GameObject _selectionObject = null;
 
+    [SerializeField] private Transform _objectSpawnPoint;
+
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
-    
-    private void OnEnable() 
+
+    private void OnEnable()
     {
         _objectImage.texture = _emptyTexture;
         _socket.selectEntered.AddListener(OnObjectPlaced);
         _socket.selectExited.AddListener(OnObjectTaken);
     }
 
-    private void OnDisable() 
+    private void OnDisable()
     {
         _socket.selectEntered.RemoveListener(OnObjectPlaced);
         _socket.selectExited.RemoveListener(OnObjectTaken);
@@ -48,7 +50,7 @@ public class UIGridObjectSpawner : MonoBehaviour
     private void OnObjectPlaced(SelectEnterEventArgs args)
     {
         SpawnedObject = args.interactableObject.transform.gameObject;
-        Utils.ToggleObjectColliders(SpawnedObject, false);
+        Utils.SetObjectColliders(SpawnedObject, false);
     }
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
@@ -65,11 +67,11 @@ public class UIGridObjectSpawner : MonoBehaviour
         if (_socket.hasSelection) return;
 
         GameObject newObject = Instantiate(_selectionObject, transform.position, transform.rotation);
-        Utils.ToggleObjectColliders(newObject, false);
+        Utils.SetObjectColliders(newObject, false);
         XRGrabInteractable interactable = newObject.AddComponent<XRGrabInteractable>();
         interactable.movementType = XRBaseInteractable.MovementType.VelocityTracking;
         newObject.transform.localScale *= 0.35f;
-        
+
         IXRSelectInteractable baseInteractor = interactable.GetComponent<XRGrabInteractable>();
         _socket.StartManualInteraction(baseInteractor);
 
@@ -78,7 +80,7 @@ public class UIGridObjectSpawner : MonoBehaviour
         await Task.Delay(delay);
         if (newObject != null)
         {
-            Utils.ToggleObjectColliders(newObject, true);
+            Utils.SetObjectColliders(newObject, true);
         }
     }
 
@@ -95,11 +97,11 @@ public class UIGridObjectSpawner : MonoBehaviour
 
     private async Task DisableObject(int time)
     {
-        Utils.ToggleObjectColliders(SpawnedObject, false);
+        Utils.SetObjectColliders(SpawnedObject, false);
         await Task.Delay(time);
         if (this != null && SpawnedObject != null)
         {
-            Utils.ToggleObjectColliders(SpawnedObject, true);
+            Utils.SetObjectColliders(SpawnedObject, true);
         }
     }
 }

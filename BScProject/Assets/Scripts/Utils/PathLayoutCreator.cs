@@ -65,9 +65,6 @@ public class PathLayoutCreator : MonoBehaviour
     [Header("Segment Distance Properties")]
     public RectTransform CanvasMovementArea;
     public event Action<int, bool> SegmentBoundaryStatusUpdate;
-    public event Action<int> SegmentBlocked;
-
-
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
@@ -99,9 +96,9 @@ public class PathLayoutCreator : MonoBehaviour
             }
             
             Vector3 relativePosition = new (
-                DataManager.Instance.Settings.DefaultSegmentLength * Mathf.Cos(angleInRadians),
+                DataManager.Instance.Settings.SegmentLength * Mathf.Cos(angleInRadians),
                 0,
-                DataManager.Instance.Settings.DefaultSegmentLength * Mathf.Sin(angleInRadians)
+                DataManager.Instance.Settings.SegmentLength * Mathf.Sin(angleInRadians)
             );
 
             Vector3 spawnPosition = currentPosition + relativePosition;
@@ -129,28 +126,6 @@ public class PathLayoutCreator : MonoBehaviour
 
         displayObjects.AddRange(_spawnedArrows);
         Utils.AdjustCameraToObjects(RenderCamera.GetCamera(), displayObjects);
-    }
-
-    private void DrawCircle(Vector3 position, int points, float radius, Color color)
-    {
-        LineRenderer lineRenderer = Instantiate(_lineRenderPrefab, transform).GetComponent<LineRenderer>();
-
-        lineRenderer.loop = true;
-        lineRenderer.positionCount = points;
-        lineRenderer.startColor = color;
-        lineRenderer.endColor = color;
-
-        for (int currentPoint = 0; currentPoint < points; currentPoint++)
-        {
-            float currentCircumference = (float)currentPoint / points;
-            float currentRadian = currentCircumference * 2 * Mathf.PI;
-
-            float x = radius * Mathf.Cos(currentRadian);
-            float y = radius * Mathf.Sin(currentRadian);
-
-            Vector3 drawPosition = position + new Vector3(x, 0.1f, y);
-            lineRenderer.SetPosition(currentPoint, drawPosition);
-        }
     }
 
     public void ClearPath()
@@ -333,6 +308,4 @@ public class PathLayoutCreator : MonoBehaviour
 
         return true;
     }
-
-    // ---------- Landmark Position Functions ------------------------------------------------------------------------------------------------------
 }

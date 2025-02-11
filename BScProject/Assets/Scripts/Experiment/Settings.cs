@@ -12,11 +12,14 @@ public class Settings : ScriptableObject
     [Tooltip("Radius of the player detection colliders")]
     public float PlayerDetectionRadius = 0.35f;
     public float DefaultPlayerDetectionRadius = 0.35f;
+
     [Tooltip("Time (in seconds) it takes to reaveal an objective")]
     public float ObjectiveRevealTime = 1.5f;
     public float DefaultObjectiveRevealTime = 1.5f;
+
+    [Tooltip("Distance of each segment to the previous (in meters) in the path preview.")]
+    public float SegmentLength = 2.0f;
     public float DefaultSegmentLength = 2.0f;
-    public List<PathData> paths;
 
     [Header("Assessment Settings")]
     [Tooltip("Standard: PathSelection, ItemDistance\nExtended: PathSelection, ItemPosition, ItemDistance")]
@@ -37,4 +40,5 @@ public class ExperimentSettingsData
     public float ObjectiveRevealTime;
     public float MovementSpeedMultiplier;
     public float TransitionDuration;
+    public float SegmentLength;
 }

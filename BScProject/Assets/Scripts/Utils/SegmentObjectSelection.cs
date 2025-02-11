@@ -56,7 +56,7 @@ public class SegmentObjectSelection : MonoBehaviour
         DistanceToObjective = 0f;
         DifferenceToRealPosition = 0f;
         MovementAngle = movementAngle;
-        WorldObject = null;  
+        WorldObject = null;
     }
 
     public void InstantiateWorldObject(Vector3 Position, Transform parent)
@@ -70,6 +70,12 @@ public class SegmentObjectSelection : MonoBehaviour
         if (WorldObject == null) return;
         newWorldPosition.y = WorldObject.transform.localScale.y / 2;
         WorldObject.transform.position = newWorldPosition;
+    }
+
+    
+    public void AutoSelect(bool autoSelect)
+    {
+        _toggle.isOn = autoSelect;
     }
 
     private void ToggleWorldObject(bool state) => WorldObject.SetActive(state);

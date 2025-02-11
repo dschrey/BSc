@@ -100,6 +100,7 @@ MonoBehaviour:
   SocketID: 0
   SocketObject: {fileID: 0}
   isOccupied: 0
+  angle: 0
   _socketIndicator: {fileID: 5840253567097958440}
 --- !u!114 &5840253567097958440
 MonoBehaviour:
@@ -172,8 +173,8 @@ MonoBehaviour:
   m_SocketActive: 1
   m_InteractableHoverScale: 1
   m_RecycleDelayTime: 1
-  m_HoverSocketSnapping: 0
-  m_SocketSnappingRadius: 0.1
+  m_HoverSocketSnapping: 1
+  m_SocketSnappingRadius: 0.2
   m_SocketScaleMode: 0
   m_FixedScale: {x: 1, y: 1, z: 1}
   m_TargetBoundsSize: {x: 1, y: 1, z: 1}

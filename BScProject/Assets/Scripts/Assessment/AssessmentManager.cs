@@ -34,9 +34,7 @@ public class AssessmentManager : MonoBehaviour
 
     [Header("Assessment")]
     public PathData CurrentPath;
-    public PathAssessment CurrentPathAssessment;
-    private AssessmentData _assessment;
-
+    public AssessmentData Assessment;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
@@ -56,8 +54,7 @@ public class AssessmentManager : MonoBehaviour
     {
         _assessmentStepChanged.AddListener(OnEvaluationStepChanged);
         _assessmentStep = AssessmentStep.IDLE;
-        CurrentPathAssessment = null;
-        _assessment = null;
+        Assessment = null;
     }
 
     private void OnDestroy()
@@ -104,10 +101,10 @@ public class AssessmentManager : MonoBehaviour
                 _activePanel = _nextPathPanel;
                 break;
             case AssessmentStep.COMPLETED:
-                DataManager.Instance.SaveAssessmentData(_assessment);
+                DataManager.Instance.SaveAssessmentData(Assessment);
+                _activePanel = null;
                 CurrentPath = null;
-                CurrentPathAssessment = null;
-                AssessmentStep = AssessmentStep.IDLE;
+                _assessmentStep = AssessmentStep.IDLE;
                 ExperimentManager.Instance.PathAssessmentCompleted();
                 break;
         }
@@ -117,62 +114,40 @@ public class AssessmentManager : MonoBehaviour
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
-    public void CreateNewAssessment(int experimentID, PathData pathData, FloorType floorType)
+    public void PrepareAssessment(int experimentID, PathData pathData, FloorType floorType, AssessmentData assessment)
     {
         CurrentPath = pathData;
-        CurrentPathAssessment = new PathAssessment(pathData);
-        Debug.Log($"Assessment (Participant {experimentID}) (Path: {pathData.name}).");
-        _assessment ??= new(experimentID, DateTime.Now);
-        _assessment.AddPath(pathData, floorType, ExperimentManager.Instance.Timer.GetElapsedTimeFormated());
+        Debug.Log($"Assessment (Participant {experimentID}) (Path: {pathData.PathID} - {pathData.PathName}).");
+        Assessment = assessment;
+        Assessment.AddPath(pathData, floorType);
 
         _currentAssessmentStep = 0;
     }
 
     public void StartAssessment()
     {
+        Assessment.SetPathTime(CurrentPath.PathName, ExperimentManager.Instance.Timer.GetElapsedTimeFormated());
         ProceedToNextAssessmentStep();
     }
 
     public void ProceedToNextAssessmentStep()
     {
-        switch (CurrentPath.Type)
+        switch (_currentAssessmentStep)
         {
-            case PathType.DEFAULT:
-                switch (_currentAssessmentStep)
-                {
-                    case 0:
-                        AssessmentStep = AssessmentStep.PATHSELECTION;
-                        break;
-                    case 1:
-                        AssessmentStep = AssessmentStep.SEGMENTDISTANCE;
-                        break;
-                    case 2:
-                        AssessmentStep = AssessmentStep.NEXTPATH;
-                        break;
-                    case 3:
-                        AssessmentStep = AssessmentStep.COMPLETED;
-                        break;
-                }
+            case 0:
+                AssessmentStep = AssessmentStep.PATHSELECTION;
                 break;
-            case PathType.EXTENDED:
-                switch (_currentAssessmentStep)
-                {
-                    case 0:
-                        AssessmentStep = AssessmentStep.PATHSELECTION;
-                        break;
-                    case 1:
-                        AssessmentStep = AssessmentStep.SEGMENTDISTANCE;
-                        break;
-                    case 2:
-                        AssessmentStep = AssessmentStep.OBJECTASSIGN;
-                        break;
-                    case 3:
-                        AssessmentStep = AssessmentStep.OBJECTPOSITION;
-                        break;
-                    case 4:
-                        AssessmentStep = AssessmentStep.COMPLETED;
-                        break;
-                }
+            case 1:
+                AssessmentStep = AssessmentStep.SEGMENTDISTANCE;
+                break;
+            case 2:
+                AssessmentStep = AssessmentStep.OBJECTASSIGN;
+                break;
+            case 3:
+                AssessmentStep = AssessmentStep.OBJECTPOSITION;
+                break;
+            case 4:
+                AssessmentStep = AssessmentStep.COMPLETED;
                 break;
         }
         Debug.Log($"AssessmentManager :: Proceed to step: {_currentAssessmentStep}");
@@ -181,33 +156,19 @@ public class AssessmentManager : MonoBehaviour
 
     public void GoToPreviousAssessmentStep()
     {
-        switch (CurrentPath.Type)
+        switch (_currentAssessmentStep)
         {
-            case PathType.DEFAULT:
-                switch (_currentAssessmentStep)
-                {
-                    case 3:
-                        AssessmentStep = AssessmentStep.OBJECTIVEDISTANCE;
-                        _currentAssessmentStep = 2;
-                        break;
-                }
+            case 3:
+                AssessmentStep = AssessmentStep.OBJECTIVEOBJECTSELECTION;
+                _currentAssessmentStep = 2;
                 break;
-            case PathType.EXTENDED:
-                switch (_currentAssessmentStep)
-                {
-                    case 3:
-                        AssessmentStep = AssessmentStep.OBJECTIVEOBJECTSELECTION;
-                        _currentAssessmentStep = 2;
-                        break;
-                    case 4:
-                        AssessmentStep = AssessmentStep.OBJECTSELECTION;
-                        _currentAssessmentStep = 3;
-                        break;
-                    case 5:
-                        AssessmentStep = AssessmentStep.OBJECTDISTANCE;
-                        _currentAssessmentStep = 4;
-                        break;
-                }
+            case 4:
+                AssessmentStep = AssessmentStep.OBJECTSELECTION;
+                _currentAssessmentStep = 3;
+                break;
+            case 5:
+                AssessmentStep = AssessmentStep.OBJECTDISTANCE;
+                _currentAssessmentStep = 4;
                 break;
         }
         Debug.Log($"AssessmentManager :: Go back to step: {_currentAssessmentStep}");
@@ -219,10 +180,14 @@ public class AssessmentManager : MonoBehaviour
     /// <param name="selectedPathLayoutID"></param>
     public void SetSelectedPathLayout(int selectedPathLayoutID)
     {
-        CurrentPathAssessment.SelectedPathLayoutID = selectedPathLayoutID;
-        PathAssessmentData pathAssessment = _assessment.GetPath(CurrentPath.PathID);
-        pathAssessment.CorrentPathLayoutSelected = CurrentPathAssessment.EvaluateSelectedPathImage();
-        Debug.Log($"AssessmentManager :: SetSelectedPathImage : Correct path -> {pathAssessment.CorrentPathLayoutSelected}");
+        PathAssessmentData pathAssessment = Assessment.GetPath(CurrentPath.PathName);
+        if (pathAssessment == null)
+        {
+            Debug.LogWarning($"PathAssessment of path ({CurrentPath.PathID} - {CurrentPath.PathName}) is null;");
+            return;
+
+        }
+        pathAssessment.SetPathLayout(selectedPathLayoutID);
     }
 
     /// <summary>
@@ -232,18 +197,12 @@ public class AssessmentManager : MonoBehaviour
     /// <param name="distanceValue"></param>
     public void SetSegmentObjectiveDistance(int segmentID, float distanceValue)
     {
-        foreach (PathSegmentAssessment segmentAssessment in CurrentPathAssessment.PathSegmentAssessments)
+        SegmentAssessmentData segmentAssessmentData = Assessment.GetPath(CurrentPath.PathName).GetSegment(segmentID);
+        if (segmentAssessmentData == null)
         {
-            if (segmentAssessment.GetSegmentID() != segmentID)
-                continue;
-
-            segmentAssessment.SelectedDistanceToPreviousSegment = distanceValue;
+            Debug.LogWarning($"segmentAssessmentData of segment {segmentID} is null");
         }
-
-        SegmentAssessmentData segmentAssessmentData = _assessment.GetPath(CurrentPath.PathID).GetSegment(segmentID);
-        segmentAssessmentData.SelectedDistanceToPreviousSegment = distanceValue;
-        segmentAssessmentData.ActualDistanceToPreviousSegment = CurrentPath.GetSegmentData(segmentID).DistanceFromPreviousSegment;
-        segmentAssessmentData.SegmentDistanceError = Math.Abs(segmentAssessmentData.ActualDistanceToPreviousSegment - distanceValue);
+        segmentAssessmentData.SetObjectiveDistance(distanceValue);
     }
 
     /// <summary>
@@ -254,19 +213,8 @@ public class AssessmentManager : MonoBehaviour
     /// <param name="differenceToRealObject"></param>
     public void SetSegmentLandmarkObjectDistance(int segmentID, float distanceToObjective, float differenceToRealObject)
     {
-        foreach (PathSegmentAssessment segmentAssessment in CurrentPathAssessment.PathSegmentAssessments)
-        {
-            if (segmentAssessment.GetSegmentID() != segmentID)
-                continue;
-
-            segmentAssessment.SelectedDistanceOfObjectToObjective = distanceToObjective;
-            segmentAssessment.SelectedDistanceOfObjectToRealObject = differenceToRealObject;
-        }
-
-        SegmentAssessmentData segmentAssessmentData = _assessment.GetPath(CurrentPath.PathID).GetSegment(segmentID);
-        segmentAssessmentData.LandmarkDifferenceToRealObject = differenceToRealObject;
-        segmentAssessmentData.SelectedLandmarkDistanceToObjective = distanceToObjective;
-        segmentAssessmentData.ActualLandmarkDistanceToObjective = CurrentPath.GetSegmentData(segmentID).LandmarkObjectDistanceToObjective;
+        SegmentAssessmentData segmentAssessmentData = Assessment.GetPath(CurrentPath.PathName).GetSegment(segmentID);
+        segmentAssessmentData.SetLandmarkDistances(distanceToObjective, differenceToRealObject);
     }
 
     /// <summary>
@@ -276,16 +224,8 @@ public class AssessmentManager : MonoBehaviour
     /// <param name="objectID"></param>
     public void AssignSegmentHoverObject(int segmentID, int objectID)
     {
-        foreach (PathSegmentAssessment segmentAssessment in CurrentPathAssessment.PathSegmentAssessments)
-        {
-            if (segmentAssessment.GetSegmentID() != segmentID)
-                continue;
-
-            segmentAssessment.SelectedObjectiveObjectID = objectID;
-            SegmentAssessmentData segmentAssessmentData = _assessment.GetPath(CurrentPath.PathID).GetSegment(segmentID);
-            segmentAssessmentData.CorrectHoverObjectSelected = segmentAssessment.AssessObjectiveObject();
-            Debug.Log($"AssessmentManager :: Hover Object -> Segment {segmentID} - Correct: {segmentAssessmentData.CorrectHoverObjectSelected}.");
-        }
+        SegmentAssessmentData segmentAssessmentData = Assessment.GetPath(CurrentPath.PathName).GetSegment(segmentID);
+        segmentAssessmentData.SetHoverObject(objectID);
     }
 
     /// <summary>
@@ -295,24 +235,17 @@ public class AssessmentManager : MonoBehaviour
     /// <param name="objectID"></param>
     public void AssignSegmentLandmarkObject(int segmentID, int objectID)
     {
-        foreach (PathSegmentAssessment segmentAssessment in CurrentPathAssessment.PathSegmentAssessments)
-        {
-            if (segmentAssessment.GetSegmentID() != segmentID)
-                continue;
-
-            segmentAssessment.SelectedSegmentObjectID = objectID;
-            SegmentAssessmentData segmentAssessmentData = _assessment.GetPath(CurrentPath.PathID).GetSegment(segmentID);
-            segmentAssessmentData.CorrectLandmarkObjectSelected = segmentAssessment.AssessSegmentObject();
-            Debug.Log($"AssessmentManager :: Landmark Object -> Segment {segmentID} - Correct: {segmentAssessmentData.CorrectLandmarkObjectSelected}.");
-        }
+        SegmentAssessmentData segmentAssessmentData = Assessment.GetPath(CurrentPath.PathName).GetSegment(segmentID);
+        segmentAssessmentData.SetLandmarkObject(objectID);
     }
 
+    [Obsolete]
     public void FinishAssessment()
     {
-        _assessment.Completed = true;
-        DataManager.Instance.SaveAssessmentData(_assessment);
+        Assessment.Completed = true;
+        DataManager.Instance.SaveAssessmentData(Assessment);
         DataManager.Instance.Settings.CompletedExperiments++;
-        _assessment = null;
+        Assessment = null;
     }
 
     [Obsolete("Function might be removed in the future.")]
@@ -326,14 +259,18 @@ public class AssessmentManager : MonoBehaviour
 
     public AssessmentData GetAssessment()
     {
-        return _assessment;
+        return Assessment;
     }
 
     public void ResetAssessment()
     {
         CurrentPath = null;
-        CurrentPathAssessment = null;
         AssessmentStep = AssessmentStep.IDLE;
+    }
+
+    public int GetSelectedLayoutOfCurrentPath()
+    {
+        return Assessment.GetPath(CurrentPath.PathName).SelectedPathLayout;
     }
 
 }
