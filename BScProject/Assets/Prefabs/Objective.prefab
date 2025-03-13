@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 957087985332534009}
   - component: {fileID: 6266508837659422805}
   - component: {fileID: 6701757231506590401}
-  - component: {fileID: 5103866825371665642}
+  - component: {fileID: 4581300464141662011}
   m_Layer: 0
   m_Name: Objective
   m_TagString: Untagged
@@ -171,8 +171,8 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!136 &5103866825371665642
-CapsuleCollider:
+--- !u!135 &4581300464141662011
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -189,11 +189,9 @@ CapsuleCollider:
   m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Radius: 0.25
-  m_Height: 2.5
-  m_Direction: 1
-  m_Center: {x: 0, y: 0.75, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3228033903312904980
 GameObject:
   m_ObjectHideFlags: 0
@@ -219,7 +217,7 @@ Transform:
   m_GameObject: {fileID: 3228033903312904980}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.7, z: 0}
+  m_LocalPosition: {x: 0, y: 2.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -233,6 +231,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 957087985332534009}
     m_Modifications:
+    - target: {fileID: 2395113372149374244, guid: d812d630f074f5f47a820eb31a4b05d9, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 4ddf9562e92aa8e4bab684e4d34b1bae, type: 2}
     - target: {fileID: 2599794838522200422, guid: d812d630f074f5f47a820eb31a4b05d9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -273,9 +275,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4766431529284242353, guid: d812d630f074f5f47a820eb31a4b05d9, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6462028513893777318, guid: d812d630f074f5f47a820eb31a4b05d9, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8364978858738832043, guid: d812d630f074f5f47a820eb31a4b05d9, type: 3}
       propertyPath: m_Name
       value: LockedParticles
+      objectReference: {fileID: 0}
+    - target: {fileID: 8364978858738832043, guid: d812d630f074f5f47a820eb31a4b05d9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -300,6 +314,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 957087985332534009}
     m_Modifications:
+    - target: {fileID: 4064095847572977613, guid: 88f492fb37afcc541a9b1230d0bedec5, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 4fcbec3761a54d44892d40c00a2f4073, type: 2}
+    - target: {fileID: 4688889898620594039, guid: 88f492fb37afcc541a9b1230d0bedec5, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6058778579443778180, guid: 88f492fb37afcc541a9b1230d0bedec5, type: 3}
       propertyPath: m_Name
       value: HintParticles
@@ -348,6 +370,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8698112504926795631, guid: 88f492fb37afcc541a9b1230d0bedec5, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -371,6 +397,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 957087985332534009}
     m_Modifications:
+    - target: {fileID: 2554165715953083068, guid: a02675c71b32af8488d3ddbbd23c9c7e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5978121879924366170, guid: a02675c71b32af8488d3ddbbd23c9c7e, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: d643a85282d78cd418ffdc532ee8b214, type: 2}
     - target: {fileID: 6011045468939942477, guid: a02675c71b32af8488d3ddbbd23c9c7e, type: 3}
       propertyPath: m_Name
       value: CapturedParticles

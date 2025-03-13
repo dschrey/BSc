@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class SceneManager : MonoBehaviour
@@ -42,6 +43,7 @@ public class SceneManager : MonoBehaviour
     {
         _cachedExerpimentState = state;
         _cachedAssessmentData =  AssessmentManager.Instance.GetAssessment();
+        ResourceManager.Instance.FreeRenderTextures();
         StartCoroutine(TransitionToScene("StartScene"));
     }
 
@@ -77,16 +79,19 @@ public class SceneManager : MonoBehaviour
         if (currentScene == "ExperimentScene")
         {
             ResourceManager.Instance.InitializeRenderObjects();
-            ExperimentManager.Instance.SetupExperimentScene();
-            ExperimentManager.Instance.PrepareExperiment(_cachedExperiment, _cachedPath);
-            AssessmentManager.Instance.PrepareAssessment(_cachedExperiment.id, _cachedPath, _cacheTrail.floor, _cachedAssessmentData);
+            if (ExperimentManager.Instance.SetupExperiment(_cachedExperiment, _cachedPath, _cacheTrail.floor))
+            {
+                ExperimentManager.Instance.StartExperiment();
+                AssessmentManager.Instance.PrepareAssessment(_cachedExperiment.id, _cachedPath, _cacheTrail.floor, _cachedAssessmentData);
+            }
+            else Debug.LogError($"Experiment could not be prepared.");
         }
 
         if (currentScene == "StartScene")
         {
             ExperimentUIManager experimentUI = FindObjectOfType<ExperimentUIManager>();
             experimentUI.LoadNextExperimentPanel(_cachedExperiment, _cachedExerpimentState, _cachedAssessmentData);
-            ExperimentManager.Instance.SetupExperimentScene();
+            // ExperimentManager.Instance.SetupExperimentScene();
         }
     }
 

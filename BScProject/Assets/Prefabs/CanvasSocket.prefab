@@ -173,7 +173,7 @@ MonoBehaviour:
   m_SocketActive: 1
   m_InteractableHoverScale: 1
   m_RecycleDelayTime: 1
-  m_HoverSocketSnapping: 1
+  m_HoverSocketSnapping: 0
   m_SocketSnappingRadius: 0.2
   m_SocketScaleMode: 0
   m_FixedScale: {x: 1, y: 1, z: 1}

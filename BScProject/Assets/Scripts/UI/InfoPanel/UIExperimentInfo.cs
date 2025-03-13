@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +11,7 @@ public class UIExperimentInfo : MonoBehaviour
     [SerializeField] private TMP_Text _textID;
     [SerializeField] private TMP_Text _textSegmentID;
     [SerializeField] private TMP_Text _textPathName;
+    [SerializeField] private TMP_Text _textAssessmentStage;
 
     [SerializeField] private Button _buttonExpand;
     [SerializeField] private Button _buttonMinimize;
@@ -20,25 +20,36 @@ public class UIExperimentInfo : MonoBehaviour
     [SerializeField] private Button _buttonStopExperiment;
     [SerializeField] private Button _buttonConfirmStop;
     [SerializeField] private Button _buttonCancelStop;
+    [SerializeField] private Button _buttonAssessmentControl;
 
     [SerializeField] private GameObject _infoPanelExpanded;
     [SerializeField] private GameObject _infoPanelMinimized;
 
+    [SerializeField] private GameObject _segmentSection;
+    [SerializeField] private GameObject _assessmentSection;
 
+    private bool _assessmentInfoShown = false;
 
     public bool IsPanelShown;
     private Timer _timer;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
-    void Update() 
+    void Update()
     {
         if (IsPanelShown && _timer != null)
         {
             _textTime.text = _timer.GetElapsedTimeFormated();
-            _textStatus.text = GetCurrentStatus();
-            _textSegmentID.text = PathManager.Instance.CurrentSegment.PathSegmentData.SegmentID.ToString();
+            _textStatus.text = GetExerpimentStatus();
             _textID.text = ExperimentManager.Instance.CurrentExperiment.id.ToString();
+            if (!_assessmentInfoShown)
+            {
+                _textSegmentID.text = PathManager.Instance.CurrentSegment.PathSegmentData.SegmentID.ToString();
+            }
+            else
+            {
+                _textAssessmentStage.text = GetAssessmentStatus();
+            }
         }
     }
 
@@ -53,7 +64,8 @@ public class UIExperimentInfo : MonoBehaviour
         _buttonStopExperiment.onClick.AddListener(OnStopExperimentClicked);
         _buttonConfirmStop.onClick.AddListener(OnConfirmStopExperimentClicked);
         _buttonCancelStop.onClick.AddListener(OnCancelStopExperimentClicked);
-    }  
+        _buttonAssessmentControl.onClick.AddListener(OnAssessmentStartPressed);
+    }
 
     void OnDisable()
     {
@@ -62,6 +74,15 @@ public class UIExperimentInfo : MonoBehaviour
         _buttonStopExperiment.onClick.RemoveListener(OnStopExperimentClicked);
         _buttonConfirmStop.onClick.RemoveListener(OnConfirmStopExperimentClicked);
         _buttonCancelStop.onClick.RemoveListener(OnCancelStopExperimentClicked);
+        _buttonAssessmentControl.onClick.RemoveListener(OnAssessmentStartPressed);
+    }
+
+    private void OnAssessmentStartPressed()
+    {
+
+        ExperimentManager.Instance.StartAssessment();
+        _buttonAssessmentControl.interactable = false;
+        //AssessmentManager.Instance.GoToPreviousAssessmentStep();
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
@@ -79,10 +100,10 @@ public class UIExperimentInfo : MonoBehaviour
     private void OnMinimizeExpermintInfo()
     {
         IsPanelShown = false;
-        _infoPanelExpanded.SetActive(IsPanelShown);   
-        _infoPanelMinimized.SetActive(! IsPanelShown);
+        _infoPanelExpanded.SetActive(IsPanelShown);
+        _infoPanelMinimized.SetActive(!IsPanelShown);
     }
-    
+
     private void OnRestartSegmentButtonClicked()
     {
         PathManager.Instance.RestartSegment();
@@ -114,7 +135,7 @@ public class UIExperimentInfo : MonoBehaviour
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
-    private string GetCurrentStatus()
+    private string GetExerpimentStatus()
     {
         switch (ExperimentManager.Instance.ExperimentState)
         {
@@ -131,10 +152,31 @@ public class UIExperimentInfo : MonoBehaviour
         return "ERROR";
     }
 
-    public void ClosePanel()
+    public void ToggleAssessmentControl()
     {
-        IsPanelShown = false;
-        _infoPanelExpanded.SetActive(IsPanelShown);   
-        _infoPanelMinimized.SetActive(IsPanelShown);
+        _assessmentInfoShown = true;
+        _segmentSection.SetActive(false);
+        _assessmentSection.SetActive(true);
+        _textAssessmentStage.text = GetAssessmentStatus();
+    }
+
+    private string GetAssessmentStatus()
+    {
+        switch (AssessmentManager.Instance.AssessmentStep)
+        {
+            case AssessmentStep.IDLE:
+                return "IDLE";
+            case AssessmentStep.PATHSELECTION:
+                return "PATHSELECTION";
+            case AssessmentStep.SEGMENTDISTANCE:
+                return "SEGMENTDISTANCE";
+            case AssessmentStep.OBJECTASSIGN:
+                return "OBJECTASSIGN";
+            case AssessmentStep.OBJECTPOSITION:
+                return "OBJECTPOSITION";
+            case AssessmentStep.COMPLETED:
+                return "COMPLETED";
+        }
+        return "ERROR";
     }
 }

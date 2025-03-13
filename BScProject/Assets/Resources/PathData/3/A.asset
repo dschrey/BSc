@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65adc9aaa9d7bce49bfd2f0b5a84c077, type: 3}
+  m_Name: A
+  m_EditorClassIdentifier: 
+  PathID: 1
+  PathName: A
+  PathColor: {r: 0, g: 1, b: 0, a: 1}
+  PathLayoutSelectionOrder: 01000000000000000200000003000000
+  PathLayoutID: 0
+  ObstaclePrefab: {fileID: 5922394165845742374, guid: ea1d049b391d98141b3d6daa64bc15e0, type: 3}
+  FakePathAngles1:
+  - 270
+  - 180
+  - 90
+  FakePathAngles2:
+  - 45
+  - 90
+  - 180
+  FakePathAngles3:
+  - 225
+  - 0
+  - 90
+  SegmentsData:
+  - SegmentID: 0
+    SegmentColor: {r: 0, g: 1, b: 0, a: 1}
+    AngleFromPreviousSegment: 225
+    DistanceFromPreviousSegment: 2.5
+    ObjectiveObjectID: 3
+    LandmarkObjectID: 2
+    RelativeLandmarkPositionToObjective: {x: 1.0606599, y: 0, z: -1.0606594}
+    AngleToLandmark: 315
+    LandmarkObjectDistanceToObjective: 1.5
+    ShowObstacle: 1
+    RelativeObstaclePositionToObjective: {x: 0.4000001, y: 0.6125, z: 1.210001}
+    ObstacleRotation: {x: 0, y: 0.38268346, z: 0, w: 0.9238795}
+    Scale: {x: 0.77, y: 1.35, z: 1}
+  - SegmentID: 1
+    SegmentColor: {r: 0, g: 0, b: 1, a: 1}
+    AngleFromPreviousSegment: 90
+    DistanceFromPreviousSegment: 4.999998
+    ObjectiveObjectID: 7
+    LandmarkObjectID: 4
+    RelativeLandmarkPositionToObjective: {x: 2, y: 0, z: 0}
+    AngleToLandmark: 0
+    LandmarkObjectDistanceToObjective: 2
+    ShowObstacle: 1
+    RelativeObstaclePositionToObjective: {x: 0.21000004, y: 0.625, z: -3}
+    ObstacleRotation: {x: 0, y: 0, z: 0, w: 1}
+    Scale: {x: 0.5, y: 1.35, z: 1}
+  - SegmentID: 2
+    SegmentColor: {r: 1, g: 0, b: 0, a: 1}
+    AngleFromPreviousSegment: 0
+    DistanceFromPreviousSegment: 4.0000005
+    ObjectiveObjectID: 5
+    LandmarkObjectID: 3
+    RelativeLandmarkPositionToObjective: {x: 0, y: 0, z: -1.5}
+    AngleToLandmark: 270
+    LandmarkObjectDistanceToObjective: 1.5
+    ShowObstacle: 1
+    RelativeObstaclePositionToObjective: {x: -2, y: 0.625, z: 0.31000137}
+    ObstacleRotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
+    Scale: {x: 0.5, y: 1.35, z: 1}

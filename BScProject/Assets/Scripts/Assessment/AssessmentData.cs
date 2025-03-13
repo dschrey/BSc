@@ -121,7 +121,7 @@ public class SegmentAssessmentData
     {
         SelectedDistanceToPreviousSegment = distance;
         SegmentDistanceError = Math.Abs(ActualDistanceToPreviousSegment - SelectedDistanceToPreviousSegment);
-        Debug.LogWarning($"Objective: Set distance: {distance}: Actual distance: {ActualDistanceToPreviousSegment}\nError: {LandmarkDistanceError}");
+        // Debug.Log($"Objective: Set distance: {distance}: Actual distance: {ActualDistanceToPreviousSegment}\nError: {LandmarkDistanceError}");
 
     }
 
@@ -130,7 +130,7 @@ public class SegmentAssessmentData
         SelectedLandmarkDistanceToObjective = distanceToObjective;
         LandmarkDifferenceToRealObject = differenceToRealObject;
         LandmarkDistanceError = Math.Abs(ActualLandmarkDistanceToObjective - SelectedLandmarkDistanceToObjective);
-        Debug.LogWarning($"Landmark: Set distance: {distanceToObjective}: Actual distance: {ActualLandmarkDistanceToObjective}\nError: {LandmarkDistanceError}");
+        // Debug.Log($"Landmark: Set distance: {distanceToObjective}: Actual distance: {ActualLandmarkDistanceToObjective}\nError: {LandmarkDistanceError}");
     }
 
     public void SetHoverObject(int objectID)

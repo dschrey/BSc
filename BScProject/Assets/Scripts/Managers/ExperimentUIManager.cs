@@ -7,6 +7,11 @@ public class ExperimentUIManager : MonoBehaviour
     [SerializeField] UIExperimentContinue _continueExperimentPanel;
     [SerializeField] GameObject _finishedExperimentPanel;
 
+    void Start()
+    {
+        _newExperimentPanel.gameObject.SetActive(true);
+    }
+
     public void LoadNextExperimentPanel(ExperimentData experiment, ExperimentState experimentState, AssessmentData assessmentData)
     {
         if (experimentState == ExperimentState.CANCELLED)
@@ -15,8 +20,8 @@ public class ExperimentUIManager : MonoBehaviour
         }
         if (experiment.paths.Count > 0)
         {
-            _newExperimentPanel.gameObject.SetActive(false);
             _continueExperimentPanel.gameObject.SetActive(true);
+            _newExperimentPanel.gameObject.SetActive(false);
             _continueExperimentPanel.ContinueExperiment(experiment, assessmentData);
             return;
         }

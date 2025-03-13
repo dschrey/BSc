@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(AudioSource)), RequireComponent(typeof(CapsuleCollider))]
+[RequireComponent(typeof(AudioSource))]
 public class Objective : MonoBehaviour
 {
     public GameObject ObjectiveObject;
@@ -15,7 +15,7 @@ public class Objective : MonoBehaviour
     private Coroutine _collectionCoroutine;
     [SerializeField] private Transform _objectiveObjectSpawnpoint;
     private AudioSource _audioSource;
-    private CapsuleCollider _collider;
+    private SphereCollider _collider;
     private bool _objectiveCaptured = false;
 
 
@@ -24,8 +24,12 @@ public class Objective : MonoBehaviour
     private void OnEnable() 
     {
         _audioSource = GetComponent<AudioSource>();
-        _collider = GetComponent<CapsuleCollider>();
+        _collider = GetComponent<SphereCollider>();
         _collider.radius = DataManager.Instance.Settings.PlayerDetectionRadius;
+        Vector3 markScale = new(DataManager.Instance.Settings.PlayerDetectionRadius * 2, _collider.transform.localScale.y,
+            DataManager.Instance.Settings.PlayerDetectionRadius * 2);
+        _collider.transform.localScale = markScale;
+
     }
 
     void OnDrawGizmos()

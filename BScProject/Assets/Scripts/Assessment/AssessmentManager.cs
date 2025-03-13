@@ -106,7 +106,7 @@ public class AssessmentManager : MonoBehaviour
                 CurrentPath = null;
                 _assessmentStep = AssessmentStep.IDLE;
                 ExperimentManager.Instance.PathAssessmentCompleted();
-                break;
+                return;
         }
         if (_activePanel != null)
             _activePanel.SetActive(true);
@@ -144,11 +144,8 @@ public class AssessmentManager : MonoBehaviour
                 AssessmentStep = AssessmentStep.OBJECTASSIGN;
                 break;
             case 3:
-                AssessmentStep = AssessmentStep.OBJECTPOSITION;
-                break;
-            case 4:
                 AssessmentStep = AssessmentStep.COMPLETED;
-                break;
+                return;
         }
         Debug.Log($"AssessmentManager :: Proceed to step: {_currentAssessmentStep}");
         _currentAssessmentStep++;
@@ -158,21 +155,17 @@ public class AssessmentManager : MonoBehaviour
     {
         switch (_currentAssessmentStep)
         {
+            case 2:
+                AssessmentStep = AssessmentStep.PATHSELECTION;
+                _currentAssessmentStep = 1;
+                break;
             case 3:
-                AssessmentStep = AssessmentStep.OBJECTIVEOBJECTSELECTION;
+                AssessmentStep = AssessmentStep.SEGMENTDISTANCE;
                 _currentAssessmentStep = 2;
-                break;
-            case 4:
-                AssessmentStep = AssessmentStep.OBJECTSELECTION;
-                _currentAssessmentStep = 3;
-                break;
-            case 5:
-                AssessmentStep = AssessmentStep.OBJECTDISTANCE;
-                _currentAssessmentStep = 4;
                 break;
         }
         Debug.Log($"AssessmentManager :: Go back to step: {_currentAssessmentStep}");
-    }
+        }
 
     /// <summary>
     /// Saves the selected path layout.

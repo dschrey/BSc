@@ -75,10 +75,6 @@ public class PathManager : MonoBehaviour
 
     public void StartNewPath(PathData pathData, Transform spawnpoint)
     {
-        // if (CurrentPath != null)
-        // {
-        //     ClearPath();
-        // }
         ExperimentManager.Instance.Timer.StartTimer();
         CurrentPath = Instantiate(_pathPrefab, spawnpoint.position, spawnpoint.rotation).GetComponent<Path>();
         CurrentPath.Initialize(pathData);

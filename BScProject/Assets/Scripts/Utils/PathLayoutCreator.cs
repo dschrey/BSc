@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SegmentObjectData : MonoBehaviour
 {
@@ -56,7 +57,7 @@ public class PathLayoutCreator : MonoBehaviour
     [SerializeField] private GameObject _arrowRenderPrefab;
     [SerializeField] private GameObject _pathSegmentPrefab;
     [SerializeField] private GameObject _previewArea;
-    [SerializeField] private float _arrowOffest = 0.0f; 
+    [SerializeField] private float _arrowOffest = 0.0f;
     public LineController DistanceLineController;
     public List<SegmentObjectData> SpawnedSegments = new();
     public RenderTexture RenderTexture => RenderCamera.GetCamera().targetTexture;
@@ -70,7 +71,7 @@ public class PathLayoutCreator : MonoBehaviour
 
     public void CreatePathLayout(List<PathSegmentData> pathSegments, List<float> fakeSegmentAngles = null)
     {
-        _arrowOffest = DataManager.Instance.Settings.PlayerDetectionRadius; 
+        _arrowOffest = DataManager.Instance.Settings.PlayerDetectionRadius;
 
         List<GameObject> displayObjects = new();
         Vector3 currentPosition = transform.position;
@@ -94,8 +95,8 @@ public class PathLayoutCreator : MonoBehaviour
             {
                 angleInRadians = pathSegmentData.AngleFromPreviousSegment * Mathf.Deg2Rad;
             }
-            
-            Vector3 relativePosition = new (
+
+            Vector3 relativePosition = new(
                 DataManager.Instance.Settings.SegmentLength * Mathf.Cos(angleInRadians),
                 0,
                 DataManager.Instance.Settings.SegmentLength * Mathf.Sin(angleInRadians)
@@ -113,6 +114,8 @@ public class PathLayoutCreator : MonoBehaviour
             _spawnedArrows.Add(lineRenderer.gameObject);
 
             SegmentObjectData segment = Instantiate(_pathSegmentPrefab, spawnPosition, Quaternion.identity, transform).AddComponent<SegmentObjectData>();
+            // segment.CanvasToggleGroup = segment.AddComponent<ToggleGroup>();
+            // segment.CanvasToggleGroup.allowSwitchOff = true;
             segment.SegmentID = pathSegmentData.SegmentID;
             segment.SetParticleScale();
             segment.SetColor(pathSegmentData.SegmentColor);
@@ -120,7 +123,7 @@ public class PathLayoutCreator : MonoBehaviour
             segment.ArrowDirection = direction;
             segment.AngleFromPrevSegmentRad = angleInRadians;
             SpawnedSegments.Add(segment);
-            currentPosition = spawnPosition; 
+            currentPosition = spawnPosition;
             displayObjects.Add(segment.gameObject);
         }
 
@@ -131,7 +134,9 @@ public class PathLayoutCreator : MonoBehaviour
     public void ClearPath()
     {
         SpawnedSegments.ForEach(obj => Destroy(obj.gameObject));
+        SpawnedSegments.Clear();
         _spawnedArrows.ForEach(obj => Destroy(obj));
+        _spawnedArrows.Clear();
     }
 
     public void ResetCameraView()
@@ -171,20 +176,20 @@ public class PathLayoutCreator : MonoBehaviour
         Vector3 arrowDirection = segment.ArrowDirection;
         Vector3 previousSegmentPos = SpawnedSegments.Find(s => s.SegmentID == (segmentID - 1)).transform.position;
 
-        Vector3 newSegmentPosition =  previousSegmentPos + (arrowDirection * newLength);
+        Vector3 newSegmentPosition = previousSegmentPos + (arrowDirection * newLength);
         Vector3 arrowBase = previousSegmentPos + arrowDirection * _arrowOffest;
         Vector3 arrowHead = newSegmentPosition - arrowDirection * _arrowOffest;
 
         Vector3 localSegmentPos = segment.transform.parent.InverseTransformPoint(newSegmentPosition);
 
         bool validPosition = ValidatePosition(localSegmentPos);
-        if (! validPosition)
+        if (!validPosition)
         {
             SegmentBoundaryStatusUpdate?.Invoke(segmentID, true);
             return false;
         }
         SegmentArrowSelection segmentArrow = segmentDistanceData.Find(data => data.SegmentID == segment.SegmentID);
-        
+
         if (segmentArrow.hitBoundary && posAdjustment)
         {
             return false;
@@ -195,7 +200,7 @@ public class PathLayoutCreator : MonoBehaviour
         return await PerformSegmentdjustment(segment, newSegmentPosition, arrowBase, arrowHead, segmentDistanceData);
     }
 
-    private async Task<bool> PerformSegmentdjustment(SegmentObjectData segment, Vector3 newSegmentPosition, Vector3 arrowBase,  Vector3 arrowHead, List<SegmentArrowSelection> segmentDistanceData)
+    private async Task<bool> PerformSegmentdjustment(SegmentObjectData segment, Vector3 newSegmentPosition, Vector3 arrowBase, Vector3 arrowHead, List<SegmentArrowSelection> segmentDistanceData)
     {
         bool success = await AdjustSegment(segment.SegmentID + 1, newSegmentPosition, segmentDistanceData);
 
@@ -215,7 +220,7 @@ public class PathLayoutCreator : MonoBehaviour
         lineRenderer.SetPosition(1, arrowBase);
 
         SegmentArrowSelection segmentArrow = segmentDistanceData.Find(data => data.SegmentID == segment.SegmentID);
-        (Vector3 position, Vector2 size) =  CalculateSelectorProperties(lineRenderer);
+        (Vector3 position, Vector2 size) = CalculateSelectorProperties(lineRenderer);
         segmentArrow.RectTransform.anchoredPosition = position;
         segmentArrow.RectTransform.sizeDelta = size;
 
@@ -242,7 +247,7 @@ public class PathLayoutCreator : MonoBehaviour
 
         Vector3 localSegmentPos = segment.transform.parent.InverseTransformPoint(newSegmentPosition);
         bool validPosition = ValidatePosition(localSegmentPos);
-        if (! validPosition)
+        if (!validPosition)
         {
             SegmentBoundaryStatusUpdate?.Invoke(segmentID, true);
             return false;
@@ -263,7 +268,7 @@ public class PathLayoutCreator : MonoBehaviour
                 return false;
             }
         }
-        
+
         segment.transform.position = newSegmentPosition;
 
         LineRenderer lineRenderer = SpawnedSegments.Find(s => s.SegmentID == segmentID).ArrowRenderer;
@@ -296,16 +301,21 @@ public class PathLayoutCreator : MonoBehaviour
 
         foreach (Vector3 corner in cornerPositions)
         {
-            if (corner.z < - halfWidth || corner.z > halfWidth)
+            if (corner.z < -halfWidth || corner.z > halfWidth)
             {
                 return false;
             }
-            else if(corner.x < - halfHeight || corner.x > halfHeight )
+            else if (corner.x < -halfHeight || corner.x > halfHeight)
             {
                 return false;
             }
         }
 
         return true;
+    }
+
+    public LineController CreateLineController()
+    {
+        return Instantiate(_lineRenderPrefab, transform).GetComponent<LineController>();
     }
 }

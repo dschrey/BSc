@@ -1,7 +1,10 @@
+using Omnifinity.Omnideck;
 using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
+using System.Collections;
+using UnityEngine.InputSystem;
 
 public enum ExperimentState {IDLE, RUNNING, ASSESSMENT, FINISHED, CANCELLED };
 
@@ -28,6 +31,10 @@ public class ExperimentManager : MonoBehaviour
     private Transform _assessmentSpawnPoint;
     public PathData _currentPath;
     public ExperimentData CurrentExperiment;
+    [SerializeField] private OmnideckInterface _omnideckInterface;
+    [SerializeField] public InputActionReference StartAction;
+
+
 
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
@@ -37,7 +44,7 @@ public class ExperimentManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            //DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -53,6 +60,14 @@ public class ExperimentManager : MonoBehaviour
         _experimentState = ExperimentState.IDLE;
     }
 
+    private void Update()
+    {
+        if (StartAction != null && StartAction.action.WasPressedThisFrame())
+        {
+            StartAssessment();
+        }
+    }
+
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
 
     private void OnExperimentStateChanged(ExperimentState newState)
@@ -64,7 +79,10 @@ public class ExperimentManager : MonoBehaviour
             case ExperimentState.RUNNING:
                 break;
             case ExperimentState.ASSESSMENT:
-                StartAssessment();
+                FindObjectOfType<UIExperimentInfo>().ToggleAssessmentControl();
+
+                // TODO Remove after testing
+                //StartCoroutine(AssessmentStart());
                 break;
             case ExperimentState.FINISHED:
                 _experimentState = ExperimentState.IDLE;
@@ -76,13 +94,14 @@ public class ExperimentManager : MonoBehaviour
     private void OnPathCompletion()
     {
         Timer.Stop();
+        Debug.Log($"Path Completed");
         ExperimentState = ExperimentState.ASSESSMENT;
     }
 
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
 
-    public void SetupExperimentScene()
+    public bool SetupExperiment(ExperimentData experiment, PathData path, FloorType floor)
     {
         SpawnPoint[] spawnpoints = FindObjectsOfType<SpawnPoint>();
         foreach (SpawnPoint spawnPoint in spawnpoints)
@@ -98,22 +117,26 @@ public class ExperimentManager : MonoBehaviour
             }
         }
         FindOrigin();
+        if (_XROrigin == null) return false;
+
+        CurrentExperiment = experiment;
+        _currentPath = path;
+
+        return _XROrigin.GetComponentInChildren<MovementManager>().HandleFloorBasedMovement(floor);
     }
 
-    public void PrepareExperiment(ExperimentData experiment, PathData path)
+    public void StartExperiment()
     {
         if (_XROrigin == null)
         {
             return;
         }
 
-        CurrentExperiment = experiment;
-        _currentPath = path;
-        PathManager.Instance.StartNewPath(path, ExperimentSpawnpoint);
+        PathManager.Instance.StartNewPath(_currentPath, ExperimentSpawnpoint);
         ExperimentState = ExperimentState.RUNNING;
     }
 
-    private void StartAssessment()
+    public void StartAssessment()
     {
         Debug.Log($"Starting assessment for path ID: {_currentPath.PathID}");
         AssessmentManager.Instance.StartAssessment();
@@ -144,7 +167,7 @@ public class ExperimentManager : MonoBehaviour
         _XROrigin = FindObjectOfType<XROrigin>().transform;
         if (_XROrigin == null)
         {
-            Debug.LogError("ExperimentManager :: Start() : Could not find XROrigin.");
+            Debug.LogError("Could not find XROrigin.");
             return;
         }
     }
@@ -168,6 +191,15 @@ public class ExperimentManager : MonoBehaviour
         }
         
         m_TeleportationProvider.QueueTeleportRequest(request);
+    }
+
+
+    // TODO REMOVE
+
+    private IEnumerator AssessmentStart()
+    {
+        yield return new WaitForSeconds(10);
+        StartAssessment();
     }
 
 }

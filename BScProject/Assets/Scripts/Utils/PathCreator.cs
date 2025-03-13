@@ -2,30 +2,43 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
+
 public class PathCreator : MonoBehaviour
 {
+    [SerializeField] private Transform _pathSpawn;
     [SerializeField] private GameObject _pathPrefabObject;
     public PathData pathData;
-    private Path _createdPath;
-    public List<PathSegmentData> SegmentsData = new();
+    private Path _createdPath = null;
+    [Header("Segments"), Range(0, 10), SerializeField]
+    private int _numSegments = 0;
+
+    // public List<SegmentAttributes> SegmentsData = new();
 
 
-    private void Start() 
+    private void Start()
     {
-        pathData.SegmentsData.ForEach(data => SegmentsData.Add(data));
-        _createdPath = Instantiate(_pathPrefabObject, ExperimentManager.Instance.ExperimentSpawnpoint.position, ExperimentManager.Instance.ExperimentSpawnpoint.rotation).GetComponent<Path>();
-        _createdPath.Initialize(pathData);
+        // pathData.SegmentsData.ForEach(data => SegmentsData.Add(data));
+        // _createdPath = Instantiate(_pathPrefabObject, _pathSpawn.transform).GetComponent<Path>();
+        // _createdPath.Initialize(_createdPath.PathData);
     }
 
 
-    private void Update() 
+    private void OnValidate()
     {
-        foreach (var segment in SegmentsData)
-        {
-            segment.SegmentID = GetID();
-            UpdatePosition();
-        }
-        pathData.SegmentsData = SegmentsData;
+      
+    }
+
+
+    private void Update()
+    {
+        // foreach (var segment in SegmentsData)
+        // {
+        //     segment.SegmentID = CalculateSegmentID();
+        //     UpdatePosition();
+        // }
+        // pathData.SegmentsData = SegmentsData;
     }
 
 
@@ -39,7 +52,7 @@ public class PathCreator : MonoBehaviour
 
         //     PathSegment segment = Instantiate(_pathSegmentPrefab, segmentSpawnpoint, Quaternion.identity, transform).GetComponent<PathSegment>();
         //     segment.Initialize(pathSegmentData, segmentDistance);
-            
+
         //     if (pathData.Type == PathType.EXTENDED)
         //     {
         //         segment.SpawnSegmentObjects();
@@ -51,9 +64,4 @@ public class PathCreator : MonoBehaviour
         // }
     }
 
-    
-    private int GetID()
-    {
-        return SegmentsData.Count - 1;
-    }
 }

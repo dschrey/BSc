@@ -1,8 +1,12 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+// TODO remove class
+
+[Obsolete("This class is deprecated and will be removed in the future.")]
 public class UIDragHandler : MonoBehaviour, IDragHandler, IEndDragHandler
 {
     [SerializeField] private RectTransform _movementArea;
@@ -111,7 +115,7 @@ public class UIDragHandler : MonoBehaviour, IDragHandler, IEndDragHandler
         return _rectTransform.anchoredPosition;
     }
 
-    
+
     public void AdjustHorizontalSlider(float adjustmentValue)
     {
         Vector2 newPosition = _rectTransform.anchoredPosition;
@@ -132,7 +136,7 @@ public class UIDragHandler : MonoBehaviour, IDragHandler, IEndDragHandler
         _rectTransform.anchoredPosition = newPosition;
         UpdateWorldObjectPosition(newPosition);
     }
-    
+
     public void AdjustVerticalSlider(float adjustmentValue)
     {
         Vector2 newPosition = _rectTransform.anchoredPosition;

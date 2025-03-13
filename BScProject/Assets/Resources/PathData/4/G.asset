@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65adc9aaa9d7bce49bfd2f0b5a84c077, type: 3}
+  m_Name: G
+  m_EditorClassIdentifier: 
+  PathID: 7
+  PathName: G
+  PathColor: {r: 0.5, g: 0, b: 0.5, a: 1}
+  PathLayoutSelectionOrder: 02000000000000000100000003000000
+  PathLayoutID: 0
+  ObstaclePrefab: {fileID: 5922394165845742374, guid: ea1d049b391d98141b3d6daa64bc15e0, type: 3}
+  FakePathAngles1:
+  - 45
+  - 180
+  - 90
+  - 0
+  FakePathAngles2:
+  - 270
+  - 0
+  - 135
+  - 45
+  FakePathAngles3:
+  - 90
+  - 0
+  - 270
+  - 225
+  SegmentsData:
+  - SegmentID: 0
+    SegmentColor: {r: 0, g: 1, b: 0, a: 1}
+    AngleFromPreviousSegment: 135.00002
+    DistanceFromPreviousSegment: 1.9999998
+    ObjectiveObjectID: 7
+    LandmarkObjectID: 2
+    RelativeLandmarkPositionToObjective: {x: 0.7071068, y: 0, z: 0.7071066}
+    AngleToLandmark: 45
+    LandmarkObjectDistanceToObjective: 1
+    ShowObstacle: 1
+    RelativeObstaclePositionToObjective: {x: 0.17000008, y: 0.675, z: -1.26}
+    ObstacleRotation: {x: 0, y: -0.38268346, z: 0, w: 0.9238795}
+    Scale: {x: 0.8, y: 1.35, z: 1}
+  - SegmentID: 1
+    SegmentColor: {r: 0, g: 0, b: 1, a: 1}
+    AngleFromPreviousSegment: 270
+    DistanceFromPreviousSegment: 3
+    ObjectiveObjectID: 6
+    LandmarkObjectID: 4
+    RelativeLandmarkPositionToObjective: {x: 1.5, y: 0, z: 0}
+    AngleToLandmark: 0
+    LandmarkObjectDistanceToObjective: 1.5
+    ShowObstacle: 1
+    RelativeObstaclePositionToObjective: {x: -0.09000015, y: 0.675, z: 1.5}
+    ObstacleRotation: {x: 0, y: 0, z: 0, w: 0}
+    Scale: {x: 0.5, y: 1.35, z: 1}
+  - SegmentID: 2
+    SegmentColor: {r: 1, g: 0, b: 0, a: 1}
+    AngleFromPreviousSegment: 0
+    DistanceFromPreviousSegment: 2.9999995
+    ObjectiveObjectID: 0
+    LandmarkObjectID: 3
+    RelativeLandmarkPositionToObjective: {x: -0.00000011920929, y: 0, z: 3}
+    AngleToLandmark: 90
+    LandmarkObjectDistanceToObjective: 3
+    ShowObstacle: 1
+    RelativeObstaclePositionToObjective: {x: -1.5, y: 0.675, z: -0.45000076}
+    ObstacleRotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
+    Scale: {x: 1, y: 1.35, z: 1}
+  - SegmentID: 3
+    SegmentColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    AngleFromPreviousSegment: 225
+    DistanceFromPreviousSegment: 3.0000005
+    ObjectiveObjectID: 8
+    LandmarkObjectID: 5
+    RelativeLandmarkPositionToObjective: {x: 0, y: 0, z: 1.5}
+    AngleToLandmark: 90
+    LandmarkObjectDistanceToObjective: 1.5
+    ShowObstacle: 1
+    RelativeObstaclePositionToObjective: {x: 2.1000004, y: 0.675, z: 0.5400009}
+    ObstacleRotation: {x: 0, y: 0.38268346, z: 0, w: 0.9238795}
+    Scale: {x: 0.65, y: 1.35, z: 1}

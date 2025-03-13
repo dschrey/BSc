@@ -84,7 +84,7 @@ public class UISegmentDistances : MonoBehaviour
     {
         if (_selectedSegment == null) return;
 
-        float roundedValue = Mathf.Round(value * 100f) / 100f;
+        float roundedValue = Mathf.Round(value / .05f) * .05f;
 
         if (await _pathPreviewCreator.AdjustArrowLength(_selectedSegment.SegmentID, roundedValue, roundedValue >= _selectedSegment.Length, _segmentDistanceData))
         {

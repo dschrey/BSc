@@ -61,8 +61,8 @@ public class UISegmentObjectSelection : MonoBehaviour
             GridObjectSelection objectSelection = Instantiate(_objectSelectionPrefab, _objectSelectionParent).GetComponent<GridObjectSelection>();
             objectSelection.Initialize(obj.ID, obj.RenderTexture, _toggleGroup);
             objectSelection.SelectedObjectChanged += OnObjectChanged;
-            objectSelection.HoverObjectChanged += OnDisplayObjectChanged;
-            objectSelection.HoverObjectRemoved += OnDisplayObjectRemoved;
+            objectSelection.PreviewObjectChanged += OnDisplayObjectChanged;
+            objectSelection.PreviewObjectRemoved += OnDisplayObjectRemoved;
             _selectionObjects.Add(objectSelection);
         }
 
@@ -85,8 +85,8 @@ public class UISegmentObjectSelection : MonoBehaviour
         _selectionObjects.ForEach(obj => 
         {
             obj.SelectedObjectChanged -= OnObjectChanged;
-            obj.HoverObjectChanged -= OnDisplayObjectChanged;
-            obj.HoverObjectRemoved -= OnDisplayObjectRemoved;
+            obj.PreviewObjectChanged -= OnDisplayObjectChanged;
+            obj.PreviewObjectRemoved -= OnDisplayObjectRemoved;
             Destroy(obj.gameObject);
         });
 

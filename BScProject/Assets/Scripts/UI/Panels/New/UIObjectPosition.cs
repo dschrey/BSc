@@ -152,7 +152,7 @@ public class UIObjectPosition : MonoBehaviour
     private void UpdateSegmentData()
     {
         _selectedSegmentObject.DistanceToObjective = CalculateDistance(_cachedObjective, _selectedSegmentObject.WorldObject);
-        Vector3 realSpawnpoint = _cachedObjective.transform.position + AssessmentManager.Instance.CurrentPath.GetSegmentData(_selectedSegmentObject.SegmentID).RelativeObjectPositionToObjective;
+        Vector3 realSpawnpoint = _cachedObjective.transform.position + AssessmentManager.Instance.CurrentPath.GetSegmentData(_selectedSegmentObject.SegmentID).RelativeLandmarkPositionToObjective;
         Vector3 objectPosition = _selectedSegmentObject.WorldObject.transform.position;
         objectPosition.y = 0;
         _selectedSegmentObject.DifferenceToRealPosition = Vector3.Distance(realSpawnpoint, objectPosition);

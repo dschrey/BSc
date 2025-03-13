@@ -9,6 +9,20 @@ public class ResourceManager : MonoBehaviour
     public List<PathData> LoadedPaths = new();
     public List<ParticipantData> ExperimentData = new();
 
+    private List<Color> _colors= new ()
+    {
+        Color.red,
+        Color.green,
+        Color.blue,
+        Color.yellow,
+        Color.cyan,
+        Color.magenta,
+        new Color(1f, 0.5f, 0f),  // Orange
+        new Color(0.5f, 0f, 0.5f), // Purple
+        new Color(0.8f, 0.4f, 0.2f), // Brown
+        Color.white
+    };
+
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
     private void Awake()
@@ -74,7 +88,18 @@ public class ResourceManager : MonoBehaviour
 
     private void LoadPaths()
     {
-        LoadedPaths.AddRange(Resources.LoadAll<PathData>("PathData"));
+        PathData[] paths = Resources.LoadAll<PathData>("PathData");
+        int count = 0;
+        int color = 0;
+        foreach (PathData path in paths)
+        {
+            path.PathID = count;
+            if (color == _colors.Count) color = 0;
+            path.PathColor = _colors[color];
+            color++;
+            count++;
+        }
+        LoadedPaths.AddRange(paths);
         Debug.Log($"Loaded {LoadedPaths.Count} path data.");
     }
 
@@ -107,6 +132,27 @@ public class ResourceManager : MonoBehaviour
 
         LandmarkObjects.ForEach(r => r.RenderTexture = objectRenderManager.CreateNewObjectRender(r.gameObject));
         HoverObjects.ForEach(r => r.RenderTexture = objectRenderManager.CreateNewObjectRender(r.gameObject));
+    }
+
+    public void FreeRenderTextures()
+    {
+        HoverObjects.ForEach(r =>
+        {
+            if (r.RenderTexture != null)
+            {
+                r.RenderTexture.Release();
+                r.RenderTexture = null;
+            }
+        });
+
+        LandmarkObjects.ForEach(r =>
+        {
+            if (r.RenderTexture != null)
+            {
+                r.RenderTexture.Release();
+                r.RenderTexture = null;
+            }
+        });
     }
 
     public RenderTexture GetHoverObjectRenderTexture(int id)
@@ -201,15 +247,5 @@ public class ResourceManager : MonoBehaviour
         return LoadedPaths.Find(p => p.PathName == pathName);
     }
 
-    public Trail LoadTrail(int dataID, string pathName)
-    {
-        ParticipantData data = ExperimentData.Find(d => d.id == dataID);
-        foreach (Trail trail in data.paths)
-        {
-            if (trail.name == pathName)
-                return trail;
-        }
-        return null;
-    }
-    
+
 }

@@ -46,4 +46,21 @@ public class PathLayoutManager : MonoBehaviour
     {
         return PathLayouts.Find(x => x.PathLayoutID == layoutToFind);
     }
+
+
+    // TODO REMOVE
+
+    public void CreatePreview(PathData pathData)
+    {
+
+        PathLayouts[0].ClearPath();
+        PathLayouts[1].ClearPath();
+        PathLayouts[2].ClearPath();
+        PathLayouts[3].ClearPath();
+        
+        PathLayouts[0].CreatePathLayout(pathData.SegmentsData);
+        PathLayouts[1].CreatePathLayout(pathData.SegmentsData, pathData.FakePathAngles1);
+        PathLayouts[2].CreatePathLayout(pathData.SegmentsData, pathData.FakePathAngles2);
+        PathLayouts[3].CreatePathLayout(pathData.SegmentsData, pathData.FakePathAngles3);
+    }
 }

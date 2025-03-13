@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public enum FloorType {REGULAR, OMNIDECK}
+public enum FloorType {DEFAULT, OMNIDECK}
 
 [Serializable]
 public class Trail  // Represents a path, since Path already exists.

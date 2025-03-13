@@ -17,7 +17,7 @@ public class LineController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        for (int i = 0; i < _points.Count;  i++)
+        for (int i = 0; i < _points.Count; i++)
         {
             _lineRenderer.SetPosition(i, _points[i].position);
         }
@@ -25,6 +25,7 @@ public class LineController : MonoBehaviour
 
     public void SetLinePoints(List<Transform> points)
     {
+        _points.Clear();
         _points = points;
     }
 
@@ -36,5 +37,11 @@ public class LineController : MonoBehaviour
     public LineRenderer GetLineRenderer()
     {
         return _lineRenderer;
+    }
+
+    public void SetColor(Color color)
+    {
+        _lineRenderer.startColor = color;
+        _lineRenderer.endColor = color;
     }
 }

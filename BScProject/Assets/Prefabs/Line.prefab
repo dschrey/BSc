@@ -50,23 +50,35 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1488590733979572895, guid: 104b761c89b8e6a4a97279a1b7ac9670, type: 3}
       propertyPath: m_Name
-      value: Line Variant
+      value: Line
       objectReference: {fileID: 0}
     - target: {fileID: 2572578676707297442, guid: 104b761c89b8e6a4a97279a1b7ac9670, type: 3}
       propertyPath: m_Positions.Array.size
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2572578676707297442, guid: 104b761c89b8e6a4a97279a1b7ac9670, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 91c9132b50b171248abf1daffaa855bc, type: 2}
+      objectReference: {fileID: 2100000, guid: 0f50ab7a67dbb4a4b820b5638ff07849, type: 2}
+    - target: {fileID: 2572578676707297442, guid: 104b761c89b8e6a4a97279a1b7ac9670, type: 3}
+      propertyPath: m_Parameters.textureScale.x
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2572578676707297442, guid: 104b761c89b8e6a4a97279a1b7ac9670, type: 3}
+      propertyPath: m_Positions.Array.data[1].x
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 2572578676707297442, guid: 104b761c89b8e6a4a97279a1b7ac9670, type: 3}
       propertyPath: m_Positions.Array.data[1].z
-      value: 3
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2572578676707297442, guid: 104b761c89b8e6a4a97279a1b7ac9670, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].time
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2572578676707297442, guid: 104b761c89b8e6a4a97279a1b7ac9670, type: 3}
       propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].value
-      value: 0.11277184
+      value: 0.049606446
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

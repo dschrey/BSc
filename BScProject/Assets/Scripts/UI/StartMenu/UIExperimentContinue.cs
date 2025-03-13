@@ -4,6 +4,11 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+using Unity.XR.CoreUtils;
+using Omnifinity.Omnideck;
+using System.Collections;
+using UnityEngine.InputSystem;
+
 public class UIExperimentContinue : MonoBehaviour
 {
     [SerializeField] private TMP_Text _experimentID;
@@ -23,11 +28,18 @@ public class UIExperimentContinue : MonoBehaviour
     private ExperimentData _experiment;
     private AssessmentData _assessment;
 
+    [SerializeField] public InputActionReference PlaceAction;
+
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
     private void Update()
     {
+        if (PlaceAction != null && PlaceAction.action.WasPressedThisFrame())
+        {
+            OnContinueExperimentClicked();
+        }
+
         if (_questionaireCompleted && _hasChangedFloor && _isReady)
             _buttonContinueExperiment.interactable = true;
         else
@@ -109,6 +121,9 @@ public class UIExperimentContinue : MonoBehaviour
         _experimentID.text = experiment.id.ToString();
         PopulatePathOptions(experiment.paths.Keys);
         OnPathSelectionChanged(0);
+
+        // TODO REMOVE WHEN DONE TESTING
+        //StartCoroutine(ContinueNextPath());
     }
 
     private void PopulatePathOptions(Dictionary<Trail, PathData>.KeyCollection trails)
@@ -120,6 +135,14 @@ public class UIExperimentContinue : MonoBehaviour
             options.Add(trail.selectionName);
         }
         _pathDropdown.AddOptions(options);
+    }
+
+    // TODO REMOVE
+
+    private IEnumerator ContinueNextPath()
+    {
+        yield return new WaitForSeconds(5);
+        OnContinueExperimentClicked();
     }
 
 }

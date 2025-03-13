@@ -186,7 +186,7 @@ public class UISegmentObjectPosition : MonoBehaviour
         _currentSegment.WorldObjectPosition = _draggableObject.transform.position;
         _currentSegment.CanvasObjectPosition = _draggableCanvasObject.GetCurrentPosition();
         _currentSegment.DistanceToObjective = CalculateDistanceToReferenceObject(_currentPath.GetPathSegment(_selectedSegmentID).gameObject);
-        _currentSegment.DistanceToRealObject = CalculateDistanceToReferenceObject(_currentPath.Segments.Find(s => s.PathSegmentData.SegmentID == _currentSegment.PathSegmentData.SegmentID).SegmentObject);
+        _currentSegment.DistanceToRealObject = CalculateDistanceToReferenceObject(_currentPath.Segments.Find(s => s.PathSegmentData.SegmentID == _currentSegment.PathSegmentData.SegmentID).LandmarkObject);
         _textHorizontalPosition.text = GetHorizontalValue().ToString("F2", CultureInfo.InvariantCulture) + "m";
         _textVerticalPosition.text =  GetVerticalValue().ToString("F2", CultureInfo.InvariantCulture) + "m";
         _textDistanceValue.text = _currentSegment.DistanceToObjective.ToString("F2", CultureInfo.InvariantCulture) + "m";

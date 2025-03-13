@@ -1,8 +1,12 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
+// TODO Remove class
+
+[Obsolete("Class is deprecated and will be removed in the future.")]
 public class ObjectHoldOrDestroy : MonoBehaviour
 {
     [SerializeField] private float _destroyDelaySec = 5f;
@@ -14,7 +18,7 @@ public class ObjectHoldOrDestroy : MonoBehaviour
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
-    void OnDestroy() 
+    void OnDestroy()
     {
         _grabInteractable.selectEntered.RemoveListener(OnObjectGrabbed);
         _grabInteractable.selectExited.RemoveListener(OnObjectReleased);

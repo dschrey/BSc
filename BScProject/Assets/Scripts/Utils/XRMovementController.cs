@@ -1,6 +1,10 @@
+using System;
 using UnityEngine;
 using UnityEngine.XR;
 
+// TODO delete
+
+[Obsolete("This class is deprecated and will be removed in the future.")]
 public class XRMovementController : MonoBehaviour
 {
 

@@ -6,12 +6,10 @@ public class PathSegmentData
     [Header("Segment Properties")]
     public int SegmentID;
     public Color SegmentColor;
-    
-    [Tooltip("Distance to segment")]
-    public float DistanceFromPreviousSegment = 0f;
-
     [Tooltip("Angle to segment")]
     public float AngleFromPreviousSegment = 0f;
+    [Tooltip("Distance to segment")]
+    public float DistanceFromPreviousSegment = 0f;
 
     [Header("Objective Object")]
     [Tooltip("Object that should hover on top of the objective")]
@@ -22,12 +20,17 @@ public class PathSegmentData
     public int LandmarkObjectID;
 
     [Tooltip("Position of the landmark object relative the the objective")]
-    public Vector3 RelativeObjectPositionToObjective;
-
-    [HideInInspector]
+    public Vector3 RelativeLandmarkPositionToObjective;
+    [Tooltip("Angle from the objective to the landmark")]
+    public float AngleToLandmark = 0f;
     public float LandmarkObjectDistanceToObjective = 0;
-
     [Header("Segment Obstacle")]
-    public GameObject SegmentObstaclePrefab;
-
+    [Tooltip("Whether the obstacle is shown in the segment")]
+    public bool ShowObstacle = true;
+    [Tooltip("Position of the obstacle object relative the the objective")]
+    public Vector3 RelativeObstaclePositionToObjective;
+    [Tooltip("Rotation of the obstacle object")]
+    public Quaternion ObstacleRotation;
+    [Tooltip("Local scale of the obstacle object")]
+    public Vector3 Scale = new(1, 1.25f, 1);
 }

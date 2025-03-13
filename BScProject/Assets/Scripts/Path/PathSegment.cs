@@ -6,9 +6,10 @@ public class PathSegment : MonoBehaviour
     public PathSegmentData PathSegmentData;
     public event Action SegmentCompleted;
     public Objective Objective;
-    public GameObject SegmentObject;
+    public GameObject LandmarkObject;
     public GameObject SegmentObstacle;
     private MovementDetection _movementDetection;
+    private GameObject _obstaclePrefab = null;
     
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------------
 
@@ -35,8 +36,8 @@ public class PathSegment : MonoBehaviour
 
     private void OnObjectiveCaptured()
     {
-        if (SegmentObject != null)
-            SegmentObject.SetActive(false);
+        if (LandmarkObject != null)
+            LandmarkObject.SetActive(false);
         if (SegmentObstacle != null)
             SegmentObstacle.SetActive(false);
         SegmentCompleted?.Invoke();
@@ -50,9 +51,10 @@ public class PathSegment : MonoBehaviour
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------------
 
-    public void Initialize(PathSegmentData pathSegmentData)
+    public void Initialize(PathSegmentData pathSegmentData, GameObject obstaclePrefab)
     {
         PathSegmentData = pathSegmentData;
+        _obstaclePrefab = obstaclePrefab;
     }
 
     public void SetObjectiveInvisible()
@@ -72,7 +74,6 @@ public class PathSegment : MonoBehaviour
 
     public void SpawnSegmentObjects()
     {
-        Debug.Log($"Spawning objects for segment (ID: {PathSegmentData.SegmentID}).");
         SpawnHoverObject();
         SpawnLandmarkObject();
         SpawnSegmentObstacle();
@@ -91,7 +92,15 @@ public class PathSegment : MonoBehaviour
 
     private  void SpawnLandmarkObject()
     {
-        Vector3 objectSpawnpoint = transform.position + PathSegmentData.RelativeObjectPositionToObjective;
+
+        float angleInRadians = PathSegmentData.AngleToLandmark * Mathf.Deg2Rad;
+        Vector3 relativePosition = new (
+            PathSegmentData.LandmarkObjectDistanceToObjective * Mathf.Cos(angleInRadians),
+            0,
+            PathSegmentData.LandmarkObjectDistanceToObjective * Mathf.Sin(angleInRadians)
+        );
+        Vector3 objectSpawnpoint = transform.position + relativePosition;
+        // Vector3 objectSpawnpoint = transform.position + PathSegmentData.RelativeLandmarkPositionToObjective;
         
         GameObject prefab = ResourceManager.Instance.GetLandmarkObject(PathSegmentData.LandmarkObjectID);
         if (prefab == null)
@@ -100,18 +109,23 @@ public class PathSegment : MonoBehaviour
             return;
         }
 
-        SegmentObject = Instantiate(prefab, objectSpawnpoint, Quaternion.identity, transform);
-        PathSegmentData.LandmarkObjectDistanceToObjective = Vector3.Distance(transform.position, objectSpawnpoint);
+        LandmarkObject = Instantiate(prefab, objectSpawnpoint, Quaternion.identity, transform);
+        // PathSegmentData.LandmarkObjectDistanceToObjective = Vector3.Distance(transform.position, objectSpawnpoint);
     }
 
     private void SpawnSegmentObstacle()
     {
-        if (PathSegmentData.SegmentObstaclePrefab == null)
+        if (!PathSegmentData.ShowObstacle) return;
+        if (_obstaclePrefab == null)
         {
-            Debug.LogWarning($"Obstacle object found.");
+            Debug.LogError($"Obstacle prefab is null.");
             return;
         }
-        SegmentObstacle = Instantiate(PathSegmentData.SegmentObstaclePrefab, transform);
+        SegmentObstacle = Instantiate(_obstaclePrefab, transform);
+        Vector3 objectSpawnpoint = transform.position + PathSegmentData.RelativeObstaclePositionToObjective;
+        objectSpawnpoint.y = SegmentObstacle.transform.position.y;
+        SegmentObstacle.transform.SetPositionAndRotation(objectSpawnpoint, PathSegmentData.ObstacleRotation);
+        SegmentObstacle.transform.localScale = PathSegmentData.Scale;
     }
 
 }
