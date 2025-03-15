@@ -4,8 +4,6 @@ using UnityEngine.UI;
 
 public class UIExperimentInfo : MonoBehaviour
 {
-
-
     [SerializeField] private TMP_Text _textStatus;
     [SerializeField] private TMP_Text _textTime;
     [SerializeField] private TMP_Text _textID;
@@ -139,13 +137,13 @@ public class UIExperimentInfo : MonoBehaviour
     {
         switch (ExperimentManager.Instance.ExperimentState)
         {
-            case ExperimentState.IDLE:
+            case ExperimentState.Idle:
                 return "IDLE";
-            case ExperimentState.RUNNING:
+            case ExperimentState.Running:
                 return "RUNNING";
-            case ExperimentState.ASSESSMENT:
+            case ExperimentState.Assessment:
                 return "ASSESSMENT";
-            case ExperimentState.FINISHED:
+            case ExperimentState.Finished:
                 return "FINISHED";
         }
 
@@ -164,17 +162,17 @@ public class UIExperimentInfo : MonoBehaviour
     {
         switch (AssessmentManager.Instance.AssessmentStep)
         {
-            case AssessmentStep.IDLE:
+            case AssessmentStep.Idle:
                 return "IDLE";
-            case AssessmentStep.PATHSELECTION:
+            case AssessmentStep.PathSelection:
                 return "PATHSELECTION";
-            case AssessmentStep.SEGMENTDISTANCE:
+            case AssessmentStep.SegmentDistance:
                 return "SEGMENTDISTANCE";
-            case AssessmentStep.OBJECTASSIGN:
+            case AssessmentStep.HoverObjectSelection:
                 return "OBJECTASSIGN";
-            case AssessmentStep.OBJECTPOSITION:
+            case AssessmentStep.LandmarkSelection:
                 return "OBJECTPOSITION";
-            case AssessmentStep.COMPLETED:
+            case AssessmentStep.Completed:
                 return "COMPLETED";
         }
         return "ERROR";

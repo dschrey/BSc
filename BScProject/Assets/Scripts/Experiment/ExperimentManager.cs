@@ -1,23 +1,23 @@
-using Omnifinity.Omnideck;
 using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
-using System.Collections;
 using UnityEngine.InputSystem;
+using System;
 
-public enum ExperimentState {IDLE, RUNNING, ASSESSMENT, FINISHED, CANCELLED };
+public enum ExperimentState {Idle, Running, Assessment, Finished, Cancelled };
 
 public class ExperimentManager : MonoBehaviour
 {
     public static ExperimentManager Instance { get; private set; }
-    [SerializeField] private UIExperimentPanelManager _UIExperimentPanelManager;
+    public Transform PlayerTransform;
     public Transform _XROrigin;
     public Transform ExperimentSpawnpoint;
     public Timer Timer;
     public UnityEvent PathCompletion = new();
+    public ExperimentData CurrentExperiment;
     private UnityEvent<ExperimentState> _experimentStateChanged = new();
-    private ExperimentState _experimentState = ExperimentState.IDLE;
+    private ExperimentState _experimentState = ExperimentState.Idle;
     public ExperimentState ExperimentState
     {
         get => _experimentState;
@@ -29,13 +29,13 @@ public class ExperimentManager : MonoBehaviour
     }
 
     private Transform _assessmentSpawnPoint;
-    public PathData _currentPath;
-    public ExperimentData CurrentExperiment;
-    [SerializeField] private OmnideckInterface _omnideckInterface;
-    [SerializeField] public InputActionReference StartAction;
+    private PathData _currentPath;
 
+    [SerializeField] private InputActionReference _confirmAction;
+    private int _hintCounter;
 
-
+    [Header("Debug"), SerializeField]
+    private InputActionReference _debugAction;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
@@ -44,7 +44,6 @@ public class ExperimentManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            //DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -57,14 +56,20 @@ public class ExperimentManager : MonoBehaviour
         FindOrigin();
         PathCompletion.AddListener(OnPathCompletion);
         _experimentStateChanged.AddListener(OnExperimentStateChanged);
-        _experimentState = ExperimentState.IDLE;
+        _experimentState = ExperimentState.Idle;
     }
 
     private void Update()
     {
-        if (StartAction != null && StartAction.action.WasPressedThisFrame())
+        if (_debugAction != null && _debugAction.action.WasPressedThisFrame())
         {
+            OnPathCompletion();
             StartAssessment();
+        }
+
+        if (_confirmAction != null && _confirmAction.action.WasPressedThisFrame())
+        {
+            CheckPlayerPosition();
         }
     }
 
@@ -74,18 +79,15 @@ public class ExperimentManager : MonoBehaviour
     {
         switch (newState)
         {
-            case ExperimentState.IDLE:
+            case ExperimentState.Idle:
                 break;
-            case ExperimentState.RUNNING:
+            case ExperimentState.Running:
                 break;
-            case ExperimentState.ASSESSMENT:
+            case ExperimentState.Assessment:
                 FindObjectOfType<UIExperimentInfo>().ToggleAssessmentControl();
-
-                // TODO Remove after testing
-                //StartCoroutine(AssessmentStart());
                 break;
-            case ExperimentState.FINISHED:
-                _experimentState = ExperimentState.IDLE;
+            case ExperimentState.Finished:
+                _experimentState = ExperimentState.Idle;
                 SceneManager.Instance.LoadStartScene(ExperimentState);
                 break;
         }
@@ -94,8 +96,7 @@ public class ExperimentManager : MonoBehaviour
     private void OnPathCompletion()
     {
         Timer.Stop();
-        Debug.Log($"Path Completed");
-        ExperimentState = ExperimentState.ASSESSMENT;
+        ExperimentState = ExperimentState.Assessment;
     }
 
 
@@ -106,9 +107,9 @@ public class ExperimentManager : MonoBehaviour
         SpawnPoint[] spawnpoints = FindObjectsOfType<SpawnPoint>();
         foreach (SpawnPoint spawnPoint in spawnpoints)
         {
-            if (spawnPoint.type == SpawnPointType.ASSESSMENT)
+            if (spawnPoint.type == SpawnPointType.Assessment)
                 _assessmentSpawnPoint = spawnPoint.transform;
-            else if (spawnPoint.type == SpawnPointType.EXPERIMENT)
+            else if (spawnPoint.type == SpawnPointType.Experiment)
                 ExperimentSpawnpoint = spawnPoint.transform;
             else
             {
@@ -121,6 +122,7 @@ public class ExperimentManager : MonoBehaviour
 
         CurrentExperiment = experiment;
         _currentPath = path;
+        _hintCounter = 0;
 
         return _XROrigin.GetComponentInChildren<MovementManager>().HandleFloorBasedMovement(floor);
     }
@@ -133,13 +135,13 @@ public class ExperimentManager : MonoBehaviour
         }
 
         PathManager.Instance.StartNewPath(_currentPath, ExperimentSpawnpoint);
-        ExperimentState = ExperimentState.RUNNING;
+        ExperimentState = ExperimentState.Running;
     }
 
     public void StartAssessment()
     {
         Debug.Log($"Starting assessment for path ID: {_currentPath.PathID}");
-        AssessmentManager.Instance.StartAssessment();
+        AssessmentManager.Instance.StartAssessment(_hintCounter);
         MoveXROrigin(_assessmentSpawnPoint);
     }
 
@@ -147,13 +149,13 @@ public class ExperimentManager : MonoBehaviour
     {
         Timer.Reset();
         AssessmentManager.Instance.ResetAssessment();
-        SceneManager.Instance.LoadStartScene(ExperimentState.CANCELLED);
-        ExperimentState = ExperimentState.IDLE;
+        SceneManager.Instance.LoadStartScene(ExperimentState.Cancelled);
+        ExperimentState = ExperimentState.Idle;
     }
 
     public void PathAssessmentCompleted()
     {
-        ExperimentState = ExperimentState.FINISHED;
+        ExperimentState = ExperimentState.Finished;
     }
 
     public void MoveXROrigin(Transform destination)
@@ -189,17 +191,17 @@ public class ExperimentManager : MonoBehaviour
             Debug.Log($"No teleport provider found");
             return;
         }
-        
+
         m_TeleportationProvider.QueueTeleportRequest(request);
     }
-
-
-    // TODO REMOVE
-
-    private IEnumerator AssessmentStart()
+    
+    private void CheckPlayerPosition()
     {
-        yield return new WaitForSeconds(10);
-        StartAssessment();
+        if (PathManager.Instance.VerifyPlayerPosition(PlayerTransform))
+        {
+            _hintCounter++;
+            Debug.Log($"Displayig guidance - Counter: {_hintCounter}");
+        }
     }
 
 }

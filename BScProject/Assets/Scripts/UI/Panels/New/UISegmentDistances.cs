@@ -35,7 +35,7 @@ public class UISegmentDistances : MonoBehaviour
         _sliderDistance.onValueChanged.AddListener(OnDistanceValueChanged);
         _continueButton.onClick.AddListener(OnContinueButtonPressed);
 
-        int layoutID = AssessmentManager.Instance.GetSelectedLayoutOfCurrentPath();
+        int layoutID = AssessmentManager.Instance.GetSelectedPathLayout();
         _pathPreviewCreator = PathLayoutManager.Instance.GetPathLayout(layoutID);
         _pathPreviewCreator.ResetCameraView();
         _pathPreviewCreator.CanvasMovementArea = _movementArea;

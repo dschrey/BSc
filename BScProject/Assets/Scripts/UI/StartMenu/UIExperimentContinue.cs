@@ -1,12 +1,7 @@
-using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
-using Unity.XR.CoreUtils;
-using Omnifinity.Omnideck;
-using System.Collections;
 using UnityEngine.InputSystem;
 
 public class UIExperimentContinue : MonoBehaviour
@@ -28,16 +23,18 @@ public class UIExperimentContinue : MonoBehaviour
     private ExperimentData _experiment;
     private AssessmentData _assessment;
 
-    [SerializeField] public InputActionReference PlaceAction;
+    [Header("Debug Controls")]
+    [SerializeField] private InputActionReference _debugAction;
 
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
     private void Update()
     {
-        if (PlaceAction != null && PlaceAction.action.WasPressedThisFrame())
+        if (_debugAction != null && _debugAction.action.WasPressedThisFrame())
         {
             OnContinueExperimentClicked();
+            return;
         }
 
         if (_questionaireCompleted && _hasChangedFloor && _isReady)
@@ -121,9 +118,6 @@ public class UIExperimentContinue : MonoBehaviour
         _experimentID.text = experiment.id.ToString();
         PopulatePathOptions(experiment.paths.Keys);
         OnPathSelectionChanged(0);
-
-        // TODO REMOVE WHEN DONE TESTING
-        //StartCoroutine(ContinueNextPath());
     }
 
     private void PopulatePathOptions(Dictionary<Trail, PathData>.KeyCollection trails)
@@ -135,14 +129,6 @@ public class UIExperimentContinue : MonoBehaviour
             options.Add(trail.selectionName);
         }
         _pathDropdown.AddOptions(options);
-    }
-
-    // TODO REMOVE
-
-    private IEnumerator ContinueNextPath()
-    {
-        yield return new WaitForSeconds(5);
-        OnContinueExperimentClicked();
     }
 
 }

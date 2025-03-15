@@ -21,7 +21,7 @@ public class Objective : MonoBehaviour
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------------
 
-    private void OnEnable() 
+    private void OnEnable()
     {
         _audioSource = GetComponent<AudioSource>();
         _collider = GetComponent<SphereCollider>();
@@ -63,7 +63,7 @@ public class Objective : MonoBehaviour
         if (collider.CompareTag("Player"))
         {
             StopCapturingObjective();
-        }        
+        }
     }
 
     // ---------- Start Methods ------------------------------------------------------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ public class Objective : MonoBehaviour
         }
 
         Debug.Log($"Objective.cs :: StartCollectingItem() : Started collecting {this}");
-        
+
         _collectionCoroutine = StartCoroutine(CaptureObjective());
     }
 
@@ -128,7 +128,7 @@ public class Objective : MonoBehaviour
     private IEnumerator CoroutineObjectiveHint()
     {
         HintParticles.SetActive(true);
-        PlayAudio(HintAudio);
+        PlayHindAudio();
         yield return new WaitForSeconds(2f);
         HintParticles.SetActive(false);
     }
@@ -138,7 +138,7 @@ public class Objective : MonoBehaviour
         if (_audioSource == null)
         {
             Debug.LogError($"Objective :: PlayAudio() : Audio source for {this} was not found.");
-            return;    
+            return;
         }
         _audioSource.PlayOneShot(clip);
     }
@@ -147,4 +147,6 @@ public class Objective : MonoBehaviour
     {
         ObjectiveObject = Instantiate(prefab, _objectiveObjectSpawnpoint);
     }
+    
+    public void PlayHindAudio() => PlayAudio(HintAudio);
 }

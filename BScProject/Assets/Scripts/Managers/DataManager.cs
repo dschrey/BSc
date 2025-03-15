@@ -8,8 +8,6 @@ public class DataManager : MonoBehaviour
     public Settings Settings;
     private string _experimentSettingsPath;
     private string _experimentResultsPath;
-    private string _assessmentFilePath;
-
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
@@ -42,7 +40,6 @@ public class DataManager : MonoBehaviour
 
     public void SaveSettings()
     {
-        Debug.Log($"Saving experiment Settings");
         ExperimentSettingsData data = new()
         {
             CompletedAssessments = Settings.CompletedExperiments,
@@ -83,11 +80,9 @@ public class DataManager : MonoBehaviour
 
         string filePath = _experimentResultsPath + "/" + $"Assessment_{data.AssessmentID}.json";
         File.WriteAllText(filePath, jsonData);
-        _assessmentFilePath = filePath;
 
         Debug.Log($"Assessment data saved to: {filePath}");
     }
-
 
     public AssessmentData TryLoadAssessmentData(int assessmentID)
     {
@@ -102,38 +97,5 @@ public class DataManager : MonoBehaviour
         Debug.Log($"No exisiting assessment data for ID {assessmentID}");
         return null;
     }
-    
-    // public void MergeAssessmentData(AssessmentData newData)
-    // {
-    //     string filePath = _experimentResultsPath + "/" + $"Assessment_{newData.AssessmentID}.json";
-        
-    //     // Load existing data
-    //     AssessmentData existingData = LoadAssessmentData(newData.AssessmentID);
-
-    //     if (existingData != null)
-    //     {
-    //         // Merge existing paths to avoid duplicates
-    //         foreach (var path in newData.Paths)
-    //         {
-    //             if (!existingData.Paths.Any(p => p.PathID == path.PathID)) // Assuming PathID is unique
-    //             {
-    //                 existingData.Paths.Add(path);
-    //             }
-    //         }
-            
-    //         existingData.Completed = newData.Completed;
-    //     }
-    //     else
-    //     {
-    //         existingData = newData;
-    //     }
-
-    //     // Save merged data
-    //     string jsonData = JsonUtility.ToJson(existingData, true);
-    //     File.WriteAllText(filePath, jsonData);
-        
-    //     Debug.Log($"Assessment data saved to: {filePath}");
-    // }
-
 
 }

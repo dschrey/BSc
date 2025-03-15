@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 
-public enum FloorType {DEFAULT, OMNIDECK}
+public enum FloorType {Default, Omnideck}
 
 [Serializable]
-public class Trail  // Represents a path, since Path already exists.
+public class Trail
 {
     public string name;
     public FloorType floor;

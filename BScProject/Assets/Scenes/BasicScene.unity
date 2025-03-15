@@ -1147,7 +1147,7 @@ MonoBehaviour:
     m_InputActionReference: {fileID: 8141401447880765752, guid: c348712bda248c246b8c49b3db54643f, type: 3}
     m_ObjectReferenceObject: {fileID: 0}
     m_ManualValue: {x: 0, y: 0}
-  _omnideckInterface: {fileID: 750296049}
+  _omnideckInterface: {fileID: 0}
 --- !u!114 &214769718
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3894,91 +3894,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 691613581}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1001 &750296048
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1410824139}
-    m_Modifications:
-    - target: {fileID: 763356280019899270, guid: 27645327f5a9f50428148dd651a03f2e, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2247807988981917356, guid: 27645327f5a9f50428148dd651a03f2e, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2247807988981917356, guid: 27645327f5a9f50428148dd651a03f2e, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2247807988981917356, guid: 27645327f5a9f50428148dd651a03f2e, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2247807988981917356, guid: 27645327f5a9f50428148dd651a03f2e, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2247807988981917356, guid: 27645327f5a9f50428148dd651a03f2e, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2247807988981917356, guid: 27645327f5a9f50428148dd651a03f2e, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2247807988981917356, guid: 27645327f5a9f50428148dd651a03f2e, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2247807988981917356, guid: 27645327f5a9f50428148dd651a03f2e, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2247807988981917356, guid: 27645327f5a9f50428148dd651a03f2e, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2247807988981917356, guid: 27645327f5a9f50428148dd651a03f2e, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6123141846030507121, guid: 27645327f5a9f50428148dd651a03f2e, type: 3}
-      propertyPath: m_Name
-      value: OmnideckInterface
-      objectReference: {fileID: 0}
-    - target: {fileID: 6123141846030507121, guid: 27645327f5a9f50428148dd651a03f2e, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8666868112550540300, guid: 27645327f5a9f50428148dd651a03f2e, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 27645327f5a9f50428148dd651a03f2e, type: 3}
---- !u!114 &750296049 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8666868112550540300, guid: 27645327f5a9f50428148dd651a03f2e, type: 3}
-  m_PrefabInstance: {fileID: 750296048}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d79dd133f1e946145b24b6fe409c3151, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &750296050 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2247807988981917356, guid: 27645327f5a9f50428148dd651a03f2e, type: 3}
-  m_PrefabInstance: {fileID: 750296048}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &756192406
 GameObject:
   m_ObjectHideFlags: 0
@@ -6430,7 +6345,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1410824139
 Transform:
   m_ObjectHideFlags: 0
@@ -6446,7 +6361,7 @@ Transform:
   m_Children:
   - {fileID: 1195223481}
   - {fileID: 1225266256}
-  - {fileID: 750296050}
+  - {fileID: 1503824232}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1418861049
@@ -6834,6 +6749,66 @@ Transform:
   - {fileID: 1279280403}
   m_Father: {fileID: 423137778}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1503824231
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1503824232}
+  - component: {fileID: 1503824234}
+  - component: {fileID: 1503824233}
+  m_Layer: 0
+  m_Name: OmnideckInterface
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1503824232
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1503824231}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1410824139}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1503824233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1503824231}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9b0fc2b4bdc56548933f58f6ba8b7c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1503824234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1503824231}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d79dd133f1e946145b24b6fe409c3151, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  debugLevel: 2
+  port: 3889
+  trackerName: AppToOmnitrackTracker0
 --- !u!1 &1528113500
 GameObject:
   m_ObjectHideFlags: 0

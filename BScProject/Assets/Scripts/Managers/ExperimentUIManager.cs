@@ -14,7 +14,7 @@ public class ExperimentUIManager : MonoBehaviour
 
     public void LoadNextExperimentPanel(ExperimentData experiment, ExperimentState experimentState, AssessmentData assessmentData)
     {
-        if (experimentState == ExperimentState.CANCELLED)
+        if (experimentState == ExperimentState.Cancelled)
         {
             return;
         }

@@ -35,9 +35,12 @@ public class AssessmentData
         return Paths.Find(p => p.Name == pathName);
     }
 
-    public void SetPathTime(string pathName, string timeTaken)
+    public void AddPathInformation(string pathName, string timeTaken, int numHints)
     {
-        GetPath(pathName).Time = timeTaken;
+        PathAssessmentData path = GetPath(pathName);
+        path.Time = timeTaken;
+        path.NumHints = numHints;
+        Debug.Log($"Time:{timeTaken} - Hints: {numHints}");
     }
 }
 
@@ -52,6 +55,7 @@ public class PathAssessmentData
     public int SelectedPathLayout;
     public int ActualPathLayout;
     public bool CorrentPathLayoutSelected;
+    public int NumHints;
     public List<SegmentAssessmentData> PathSegments;
 
     public PathAssessmentData(PathData pathData, FloorType floor)
@@ -121,8 +125,6 @@ public class SegmentAssessmentData
     {
         SelectedDistanceToPreviousSegment = distance;
         SegmentDistanceError = Math.Abs(ActualDistanceToPreviousSegment - SelectedDistanceToPreviousSegment);
-        // Debug.Log($"Objective: Set distance: {distance}: Actual distance: {ActualDistanceToPreviousSegment}\nError: {LandmarkDistanceError}");
-
     }
 
     public void SetLandmarkDistances(float distanceToObjective, float differenceToRealObject)
@@ -130,7 +132,6 @@ public class SegmentAssessmentData
         SelectedLandmarkDistanceToObjective = distanceToObjective;
         LandmarkDifferenceToRealObject = differenceToRealObject;
         LandmarkDistanceError = Math.Abs(ActualLandmarkDistanceToObjective - SelectedLandmarkDistanceToObjective);
-        // Debug.Log($"Landmark: Set distance: {distanceToObjective}: Actual distance: {ActualLandmarkDistanceToObjective}\nError: {LandmarkDistanceError}");
     }
 
     public void SetHoverObject(int objectID)

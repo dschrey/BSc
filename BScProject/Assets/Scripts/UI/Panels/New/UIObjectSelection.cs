@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Security.Cryptography;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -64,6 +63,8 @@ public class UIObjectSelection : MonoBehaviour
     [SerializeField] private ToggleGroup _hoverSegmentsGroup;
 
     [Header("Canvas Landmark Object Placement")]
+    [SerializeField] private GameObject _segmentSelectorPrefab;
+    private readonly List<CanvasSegmentSelector> _landmarkSegmentSelectors = new();
     [SerializeField] private Transform _landmarkSocketHolder;
     [SerializeField] private GameObject _landmarkObjectSocketPrefab;
     [SerializeField] private GameObject _placementCrosshairPrefab;
@@ -134,7 +135,7 @@ public class UIObjectSelection : MonoBehaviour
         _nextButton.onClick.AddListener(OnNextObjectTypeClicked);
         _finishButton.onClick.AddListener(OnFinishButtonClicked);
 
-        int layoutID = AssessmentManager.Instance.GetSelectedLayoutOfCurrentPath();
+        int layoutID = AssessmentManager.Instance.GetSelectedPathLayout();
         _pathPreviewCreator = PathLayoutManager.Instance.GetPathLayout(layoutID);
         _canvasCamera = _pathPreviewCreator.RenderCamera;
         _lineRender = _pathPreviewCreator.DistanceLineController;
@@ -277,6 +278,8 @@ public class UIObjectSelection : MonoBehaviour
 
             _selectedLandmarkSegmentID = (_selectedLandmarkSegmentID + 1) % (_pathPreviewCreator.SpawnedSegments.Count - 1);
             _landmarkSegmentIndicators[_selectedLandmarkSegmentID].Toggle(true);
+
+            _landmarkSegmentSelectors.Find(selector => selector.BelongsToSegmentID == _selectedLandmarkSegmentID).Select();
             UpdateSegmentText();
             HandleLandmarkSegmentChange();
         }
@@ -527,16 +530,10 @@ public class UIObjectSelection : MonoBehaviour
 
     private void OnFinishButtonClicked()
     {
-        if (_completed)
-        {
-            AssessmentManager.Instance.ProceedToNextAssessmentStep();
-            return;
-        }
-
         _completed = true;
         if (ClearUIData())
         {
-            Debug.Log($"Clean!");
+            AssessmentManager.Instance.ProceedToNextAssessmentStep();
         }
     }
 
@@ -703,6 +700,7 @@ public class UIObjectSelection : MonoBehaviour
         _hoverSegmentIndicators.Clear();
 
         CreateLandmarkObjectSelectionGrid();
+        CreateLandmarkSegmentSelectors();
 
         if (_placementCrosshair == null)
         {
@@ -716,6 +714,7 @@ public class UIObjectSelection : MonoBehaviour
         }
 
         _selectedLandmarkSegmentID = 0;
+        _landmarkSegmentSelectors.Find(selector => selector.BelongsToSegmentID == _selectedLandmarkSegmentID).Select();
         _landmarkSegmentIndicators[_selectedLandmarkSegmentID].Toggle(true);
 
         _lineRender.SetLinePoints(new()
@@ -768,13 +767,12 @@ public class UIObjectSelection : MonoBehaviour
             Vector2 canvasPosition = _pathPreviewCreator.RenderCamera.WorldCoordinatesToScreenSpace(socketWorldPosition);
 
             ObjectPlacementSocket socketInteractor = Instantiate(_objectiveSocketPrefab, _objectiveSocketHolder).GetComponent<ObjectPlacementSocket>();
-            Color segmentColor = PathManager.Instance.CurrentPath.Segments.Find(s => s.PathSegmentData.SegmentID == segment.SegmentID).PathSegmentData.SegmentColor;
-            socketInteractor.Initialize(segment.SegmentID, 0, segmentColor, _hoverSegmentsGroup);
+            // Color segmentColor = PathManager.Instance.CurrentPath.Segments.Find(s => s.PathSegmentData.SegmentID == segment.SegmentID).PathSegmentData.SegmentColor;
+            socketInteractor.Initialize(segment.SegmentID, 0, segment.SegmentColor, _hoverSegmentsGroup);
             socketInteractor.OnSocketObjectChanged += OnSocketSelectionChanged;
             socketInteractor.PreviewObjectChanged += OnSocketPreviewChanged;
             socketInteractor.PreviewObjectRemoved += OnSocketPreviewRemoved;
-            RectTransform socketRect = socketInteractor.GetComponent<RectTransform>();
-            socketRect.anchoredPosition = canvasPosition;
+            socketInteractor.GetComponent<RectTransform>().anchoredPosition = canvasPosition;
             _canvasHoverObjectData.Add(new SegmentSocketSelection(segment.SegmentID, socketInteractor));
         }
     }
@@ -786,6 +784,23 @@ public class UIObjectSelection : MonoBehaviour
             if (segment.SegmentID == -1) continue;
             Color segmentColor = PathManager.Instance.CurrentPath.Segments.Find(s => s.PathSegmentData.SegmentID == segment.SegmentID).PathSegmentData.SegmentColor;
             _canvasLandmarkObjectData.Add(new LandmarkPlacementData(segment.SegmentID, segmentColor));
+        }
+    }
+
+    private void CreateLandmarkSegmentSelectors()
+    {
+        foreach (SegmentObjectData segment in _pathPreviewCreator.SpawnedSegments)
+        {
+            Vector3 referencePosition = segment.transform.position;
+            Vector3 socketWorldPosition = referencePosition;
+            Vector2 canvasPosition = _pathPreviewCreator.RenderCamera.WorldCoordinatesToScreenSpace(socketWorldPosition);
+
+            // Color segmentColor = PathManager.Instance.CurrentPath.Segments.Find(s => s.PathSegmentData.SegmentID == segment.SegmentID).PathSegmentData.SegmentColor;
+            CanvasSegmentSelector segmentSelector = Instantiate(_segmentSelectorPrefab, _landmarkSocketHolder).GetComponent<CanvasSegmentSelector>();
+            segmentSelector.Initialize(segment.SegmentID, segment.SegmentColor, _landmarkSegmentsGroup);
+            segmentSelector.GetComponent<RectTransform>().anchoredPosition = canvasPosition;
+            _landmarkSegmentSelectors.Add(segmentSelector);
+            
         }
     }
 
@@ -889,6 +904,12 @@ public class UIObjectSelection : MonoBehaviour
             Destroy(socket.Socket.gameObject);
         }
         _canvasLandmarkObjectData.Clear();
+
+        foreach (CanvasSegmentSelector segment in _landmarkSegmentSelectors)
+        {
+            Destroy(segment.gameObject);
+        }
+        _landmarkSegmentSelectors.Clear();
 
         ClearGridSelection(_landmarkObjectSelection);
 

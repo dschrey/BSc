@@ -40,7 +40,7 @@ public class UIObjectPosition : MonoBehaviour
         _continueButton.onClick.AddListener(OnContinueButtonPressed);
         _continueButton.interactable = false;
 
-        int layoutID = AssessmentManager.Instance.GetSelectedLayoutOfCurrentPath();
+        int layoutID = AssessmentManager.Instance.GetSelectedPathLayout();
         _pathPreviewCreator = PathLayoutManager.Instance.GetPathLayout(layoutID);
         _canvasCamera = _pathPreviewCreator.RenderCamera;
         _lineRender = _pathPreviewCreator.DistanceLineController;

@@ -100,7 +100,6 @@ public class PathSegment : MonoBehaviour
             PathSegmentData.LandmarkObjectDistanceToObjective * Mathf.Sin(angleInRadians)
         );
         Vector3 objectSpawnpoint = transform.position + relativePosition;
-        // Vector3 objectSpawnpoint = transform.position + PathSegmentData.RelativeLandmarkPositionToObjective;
         
         GameObject prefab = ResourceManager.Instance.GetLandmarkObject(PathSegmentData.LandmarkObjectID);
         if (prefab == null)
@@ -110,7 +109,6 @@ public class PathSegment : MonoBehaviour
         }
 
         LandmarkObject = Instantiate(prefab, objectSpawnpoint, Quaternion.identity, transform);
-        // PathSegmentData.LandmarkObjectDistanceToObjective = Vector3.Distance(transform.position, objectSpawnpoint);
     }
 
     private void SpawnSegmentObstacle()

@@ -1,10 +1,7 @@
-using System;
 using UnityEngine;
 using UnityEngine.Events;
 
-public enum AssessmentStep {IDLE, PATHSELECTION, OBJECTIVEDISTANCE, OBJECTSELECTION,
-                            OBJECTDISTANCE, OBJECTIVEOBJECTSELECTION, NEXTPATH, COMPLETED,
-                            OBJECTASSIGN, OBJECTPOSITION, SEGMENTDISTANCE}
+public enum AssessmentStep {Idle, PathSelection, SegmentDistance, HoverObjectSelection, LandmarkSelection, Completed}
 
 public class AssessmentManager : MonoBehaviour
 {
@@ -21,14 +18,9 @@ public class AssessmentManager : MonoBehaviour
         }
     }
     [SerializeField] private GameObject _pathSelectionPanel;
-    [SerializeField] private GameObject _objectiveDistancePanel;
-    [SerializeField] private GameObject _objectiveObjectPanel;
-    [SerializeField] private GameObject _objectSelectionPanel;
-    [SerializeField] private GameObject _objectDistancePanel;
     [SerializeField] private GameObject _objectAssignPanel;
     [SerializeField] private GameObject _objectPositionPanel;
     [SerializeField] private GameObject _segmentDistancePanel;
-    [SerializeField] private GameObject _nextPathPanel;
     private GameObject _activePanel;
     private int _currentAssessmentStep;
 
@@ -53,7 +45,7 @@ public class AssessmentManager : MonoBehaviour
     void Start()
     {
         _assessmentStepChanged.AddListener(OnEvaluationStepChanged);
-        _assessmentStep = AssessmentStep.IDLE;
+        _assessmentStep = AssessmentStep.Idle;
         Assessment = null;
     }
 
@@ -70,41 +62,26 @@ public class AssessmentManager : MonoBehaviour
             _activePanel.SetActive(false);
         switch (newStep)
         {
-            case AssessmentStep.IDLE:
+            case AssessmentStep.Idle:
                 _activePanel = null;
                 break;
-            case AssessmentStep.PATHSELECTION:
+            case AssessmentStep.PathSelection:
                 _activePanel = _pathSelectionPanel;
                 break;
-            case AssessmentStep.OBJECTIVEDISTANCE:
-                _activePanel = _objectiveDistancePanel;
-                break;
-            case AssessmentStep.OBJECTIVEOBJECTSELECTION:
-                _activePanel = _objectiveObjectPanel;
-                break;
-            case AssessmentStep.OBJECTSELECTION:
-                _activePanel = _objectSelectionPanel;
-                break;
-            case AssessmentStep.OBJECTDISTANCE:
-                _activePanel = _objectDistancePanel;
-                break;
-            case AssessmentStep.OBJECTASSIGN:
+            case AssessmentStep.HoverObjectSelection:
                 _activePanel = _objectAssignPanel;
                 break;
-            case AssessmentStep.OBJECTPOSITION:
+            case AssessmentStep.LandmarkSelection:
                 _activePanel = _objectPositionPanel;
                 break;
-            case AssessmentStep.SEGMENTDISTANCE:
+            case AssessmentStep.SegmentDistance:
                 _activePanel = _segmentDistancePanel;
                 break;
-            case AssessmentStep.NEXTPATH:
-                _activePanel = _nextPathPanel;
-                break;
-            case AssessmentStep.COMPLETED:
+            case AssessmentStep.Completed:
                 DataManager.Instance.SaveAssessmentData(Assessment);
                 _activePanel = null;
                 CurrentPath = null;
-                _assessmentStep = AssessmentStep.IDLE;
+                _assessmentStep = AssessmentStep.Idle;
                 ExperimentManager.Instance.PathAssessmentCompleted();
                 return;
         }
@@ -124,9 +101,9 @@ public class AssessmentManager : MonoBehaviour
         _currentAssessmentStep = 0;
     }
 
-    public void StartAssessment()
+    public void StartAssessment(int numHints)
     {
-        Assessment.SetPathTime(CurrentPath.PathName, ExperimentManager.Instance.Timer.GetElapsedTimeFormated());
+        Assessment.AddPathInformation(CurrentPath.PathName, ExperimentManager.Instance.Timer.GetElapsedTimeFormated(), numHints);
         ProceedToNextAssessmentStep();
     }
 
@@ -135,16 +112,16 @@ public class AssessmentManager : MonoBehaviour
         switch (_currentAssessmentStep)
         {
             case 0:
-                AssessmentStep = AssessmentStep.PATHSELECTION;
+                AssessmentStep = AssessmentStep.PathSelection;
                 break;
             case 1:
-                AssessmentStep = AssessmentStep.SEGMENTDISTANCE;
+                AssessmentStep = AssessmentStep.SegmentDistance;
                 break;
             case 2:
-                AssessmentStep = AssessmentStep.OBJECTASSIGN;
+                AssessmentStep = AssessmentStep.HoverObjectSelection;
                 break;
             case 3:
-                AssessmentStep = AssessmentStep.COMPLETED;
+                AssessmentStep = AssessmentStep.Completed;
                 return;
         }
         Debug.Log($"AssessmentManager :: Proceed to step: {_currentAssessmentStep}");
@@ -156,16 +133,16 @@ public class AssessmentManager : MonoBehaviour
         switch (_currentAssessmentStep)
         {
             case 2:
-                AssessmentStep = AssessmentStep.PATHSELECTION;
+                AssessmentStep = AssessmentStep.PathSelection;
                 _currentAssessmentStep = 1;
                 break;
             case 3:
-                AssessmentStep = AssessmentStep.SEGMENTDISTANCE;
+                AssessmentStep = AssessmentStep.SegmentDistance;
                 _currentAssessmentStep = 2;
                 break;
         }
         Debug.Log($"AssessmentManager :: Go back to step: {_currentAssessmentStep}");
-        }
+    }
 
     /// <summary>
     /// Saves the selected path layout.
@@ -232,24 +209,6 @@ public class AssessmentManager : MonoBehaviour
         segmentAssessmentData.SetLandmarkObject(objectID);
     }
 
-    [Obsolete]
-    public void FinishAssessment()
-    {
-        Assessment.Completed = true;
-        DataManager.Instance.SaveAssessmentData(Assessment);
-        DataManager.Instance.Settings.CompletedExperiments++;
-        Assessment = null;
-    }
-
-    [Obsolete("Function might be removed in the future.")]
-    public void ResetPanelData()
-    {
-        _objectiveDistancePanel.GetComponent<UIObjectiveDistanceSelection>().ResetPanelData();
-        _objectiveObjectPanel.GetComponent<UIObjectiveObjectSelection>().ResetPanelData();
-        _objectSelectionPanel.GetComponent<UISegmentObjectSelection>().ResetPanelData();
-        _objectDistancePanel.GetComponent<UISegmentObjectPosition>().ResetPanelData();
-    }
-
     public AssessmentData GetAssessment()
     {
         return Assessment;
@@ -258,10 +217,10 @@ public class AssessmentManager : MonoBehaviour
     public void ResetAssessment()
     {
         CurrentPath = null;
-        AssessmentStep = AssessmentStep.IDLE;
+        AssessmentStep = AssessmentStep.Idle;
     }
 
-    public int GetSelectedLayoutOfCurrentPath()
+    public int GetSelectedPathLayout()
     {
         return Assessment.GetPath(CurrentPath.PathName).SelectedPathLayout;
     }

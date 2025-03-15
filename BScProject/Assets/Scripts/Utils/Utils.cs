@@ -4,6 +4,14 @@ using UnityEngine.UI;
 
 class Utils
 {
+
+    /// <summary>
+    /// Shuffles a list based on a (optionally given) seed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="list"></param>
+    /// <param name="seed"></param>
+    /// <returns></returns>
     public static List<T> Shuffle<T>(List<T> list, int seed = -1)
     {
         System.Random rng;
@@ -24,6 +32,11 @@ class Utils
         return list;
     }
 
+    /// <summary>
+    /// Sets the layer of a gameobject and it's children.
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="layerIndex"></param>
     public static void SetLayerRecursively(GameObject obj, int layerIndex)
     {
         obj.layer = layerIndex;

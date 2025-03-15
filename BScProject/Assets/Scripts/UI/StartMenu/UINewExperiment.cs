@@ -1,19 +1,15 @@
 using System;
 using System.Collections.Generic;
-using Unity.XR.CoreUtils;
-using Omnifinity.Omnideck;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 using UnityEngine.InputSystem;
 
 public class UINewExperiment : MonoBehaviour
 {
-    [SerializeField] private TMP_InputField _inputExperimentID;
+    [Header("UI Elements"), SerializeField] private TMP_InputField _inputExperimentID;
     [SerializeField] private Button _buttonEditExperimentID;
     [SerializeField] private TMP_Dropdown _pathDropdown;
-    [SerializeField] private TMP_InputField _inputParticipantName;
     [SerializeField] private Button _buttonStartExperiment;
     [SerializeField] private Toggle _toggleResetExperimentCount;
     [SerializeField] private Toggle _toggleResetAssessmentData;
@@ -29,10 +25,9 @@ public class UINewExperiment : MonoBehaviour
     private bool _overwriteCompletedExperiment = false;
     private bool _overwriteAssessmentData = false;
     public AssessmentData _currentAssessment = null;
-    private bool _omnideckConnected;
 
-    [SerializeField] public InputActionReference StartAction;
-
+    [Header("Debug"), SerializeField]
+    private InputActionReference _debugAction;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
 
@@ -44,9 +39,7 @@ public class UINewExperiment : MonoBehaviour
         _pathDropdown.onValueChanged.AddListener(OnPathSelectionChanged);
         _toggleResetExperimentCount.onValueChanged.AddListener(OnResetExperimentCount);
         _toggleResetAssessmentData.onValueChanged.AddListener(OnResetAssessmentData);
-        _buttonOmnideckStatus.onClick.AddListener(OnOmnideckStatusChanged);
     }
-
 
     private void OnDisable()
     {
@@ -56,26 +49,21 @@ public class UINewExperiment : MonoBehaviour
         _pathDropdown.onValueChanged.RemoveListener(OnPathSelectionChanged);
         _toggleResetExperimentCount.onValueChanged.RemoveListener(OnResetExperimentCount);
         _toggleResetAssessmentData.onValueChanged.RemoveListener(OnResetAssessmentData);
-        _buttonOmnideckStatus.onClick.RemoveListener(OnOmnideckStatusChanged);
     }
 
     void Start()
     {
-        _omnideckConnected = true;
         _experimentID = DataManager.Instance.Settings.CompletedExperiments;
         _inputExperimentID.text = _experimentID.ToString();
         _currentAssessment = DataManager.Instance.TryLoadAssessmentData(_experimentID);
         if (_currentAssessment == null) _toggleResetAssessmentData.isOn = false;
         _toggleResetAssessmentData.interactable = _currentAssessment != null;
         PopulatePathOptions();
-
-        // TODO Remove after testing
-        //StartCoroutine(StartScene());
     }
 
     private void Update()
     {
-        if (StartAction != null && StartAction.action.WasPressedThisFrame())
+        if (_debugAction != null && _debugAction.action.WasPressedThisFrame())
         {
             OnStartExperimentClicked();
         }
@@ -141,8 +129,8 @@ public class UINewExperiment : MonoBehaviour
             return;
         }
 
-        _buttonStartExperiment.interactable = CheckStartRequirements();
-        Debug.Log($"Experiment {_experiment.id} selected Path: {_selectedPath.PathID} - {_selectedPath.name}");
+        _buttonStartExperiment.interactable = true;
+        Debug.Log($"Experiment {_experiment.id}: {_selectedPath.name} - {_selectedTrail.floor}");
     }
 
     private void OnResetExperimentCount(bool state)
@@ -215,84 +203,6 @@ public class UINewExperiment : MonoBehaviour
         _inputExperimentID.text = _experimentID.ToString();
 
         PopulatePathOptions();
-    }
-
-    private void OnOmnideckStatusChanged()
-    {
-        return;
-        Debug.Log($"Omnideck State : {_omnideckConnected}");
-
-        
-        if (!_omnideckConnected)
-        {
-            _omnideckConnected = !_omnideckConnected;
-
-            if (!Instantiate(_omnideckInterfacePrefab, _interfaceParent))
-            {
-                Debug.LogError("Could not find Omnideck Interface.");
-                _omnideckConnected = !_omnideckConnected;
-                _textOmnideckStatus.color = Color.yellow;
-                _textOmnideckStatus.text = "Connection failed";
-                _textOmnideckStatusButton.color = Color.green;
-                _textOmnideckStatusButton.text = "Enable";
-                return;
-            }
-            _textOmnideckStatus.color = Color.green;
-            _textOmnideckStatus.text = "Enabled";
-            _textOmnideckStatusButton.color = Color.red;
-            _textOmnideckStatusButton.text = "Disable";
-        }
-        else
-        {
-            _omnideckConnected = !_omnideckConnected;
-            Destroy(FindObjectOfType<OmnideckInterface>().gameObject);
-            _textOmnideckStatus.color = Color.red;
-            _textOmnideckStatus.text = "Disabled";
-            _textOmnideckStatusButton.color = Color.green;
-            _textOmnideckStatusButton.text = "Enable";
-        }
-
-        //
-        //if (_omnideckConnected && omnideckInterface.GetTreadmillStatus() == ETreadmillStatus.Stopped)
-        //{
-        //    _omnideckConnected = !_omnideckConnected;
-        //    omnideckInterface.enabled = _omnideckConnected;
-        //    _textOmnideckStatus.color = Color.yellow;
-        //    _textOmnideckStatus.text = "Unable to connect";
-        //    return;
-        //}
-
-        XROrigin XROrigin = FindObjectOfType<XROrigin>();
-        if (XROrigin == null)
-        {
-            Debug.LogError("Could not find XROrigin.");
-            return;
-        }
-
-        OmnideckContinuousMove omnideckMove = XROrigin.GetComponentInChildren<OmnideckContinuousMove>();
-        if (omnideckMove == null)
-        {
-            Debug.LogError("Could not find Omnideck Continuous Move provider.");
-            return;
-        }
-        omnideckMove.enabled = _omnideckConnected;
-
-
-        _buttonStartExperiment.interactable = CheckStartRequirements();
-    }
-
-    
-    private bool CheckStartRequirements()
-    {
-        if (_selectedPath == null) return false;
-        //if (_selectedTrail.floor == FloorType.OMNIDECK && !_omnideckConnected) return false;
-        return true;
-    }
-
-    private IEnumerator StartScene()
-    {
-        yield return new WaitForSeconds(5);
-        OnStartExperimentClicked();
     }
 
 }

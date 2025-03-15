@@ -27,7 +27,7 @@
                     "name": "Is Tracked",
                     "type": "Button",
                     "id": "6bb4e248-e42b-47c3-b66c-79566508ca74",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -2787,9 +2787,18 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "A",
+                    "name": "Confirm",
                     "type": "Button",
                     "id": "fc428a05-c3dd-431a-a197-bfab8b82c60e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Debug",
+                    "type": "Button",
+                    "id": "827ce4d6-9f27-4bd7-844b-574382f098b2",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -2826,7 +2835,18 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "A",
+                    "action": "Confirm",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0f378cfc-9b52-4082-bec8-32f28a7fc48a",
+                    "path": "<XRController>{LeftHand}/{SecondaryButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Debug",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

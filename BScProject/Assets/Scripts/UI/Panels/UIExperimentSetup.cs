@@ -37,7 +37,7 @@ public class UIExperimentSetup : MonoBehaviour
     private void Update()
     {
         return;
-        if (ExperimentManager.Instance.ExperimentState == ExperimentState.IDLE)
+        if (ExperimentManager.Instance.ExperimentState == ExperimentState.Idle)
         {
             if (_startPointHandler.ExperimentReadyToStart)
             {

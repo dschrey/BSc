@@ -12,6 +12,14 @@
                 { "name": "G", "floor": 0 },
                 { "name": "H", "floor": 0 }
             ]
+        },        {
+            "id": 222,
+            "paths": [
+                { "name": "A", "floor": 0 },
+                { "name": "B", "floor": 1 },
+                { "name": "C", "floor": 0 },
+                { "name": "D", "floor": 1 }
+            ]
         },
         {
             "id": 999,

@@ -16,6 +16,9 @@ public class Settings : ScriptableObject
     [Tooltip("Time (in seconds) it takes to reaveal an objective")]
     public float ObjectiveRevealTime = 1.5f;
     public float DefaultObjectiveRevealTime = 1.5f;
+    [Tooltip("Time (in seconds) it takes to reaveal an objective")]
+    public float PathGuidanceCooldown = 5f;
+    public float DefaultPathGuidanceCooldown = 5f;
 
     [Tooltip("Distance of each segment to the previous (in meters) in the path preview.")]
     public float SegmentLength = 2.0f;

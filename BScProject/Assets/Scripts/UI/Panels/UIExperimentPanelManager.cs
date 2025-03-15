@@ -1,8 +1,12 @@
+using System;
 using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit.UI;
 
+// TODO REMOVE
+
+[Obsolete("Class is deprecated and will be removed in the future.")]
 public class UIExperimentPanelManager : MonoBehaviour
 {
     [SerializeField] private GameObject _experimentSetupPanel;
@@ -21,7 +25,7 @@ public class UIExperimentPanelManager : MonoBehaviour
     {
         if (_activationButton.action.WasPressedThisFrame())
         {
-            if (ExperimentManager.Instance.ExperimentState == ExperimentState.RUNNING)
+            if (ExperimentManager.Instance.ExperimentState == ExperimentState.Running)
             {
                 _menuVisible = _experimentRunningPanel.activeSelf;
                 _menuVisible = !_menuVisible;

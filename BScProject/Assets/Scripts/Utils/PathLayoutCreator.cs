@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class SegmentObjectData : MonoBehaviour
 {
@@ -17,6 +16,7 @@ public class SegmentObjectData : MonoBehaviour
     private ParticleSystem _particleSystem;
     public Vector3 CanvasSocketPosition = Vector3.zero;
     public float SocketOffsetAngle;
+    public Color SegmentColor = Color.white;
 
     private void OnEnable()
     {
@@ -45,6 +45,7 @@ public class SegmentObjectData : MonoBehaviour
     {
         var mainModule = _particleSystem.main;
         mainModule.startColor = color;
+        SegmentColor = color;
     }
 }
 

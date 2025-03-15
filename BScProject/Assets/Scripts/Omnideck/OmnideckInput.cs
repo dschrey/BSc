@@ -32,19 +32,16 @@ public class OmnideckInput : MonoBehaviour
 
     void Start()
     {
-        // Register the Omnideck device layout with the Input System
         InputSystem.RegisterLayout<OmnideckInputDevice>("Omnideck");
-
-        // Add an instance of the device
         m_omnideckInput = InputSystem.AddDevice<OmnideckInputDevice>("Omnideck");
-
-        // Get reference to the Omnideck API script
         if (!TryGetComponent<OmnideckInterface>(out m_omnideckInterface))
             Debug.LogError($"Could not find OmnideckInterface reference.");
     }
 
     void Update()
     {
+        if (m_omnideckInput == null || m_omnideckInterface == null) return;
+
         Vector3 movementVector = m_omnideckInterface.GetCurrentOmnideckCharacterMovementVector();
         var state = new OmnideckInputState { movement = new (movementVector.x, movementVector.z) };
         InputSystem.QueueStateEvent(m_omnideckInput, state);

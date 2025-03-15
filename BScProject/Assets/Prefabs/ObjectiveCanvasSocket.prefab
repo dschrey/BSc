@@ -189,7 +189,6 @@ MonoBehaviour:
   BelongsToSegmentID: 0
   SocketID: 0
   SocketObject: {fileID: 0}
-  angle: 0
   _socketIndicator: {fileID: 1483305207568796042}
   _highlightImage: {fileID: 1277687399356138191}
 --- !u!114 &212586730225893643

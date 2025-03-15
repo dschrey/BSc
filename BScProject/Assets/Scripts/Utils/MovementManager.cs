@@ -4,7 +4,7 @@ using UnityEngine.XR.Interaction.Toolkit.Locomotion.Movement;
 
 public class MovementManager : MonoBehaviour
 {
-    [SerializeField] private FloorType _activeType = FloorType.DEFAULT;
+    [SerializeField] private FloorType _activeType = FloorType.Default;
 
     [Header("Default"), SerializeField]
     private CharacterControllerSync _characterControllerSync;
@@ -18,16 +18,15 @@ public class MovementManager : MonoBehaviour
 
     public bool HandleFloorBasedMovement(FloorType floorType)
     {
-        return true;
         _activeType = floorType;
-        if (floorType == FloorType.DEFAULT)
+        if (floorType == FloorType.Default)
         {
-            if (_characterControllerSync == null)
-            {
-                Debug.LogError("Could not find Character Controller Sync component.");
-                return false;
-            }
-            _characterControllerSync.enabled = true;
+            //if (_characterControllerSync == null)
+            //{
+            //    Debug.LogError("Could not find Character Controller Sync component.");
+            //    return false;
+            //}
+            //_characterControllerSync.enabled = true;
         }
         else
         {

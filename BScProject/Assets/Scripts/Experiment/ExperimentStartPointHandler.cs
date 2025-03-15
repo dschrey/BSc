@@ -24,27 +24,30 @@ public class ExperimentStartPointHandler : MonoBehaviour
         Gizmos.DrawWireCube(transform.position, new Vector3(6, 3, 10));
     }
 
+    void OnDestroy()
+    {
+        if (_experimentSpawnMovementDetection != null)
+        {
+            _experimentSpawnMovementDetection.EnteredDectectionZone -= HandleReadyToStart;
+            _experimentSpawnMovementDetection.ExitedDectectionZone -= HandleNotReadyToStart;
+        }
+    }
+
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
 
     private void HandleReadyToStart()
     {
+        Debug.Log($"HandleReadyToStart");
         ExperimentReadyToStart = true;
     }
 
     private void HandleNotReadyToStart()
     {
+        Debug.Log($"HandleNotReadyToStart");
         ExperimentReadyToStart = false;
     }
     
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
-
-    public void SetExperimentStartPosition(Transform newTransform)
-    {
-        Vector3 newPosition = newTransform.position;
-        newPosition.y = 0;
-        _experimentArea.transform.SetLocalPositionAndRotation(newPosition, newTransform.rotation);
-
-    }
 
     public void ToggleStartPositionHighlight(bool state)
     {

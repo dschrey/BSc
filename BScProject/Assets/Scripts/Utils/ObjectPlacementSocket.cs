@@ -72,23 +72,6 @@ public class ObjectPlacementSocket : MonoBehaviour, IPointerEnterHandler, IPoint
         _toggle.group = group;
     }
 
-    [Obsolete]
-    public void DeleteSocketObject()
-    {
-        if (_socket.hasSelection)
-        {
-            IXRHoverInteractable interactable = _socket.GetOldestInteractableHovered();
-            if (interactable != null)
-            {
-                GameObject placedObject = interactable.transform.gameObject;
-                if (placedObject != null)
-                {
-                    Destroy(placedObject);
-                }
-            }
-        }
-    }
-
     public void PlaceSocketObject(GameObject socketObject)
     {
         SocketObject = Instantiate(socketObject, _socket.attachTransform.position, _socket.attachTransform.rotation);
