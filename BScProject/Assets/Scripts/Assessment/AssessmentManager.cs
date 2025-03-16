@@ -18,9 +18,9 @@ public class AssessmentManager : MonoBehaviour
         }
     }
     [SerializeField] private GameObject _pathSelectionPanel;
-    [SerializeField] private GameObject _objectAssignPanel;
-    [SerializeField] private GameObject _objectPositionPanel;
     [SerializeField] private GameObject _segmentDistancePanel;
+    [SerializeField] private GameObject _hoverObjectSelectionPanel;
+    [SerializeField] private GameObject _landmarkSelectionPanel;
     private GameObject _activePanel;
     private int _currentAssessmentStep;
 
@@ -69,10 +69,10 @@ public class AssessmentManager : MonoBehaviour
                 _activePanel = _pathSelectionPanel;
                 break;
             case AssessmentStep.HoverObjectSelection:
-                _activePanel = _objectAssignPanel;
+                _activePanel = _hoverObjectSelectionPanel;
                 break;
             case AssessmentStep.LandmarkSelection:
-                _activePanel = _objectPositionPanel;
+                _activePanel = _landmarkSelectionPanel;
                 break;
             case AssessmentStep.SegmentDistance:
                 _activePanel = _segmentDistancePanel;
@@ -121,6 +121,9 @@ public class AssessmentManager : MonoBehaviour
                 AssessmentStep = AssessmentStep.HoverObjectSelection;
                 break;
             case 3:
+                AssessmentStep = AssessmentStep.LandmarkSelection;
+                break;
+            case 4:
                 AssessmentStep = AssessmentStep.Completed;
                 return;
         }
@@ -132,13 +135,21 @@ public class AssessmentManager : MonoBehaviour
     {
         switch (_currentAssessmentStep)
         {
-            case 2:
+            case 1:
                 AssessmentStep = AssessmentStep.PathSelection;
+                _currentAssessmentStep = 0;
+                break;
+            case 2:
+                AssessmentStep = AssessmentStep.SegmentDistance;
                 _currentAssessmentStep = 1;
                 break;
             case 3:
-                AssessmentStep = AssessmentStep.SegmentDistance;
+                AssessmentStep = AssessmentStep.HoverObjectSelection;
                 _currentAssessmentStep = 2;
+                break;
+            case 4:
+                AssessmentStep = AssessmentStep.LandmarkSelection;
+                _currentAssessmentStep = 3;
                 break;
         }
         Debug.Log($"AssessmentManager :: Go back to step: {_currentAssessmentStep}");

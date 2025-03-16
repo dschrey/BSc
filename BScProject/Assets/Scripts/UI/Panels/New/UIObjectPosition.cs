@@ -21,7 +21,7 @@ public class UIObjectPosition : MonoBehaviour
 
     [Header("Object Selection")]
     [SerializeField] private GameObject _selectionObjectPrefab;
-    [SerializeField] private Transform _movementArea;
+    [SerializeField] private Transform _positionImage;
     [SerializeField] private ToggleGroup _toggleGroup;
     private CanvasCameraHandler _canvasCamera;
 
@@ -131,7 +131,7 @@ public class UIObjectPosition : MonoBehaviour
                 continue;
             }
 
-            SegmentObjectSelection objectSelection = Instantiate(_selectionObjectPrefab, _movementArea).GetComponent<SegmentObjectSelection>();
+            SegmentObjectSelection objectSelection = Instantiate(_selectionObjectPrefab, _positionImage).GetComponent<SegmentObjectSelection>();
             objectSelection.GetComponent<RectTransform>().anchoredPosition = segmentData.CanvasSocketPosition;
             objectSelection.Initialize(segmentData.SegmentID, segmentData.AssignedLandmarkObjectID, segmentData.SocketOffsetAngle, _toggleGroup);
             Vector3 worldPosition = _canvasCamera.ScreenCoordinatesToWorldSpace(segmentData.CanvasSocketPosition);

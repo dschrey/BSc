@@ -104,7 +104,7 @@ public class XRInteractionToggle : MonoBehaviour
     
     public void UpdateUIInteractor()
     {
-        UIObjectSelection objectSelectionUI = FindObjectOfType<UIObjectSelection>();
+        UILandmarkSelection objectSelectionUI = FindObjectOfType<UILandmarkSelection>();
         if (objectSelectionUI != null)
         {
             if (_currentlyEnabledInteractor.TryGetComponent<NearFarInteractor>(out var nearFarInteractor))
