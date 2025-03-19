@@ -23,27 +23,6 @@ public class ObjectRenderer : MonoBehaviour
         _renderCamera.cullingMask = LayerMask.GetMask("ObjectRendering");
     }
 
-    // private Bounds CalculateObjectBounds(GameObject obj)
-    // {
-    //     Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
-    //     Bounds bounds = renderers[0].bounds;
-
-    //     foreach (Renderer renderer in renderers)
-    //     {
-    //         bounds.Encapsulate(renderer.bounds);
-    //     }
-
-    //     return bounds;
-    // }
-
-    // private void AdjustCameraToFitObject(Bounds objectBounds)
-    // {
-    //     _renderCamera.orthographicSize = Mathf.Max(objectBounds.size.y, objectBounds.size.x) / 2f + 0.05f;
-
-    //     _renderCamera.transform.position = new Vector3(objectBounds.center.x, objectBounds.center.y, _renderCamera.transform.position.z);
-    //     _renderCamera.transform.LookAt(objectBounds.center);
-    // }
-
     public RenderTexture GetRenderTexture()
     {
         return _renderCamera.targetTexture;

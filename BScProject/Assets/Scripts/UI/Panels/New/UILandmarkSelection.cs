@@ -8,7 +8,6 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
-
 [Serializable]
 public class LandmarkPlacementData
 {
@@ -348,9 +347,9 @@ public class UILandmarkSelection : MonoBehaviour
 
         Debug.Log($"Landmark: Segment {_selectedLandmarkSegmentID} - Object - {landmarkData.SelectedObjectID}");
 
-        SegmentObjectData segmentLandmarkObjectData = _pathPreviewCreator.SpawnedSegments.Find(s => s.SegmentID == _selectedLandmarkSegmentID);
-        segmentLandmarkObjectData.AssignedHoverObjectID = landmarkData.SelectedObjectID;
-        segmentLandmarkObjectData.AssignedHoverObjectSocketID = 0;
+        // SegmentObjectData segmentLandmarkObjectData = _pathPreviewCreator.SpawnedSegments.Find(s => s.SegmentID == _selectedLandmarkSegmentID);
+        // segmentLandmarkObjectData.AssignedHoverObjectID = landmarkData.SelectedObjectID;
+        // segmentLandmarkObjectData.AssignedHoverObjectSocketID = 0;
         AssessmentManager.Instance.AssignSegmentLandmarkObject(_selectedLandmarkSegmentID, landmarkData.SelectedObjectID);
 
         _textObjectName.text = landmarkData.Socket.SocketObject.name.Replace("(Clone)", "").Trim();

@@ -51,9 +51,9 @@ public class PathData : ScriptableObject
         }
 
         #if UNITY_EDITOR
-            if (!Application.isPlaying) return;
+        if (!Application.isPlaying) return;
+            Update.Invoke();
         #endif
-        // Update.Invoke();
     }
 
     private void OnEnable()

@@ -6,16 +6,14 @@ using UnityEngine;
 public class SegmentObjectData : MonoBehaviour
 {
     public int SegmentID = -1;
-    public int AssignedHoverObjectSocketID = -1;
-    public int AssignedHoverObjectID = -1;
-    public int AssignedLandmarkObjectSocketID = -1;
-    public int AssignedLandmarkObjectID = -1;
+    // public int AssignedHoverObjectSocketID = -1;
+    // public int AssignedHoverObjectID = -1;
+    // public int AssignedLandmarkObjectSocketID = -1;
+    // public int AssignedLandmarkObjectID = -1;
     public float AngleFromPrevSegmentRad;
     public LineRenderer ArrowRenderer;
     public Vector3 ArrowDirection;
     private ParticleSystem _particleSystem;
-    public Vector3 CanvasSocketPosition = Vector3.zero;
-    public float SocketOffsetAngle;
     public Color SegmentColor = Color.white;
 
     private void OnEnable()
@@ -26,8 +24,6 @@ public class SegmentObjectData : MonoBehaviour
             Debug.Log($"Could not find particle system.");
             return;
         }
-
-        // SetParticleScale();
     }
 
     public void SetParticleScale()
@@ -115,8 +111,6 @@ public class PathLayoutCreator : MonoBehaviour
             _spawnedArrows.Add(lineRenderer.gameObject);
 
             SegmentObjectData segment = Instantiate(_pathSegmentPrefab, spawnPosition, Quaternion.identity, transform).AddComponent<SegmentObjectData>();
-            // segment.CanvasToggleGroup = segment.AddComponent<ToggleGroup>();
-            // segment.CanvasToggleGroup.allowSwitchOff = true;
             segment.SegmentID = pathSegmentData.SegmentID;
             segment.SetParticleScale();
             segment.SetColor(pathSegmentData.SegmentColor);

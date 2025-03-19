@@ -77,8 +77,6 @@ public class PathPreviewer : MonoBehaviour
         Vector3 relativePosition = obstacle.transform.position - segment.transform.position;
         relativePosition.y = obstacle.transform.localScale.y / 2;
         segment.PathSegmentData.RelativeObstaclePositionToObjective = relativePosition;
-        // Vector3 scale = obstacle.transform.localScale;
-        // scale.y = 1.35f;
         segment.PathSegmentData.Scale = obstacle.transform.localScale;
     }
 

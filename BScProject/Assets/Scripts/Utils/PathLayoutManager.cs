@@ -47,9 +47,6 @@ public class PathLayoutManager : MonoBehaviour
         return PathLayouts.Find(x => x.PathLayoutID == layoutToFind);
     }
 
-
-    // TODO REMOVE
-
     public void CreatePreview(PathData pathData)
     {
 

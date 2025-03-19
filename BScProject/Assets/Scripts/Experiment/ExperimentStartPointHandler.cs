@@ -37,13 +37,11 @@ public class ExperimentStartPointHandler : MonoBehaviour
 
     private void HandleReadyToStart()
     {
-        Debug.Log($"HandleReadyToStart");
         ExperimentReadyToStart = true;
     }
 
     private void HandleNotReadyToStart()
     {
-        Debug.Log($"HandleNotReadyToStart");
         ExperimentReadyToStart = false;
     }
     

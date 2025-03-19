@@ -5,7 +5,6 @@ public class CharacterControllerSync : MonoBehaviour
     [SerializeField] private CharacterController _characterController;
     [SerializeField] private Transform _XRCamera;
 
-
     private void Update()
     {
         if (_characterController == null || _XRCamera == null)
