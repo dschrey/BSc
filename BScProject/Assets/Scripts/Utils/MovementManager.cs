@@ -2,7 +2,7 @@ using Omnifinity.Omnideck;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Movement;
 
-public class MovementManager : MonoBehaviour
+public class LocomotionManager : MonoBehaviour
 {
     [SerializeField] private FloorType _activeType = FloorType.Default;
 

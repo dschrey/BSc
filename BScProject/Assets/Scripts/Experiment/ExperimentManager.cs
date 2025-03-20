@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
 using UnityEngine.InputSystem;
-using System;
 
 public enum ExperimentState {Idle, Running, Assessment, Finished, Cancelled };
 
@@ -11,10 +10,10 @@ public class ExperimentManager : MonoBehaviour
 {
     public static ExperimentManager Instance { get; private set; }
     public Transform PlayerTransform;
-    public Transform _XROrigin;
-    public Transform ExperimentSpawnpoint;
+    [HideInInspector] public Transform _XROrigin;
+    [HideInInspector] public Transform ExperimentSpawnpoint;
+    [HideInInspector] public UnityEvent PathCompletion = new();
     public Timer Timer;
-    public UnityEvent PathCompletion = new();
     public ExperimentData CurrentExperiment;
     private UnityEvent<ExperimentState> _experimentStateChanged = new();
     private ExperimentState _experimentState = ExperimentState.Idle;
@@ -75,6 +74,13 @@ public class ExperimentManager : MonoBehaviour
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
 
+    private void OnDrawGizmos() 
+    {
+        if (!Application.isPlaying) return;
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireCube(transform.position, new Vector3(DataManager.Instance.Settings.MovementArea.y, 3, DataManager.Instance.Settings.MovementArea.x));
+    }
+
     private void OnExperimentStateChanged(ExperimentState newState)
     {
         switch (newState)
@@ -124,7 +130,7 @@ public class ExperimentManager : MonoBehaviour
         _currentPath = path;
         _hintCounter = 0;
 
-        return _XROrigin.GetComponentInChildren<MovementManager>().HandleFloorBasedMovement(floor);
+        return _XROrigin.GetComponentInChildren<LocomotionManager>().HandleFloorBasedMovement(floor);
     }
 
     public void StartExperiment()

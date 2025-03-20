@@ -4,8 +4,8 @@ using UnityEngine;
 [RequireComponent(typeof(SphereCollider))]
 public class MovementDetection : MonoBehaviour
 {
-    public event Action ExitedDectectionZone;
-    public event Action EnteredDectectionZone;
+    public event Action PlayerEnteredDectectionZone;
+    public event Action PlayerExitedDectectionZone;
     private SphereCollider _collider;
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------------
@@ -16,13 +16,20 @@ public class MovementDetection : MonoBehaviour
         _collider.radius = DataManager.Instance.Settings.PlayerDetectionRadius;
     }
 
+    void OnDrawGizmos()
+    {
+        if (!Application.isPlaying) return;
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(transform.position, DataManager.Instance.Settings.PlayerDetectionRadius);
+    }
+
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------------
 
     private void OnTriggerEnter(Collider collider)
     {
         if (collider.CompareTag("Player"))
         {
-            EnteredDectectionZone?.Invoke();
+            PlayerEnteredDectectionZone?.Invoke();
         }
     }
 
@@ -30,7 +37,7 @@ public class MovementDetection : MonoBehaviour
     {
         if (collider.CompareTag("Player"))
         {
-            ExitedDectectionZone?.Invoke();
+            PlayerExitedDectectionZone?.Invoke();
         }        
     }
 }

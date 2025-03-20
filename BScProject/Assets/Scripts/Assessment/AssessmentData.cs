@@ -65,7 +65,7 @@ public class PathAssessmentData
         PathID = pathData.PathID;
         FloorType = floor;
         Length = pathData.SegmentsData.Count;
-        ActualPathLayout = pathData.PathLayoutID;
+        ActualPathLayout = pathData.CorrectPathLayoutID;
 
         foreach (PathSegmentData pathSegment in pathData.SegmentsData)
         {

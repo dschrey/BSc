@@ -12,6 +12,7 @@ public class UISegmentIndicator : MonoBehaviour
 
     private bool _isActive;
     private bool _isCompleted;
+    public bool IsCompleted => _isCompleted;
 
     private void Start()
     {
@@ -23,7 +24,7 @@ public class UISegmentIndicator : MonoBehaviour
     {
         _isActive = isOn;
         _activeDot.enabled = isOn;
-        _inactiveDot.enabled = ! isOn;
+        _inactiveDot.enabled = !isOn;
 
         Color targetColor;
 

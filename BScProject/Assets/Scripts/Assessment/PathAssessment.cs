@@ -23,7 +23,7 @@ public class PathAssessment
 
     public bool EvaluateSelectedPathImage()
     {
-        return PathData.PathLayoutID == SelectedPathLayoutID;
+        return PathData.CorrectPathLayoutID == SelectedPathLayoutID;
     }
 
 }

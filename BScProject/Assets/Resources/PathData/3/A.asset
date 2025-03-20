@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65adc9aaa9d7bce49bfd2f0b5a84c077, type: 3}
   m_Name: A
   m_EditorClassIdentifier: 
-  PathID: 1
+  PathID: 0
   PathName: A
-  PathColor: {r: 0, g: 1, b: 0, a: 1}
+  PathObjects: -1
+  PathColor: {r: 1, g: 0, b: 0, a: 1}
   PathLayoutSelectionOrder: 01000000000000000200000003000000
-  PathLayoutID: 0
+  CorrectPathLayoutID: 0
   ObstaclePrefab: {fileID: 5922394165845742374, guid: ea1d049b391d98141b3d6daa64bc15e0, type: 3}
   FakePathAngles1:
   - 270

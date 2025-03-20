@@ -3,16 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public enum PathType {DEFAULT, EXTENDED}
+[Flags]
+public enum PathObjects
+{
+    None = 0,
+    Hovering = 1 << 0,
+    Landmarks = 1 << 1,
+    Obstacles = 1 << 2
+}
 
 [CreateAssetMenu(fileName = "Path", menuName = "PathData", order = 0)]
 public class PathData : ScriptableObject
 {
     public int PathID = -1;
     public string PathName;
-    public Color PathColor;
+    public PathObjects PathObjects;
+    [HideInInspector] public Color PathColor;
     public List<int> PathLayoutSelectionOrder = new();
-    [HideInInspector] public int PathLayoutID = 0;
+    [HideInInspector] public int CorrectPathLayoutID = 0;
 
     public GameObject ObstaclePrefab = null;
     [Header("Fake Paths")]
@@ -20,7 +28,6 @@ public class PathData : ScriptableObject
     public List<float> FakePathAngles2 = new();
     public List<float> FakePathAngles3 = new();
     public List<PathSegmentData> SegmentsData = new();
-
     public event Action Update;
     public PathSegmentData GetSegmentData(int id)
     {
@@ -50,10 +57,10 @@ public class PathData : ScriptableObject
             color++;
         }
 
-        #if UNITY_EDITOR
-        if (!Application.isPlaying) return;
-            Update.Invoke();
-        #endif
+        // #if UNITY_EDITOR
+        // if (!Application.isPlaying) return;
+        //     Update.Invoke();
+        // #endif
     }
 
     private void OnEnable()

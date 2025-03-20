@@ -80,7 +80,6 @@ public class UIExperimentInfo : MonoBehaviour
 
         ExperimentManager.Instance.StartAssessment();
         _buttonAssessmentControl.interactable = false;
-        //AssessmentManager.Instance.GoToPreviousAssessmentStep();
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------

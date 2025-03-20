@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &3634804443328228023
+--- !u!1 &6098852167622832500
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,8 +8,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7553563997605949571}
-  - component: {fileID: 5217472626654148253}
+  - component: {fileID: 1639351202405942260}
+  - component: {fileID: 7973017165192796271}
+  - component: {fileID: 8689274664302458369}
   m_Layer: 0
   m_Name: ExperimentManager
   m_TagString: Untagged
@@ -17,37 +18,53 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7553563997605949571
+--- !u!4 &1639351202405942260
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3634804443328228023}
+  m_GameObject: {fileID: 6098852167622832500}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.8821654, y: -2.0687487, z: -28.424377}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5217472626654148253
+--- !u!114 &7973017165192796271
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3634804443328228023}
+  m_GameObject: {fileID: 6098852167622832500}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2f19650fa65c1f84bbdc8b847c5f86a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ExperimentSettings: {fileID: 11400000, guid: b2ee6dfa72c32e44caaba6f93789c8a9, type: 2}
-  Paths: []
+  PlayerTransform: {fileID: 0}
   _XROrigin: {fileID: 0}
-  _evaluationRoomSpawnPoint: {fileID: 0}
+  ExperimentSpawnpoint: {fileID: 0}
   PathCompletion:
     m_PersistentCalls:
       m_Calls: []
+  Timer: {fileID: 8689274664302458369}
+  CurrentExperiment:
+    id: -1
+  _confirmAction: {fileID: 7038942526975679363, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+  _debugAction: {fileID: 3603829134995453537, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+--- !u!114 &8689274664302458369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6098852167622832500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3afe0d53ce882d240a8cf42e48c84fad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

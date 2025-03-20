@@ -49,8 +49,7 @@ public class Path : MonoBehaviour
             Vector3 segmentSpawnpoint = lastSegmentPosition + relativePosition;
 
             PathSegment segment = Instantiate(_pathSegmentPrefab, segmentSpawnpoint, Quaternion.identity, transform).GetComponent<PathSegment>();
-            segment.Initialize(pathSegmentData, pathData.ObstaclePrefab);
-            segment.SpawnSegmentObjects();
+            segment.Initialize(pathSegmentData, pathData.ObstaclePrefab, pathData.PathObjects);
             Segments.Add(segment);
             lastSegmentPosition = segmentSpawnpoint;
 

@@ -1,35 +1,59 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
-public class PathSegment : MonoBehaviour 
+[RequireComponent(typeof(AudioSource))]
+public class PathSegment : MonoBehaviour
 {
     public PathSegmentData PathSegmentData;
     public event Action SegmentCompleted;
-    public Objective Objective;
+    private MovementDetection _playerMovementDetection;
+    private Coroutine _collectionCoroutine;
+    private bool _objectiveCaptured = false;
+
+    [Header("Objects")]
+    [SerializeField] private Transform _objectiveObjectSpawnpoint;
     public GameObject LandmarkObject;
     public GameObject SegmentObstacle;
-    private MovementDetection _movementDetection;
     private GameObject _obstaclePrefab = null;
-    
+
+    [Header("Particles")]
+    public GameObject ObjectiveObject;
+    public GameObject CapturedParticles;
+    public GameObject HintParticles;
+    public GameObject LockedParticles;
+
+    [Header("Audio")]
+    private AudioSource _audioSource;
+    [SerializeField] private AudioClip Hint;
+    [SerializeField] private AudioClip Captured;
+
+
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------------
 
-    private void OnEnable() 
-    {        
-        _movementDetection = GetComponent<MovementDetection>();
-        if (_movementDetection == null)
+    private void OnEnable()
+    {
+        _audioSource = GetComponent<AudioSource>();
+        _playerMovementDetection = GetComponent<MovementDetection>();
+        if (_playerMovementDetection == null)
         {
             Debug.LogError($"Could not find objective for {this} path segment.");
             return;
         }
-        _movementDetection.ExitedDectectionZone += OnExitedDectectionZone;
-        Objective = GetComponentInChildren<Objective>();
-        if (Objective == null)
-        {
-            Debug.LogError($"Could not find objective for {this} path segment.");
-            return;
-        }
-        Objective.ObjectiveCaptured += OnObjectiveCaptured;
+        _playerMovementDetection.PlayerEnteredDectectionZone += OnPlayerEnterObjective;
+        _playerMovementDetection.PlayerExitedDectectionZone += OnPlayerExitObjective;
+    }
 
+    void OnDrawGizmos()
+    {
+        Gizmos.color = PathSegmentData.SegmentColor;
+        Gizmos.DrawWireSphere(transform.position, DataManager.Instance.Settings.PlayerDetectionRadius);
+    }
+
+    void OnDisable()
+    {
+        _playerMovementDetection.PlayerEnteredDectectionZone -= OnPlayerEnterObjective;
+        _playerMovementDetection.PlayerExitedDectectionZone -= OnPlayerExitObjective;
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------------
@@ -42,41 +66,112 @@ public class PathSegment : MonoBehaviour
             SegmentObstacle.SetActive(false);
         SegmentCompleted?.Invoke();
     }
-    
-    private void OnExitedDectectionZone()
+
+    private void OnPlayerEnterObjective()
     {
-        _movementDetection.enabled = false;
-        SetObjectiveInvisible();
+        if (_objectiveCaptured)
+        {
+            return;
+        }
+        StartCapturingObjective();
+    }
+
+    private void OnPlayerExitObjective()
+    {
+        if (_objectiveCaptured)
+        {
+            return;
+        }
+        StopCapturingObjective();
     }
 
     // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------------
 
-    public void Initialize(PathSegmentData pathSegmentData, GameObject obstaclePrefab)
+    public void Initialize(PathSegmentData pathSegmentData, GameObject obstaclePrefab, PathObjects pathObjects)
     {
         PathSegmentData = pathSegmentData;
         _obstaclePrefab = obstaclePrefab;
+        SpawnSegmentObjects(pathObjects);
+    }
+
+    private void StartCapturingObjective()
+    {
+        if (_collectionCoroutine != null)
+        {
+            return;
+        }
+        _collectionCoroutine = StartCoroutine(CaptureObjective());
+    }
+
+    private void StopCapturingObjective()
+    {
+        if (_collectionCoroutine != null)
+        {
+            StopCoroutine(_collectionCoroutine);
+            _collectionCoroutine = null;
+        }
+    }
+
+    private IEnumerator CaptureObjective()
+    {
+        yield return new WaitForSeconds(DataManager.Instance.Settings.ObjectiveRevealTime);
+        SetObjectiveCaptured();
+    }
+
+    private void SetObjectiveCaptured()
+    {
+        Debug.Log($"Captured Segment {PathSegmentData.SegmentID}!");
+        _objectiveCaptured = true;
+        LockedParticles.SetActive(false);
+        CapturedParticles.SetActive(true);
+        PlayAudio(Captured);
+        OnObjectiveCaptured();
     }
 
     public void SetObjectiveInvisible()
     {
-        Objective.HideObjective();
+        LockedParticles.SetActive(false);
+        if (ObjectiveObject != null)
+            ObjectiveObject.SetActive(false);
     }
 
     public void ShowSegmentObjective()
     {
-        Objective.ShowObjective();
+        LockedParticles.SetActive(true);
+        if (ObjectiveObject != null)
+            ObjectiveObject.SetActive(true); ;
     }
 
     public void PlaySegmentObjectiveHint()
     {
-        Objective.ShowObjectiveHint();
+        StartCoroutine(CoroutineObjectiveHint());
     }
 
-    public void SpawnSegmentObjects()
+    private IEnumerator CoroutineObjectiveHint()
     {
-        SpawnHoverObject();
-        SpawnLandmarkObject();
-        SpawnSegmentObstacle();
+        HintParticles.SetActive(true);
+        PlayAudio(Hint);
+        yield return new WaitForSeconds(2f);
+        HintParticles.SetActive(false);
+    }
+
+    private void SpawnSegmentObjects(PathObjects pathObjects)
+    {
+        if ((pathObjects & PathObjects.Hovering) != 0)
+        {
+            SpawnHoverObject();
+        }
+
+        if ((pathObjects & PathObjects.Landmarks) != 0)
+        {
+            SpawnLandmarkObject();
+        }
+
+        if ((pathObjects & PathObjects.Obstacles) != 0)
+        {
+            SpawnSegmentObstacle();
+        }
+
     }
 
     private void SpawnHoverObject()
@@ -87,20 +182,20 @@ public class PathSegment : MonoBehaviour
             Debug.LogWarning($"Objective object found.");
             return;
         }
-        Objective.SpawnObject(prefab);
+        ObjectiveObject = Instantiate(prefab, _objectiveObjectSpawnpoint);
     }
 
-    private  void SpawnLandmarkObject()
+    private void SpawnLandmarkObject()
     {
 
         float angleInRadians = PathSegmentData.AngleToLandmark * Mathf.Deg2Rad;
-        Vector3 relativePosition = new (
+        Vector3 relativePosition = new(
             PathSegmentData.LandmarkObjectDistanceToObjective * Mathf.Cos(angleInRadians),
             0,
             PathSegmentData.LandmarkObjectDistanceToObjective * Mathf.Sin(angleInRadians)
         );
         Vector3 objectSpawnpoint = transform.position + relativePosition;
-        
+
         GameObject prefab = ResourceManager.Instance.GetLandmarkObject(PathSegmentData.LandmarkObjectID);
         if (prefab == null)
         {
@@ -125,5 +220,17 @@ public class PathSegment : MonoBehaviour
         SegmentObstacle.transform.SetPositionAndRotation(objectSpawnpoint, PathSegmentData.ObstacleRotation);
         SegmentObstacle.transform.localScale = PathSegmentData.Scale;
     }
+
+    private void PlayAudio(AudioClip clip)
+    {
+        if (_audioSource == null)
+        {
+            Debug.LogError($"Audio source for segment {PathSegmentData.SegmentID} was not found.");
+            return;
+        }
+        _audioSource.PlayOneShot(clip);
+    }
+
+    public void PlayHintAudio() => PlayAudio(Hint);
 
 }

@@ -338,9 +338,6 @@ public class UIHoverObjectSelection : MonoBehaviour
         if (hoverSelection.SelectedObjectID == -1) return;
 
         Debug.Log($"Hover: Segment {_selectedHoverSegmentID} -  Object - {hoverSelection.SelectedObjectID}");
-
-        // SegmentObjectData segmentHoverObjectData = _pathPreviewCreator.SpawnedSegments.Find(s => s.SegmentID == _selectedHoverSegmentID);
-        // segmentHoverObjectData.AssignedHoverObjectID = hoverSelection.SelectedObjectID;
         AssessmentManager.Instance.AssignSegmentHoverObject(_selectedHoverSegmentID, hoverSelection.SelectedObjectID);
 
         ObjectPlacementSocket hoverSocket = hoverSelection.Socket;

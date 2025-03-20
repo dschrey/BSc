@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -38,12 +37,19 @@ public class PathManager : MonoBehaviour
             Debug.LogError($"Could not find experiment Spawnpoint movement detection.");
             return;
         }
-        _experimentSpawnMovementDetection.ExitedDectectionZone += OnExitedDectectionZoneSpawn;
+
+        _experimentSpawnMovementDetection.PlayerExitedDectectionZone += OnExitedDectectionZoneSpawn;
 
         CurrentSegment = null;
         LastSegment = null;
         _unlockedSegments = 0;
         _pathCompleted = false;
+    }
+
+    void OnDestroy()
+    {
+        if (_experimentSpawnMovementDetection == null)
+            _experimentSpawnMovementDetection.PlayerExitedDectectionZone -= OnExitedDectectionZoneSpawn;
     }
 
     // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
@@ -57,8 +63,10 @@ public class PathManager : MonoBehaviour
         _unlockedSegments++;
         if (_unlockedSegments == CurrentPath.Segments.Count)
         {
-            ExperimentManager.Instance.PathCompletion?.Invoke();
             _pathCompleted = true;
+            // PrepareBacktracking
+
+            ExperimentManager.Instance.PathCompletion?.Invoke();
             return;
         }
         RevealNextPathSegment();
@@ -96,9 +104,9 @@ public class PathManager : MonoBehaviour
         {
             CurrentSegment.SegmentCompleted -= OnSegmentCompleted;
             if (LastSegment != null)
-                LastSegment.GetComponent<MovementDetection>().ExitedDectectionZone -= OnExitedDectectionZoneSpawn;
+                LastSegment.GetComponent<MovementDetection>().PlayerExitedDectectionZone -= OnExitedDectectionZoneSpawn;
             LastSegment = CurrentSegment;
-            LastSegment.GetComponent<MovementDetection>().ExitedDectectionZone += OnExitedDectectionZoneSpawn;
+            LastSegment.GetComponent<MovementDetection>().PlayerExitedDectectionZone += OnExitedDectectionZoneSpawn;
         }
         CurrentSegment = CurrentPath.Segments[_unlockedSegments];
         CurrentSegment.SegmentCompleted += OnSegmentCompleted;
@@ -142,7 +150,7 @@ public class PathManager : MonoBehaviour
             return false;
         }
 
-        CurrentSegment.Objective.PlayHindAudio();
+        CurrentSegment.PlayHintAudio();
         _guidanceCoroutine = StartCoroutine(ShowGuidance(player, target));
         return true;
     }

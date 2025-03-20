@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
+[Obsolete]
 [RequireComponent(typeof(AudioSource))]
 public class Objective : MonoBehaviour
 {
@@ -15,8 +16,8 @@ public class Objective : MonoBehaviour
     private Coroutine _collectionCoroutine;
     [SerializeField] private Transform _objectiveObjectSpawnpoint;
     private AudioSource _audioSource;
-    private SphereCollider _collider;
     private bool _objectiveCaptured = false;
+    // private MovementDetection _playerMovementDetection;
 
 
     // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------------
@@ -24,71 +25,22 @@ public class Objective : MonoBehaviour
     private void OnEnable()
     {
         _audioSource = GetComponent<AudioSource>();
-        _collider = GetComponent<SphereCollider>();
-        _collider.radius = DataManager.Instance.Settings.PlayerDetectionRadius;
-        Vector3 markScale = new(DataManager.Instance.Settings.PlayerDetectionRadius * 2, _collider.transform.localScale.y,
-            DataManager.Instance.Settings.PlayerDetectionRadius * 2);
-        _collider.transform.localScale = markScale;
+        // _playerMovementDetection = gameObject.AddComponent<MovementDetection>();
+        // _playerMovementDetection.PlayerEnteredDectectionZone += OnPlayerEnterObjective;
+        // _playerMovementDetection.PlayerExitedDectectionZone += OnPlayerExitObjective;
 
     }
 
-    void OnDrawGizmos()
+    void OnDisable()
     {
-        Gizmos.color = Color.magenta;
-        Gizmos.DrawWireSphere(transform.position, DataManager.Instance.Settings.PlayerDetectionRadius);
+        // _playerMovementDetection.PlayerEnteredDectectionZone -= OnPlayerEnterObjective;
+        // _playerMovementDetection.PlayerExitedDectectionZone -= OnPlayerExitObjective;
     }
 
-    // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------------
-
-    private void OnTriggerEnter(Collider collider)
-    {
-        if (_objectiveCaptured)
-        {
-            return;
-        }
-
-        if (collider.CompareTag("Player"))
-        {
-            StartCollectingObjective();
-        }
-    }
-
-    private void OnTriggerExit(Collider collider)
-    {
-        if (_objectiveCaptured)
-        {
-            return;
-        }
-
-        if (collider.CompareTag("Player"))
-        {
-            StopCapturingObjective();
-        }
-    }
+    // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------------ 
 
     // ---------- Start Methods ------------------------------------------------------------------------------------------------------------------------------
 
-    private void StartCollectingObjective()
-    {
-        if (_collectionCoroutine != null)
-        {
-            return;
-        }
-
-        Debug.Log($"Objective.cs :: StartCollectingItem() : Started collecting {this}");
-
-        _collectionCoroutine = StartCoroutine(CaptureObjective());
-    }
-
-    private void StopCapturingObjective()
-    {
-        if (_collectionCoroutine != null)
-        {
-            Debug.Log($"Objective.cs :: StopCollectingItem() : Stopped collecting {this}");
-            StopCoroutine(_collectionCoroutine);
-            _collectionCoroutine = null;
-        }
-    }
 
     private IEnumerator CaptureObjective()
     {
