@@ -9,7 +9,7 @@ public class PathSegmentData
     [Tooltip("Angle to segment")]
     public float AngleFromPreviousSegment = 0f;
     [Tooltip("Distance to segment")]
-    public float DistanceFromPreviousSegment = 0f;
+    public float DistanceToPreviousSegment = 0f;
 
     [Header("Objective Object")]
     [Tooltip("Object that should hover on top of the objective")]
@@ -23,10 +23,8 @@ public class PathSegmentData
     public Vector3 RelativeLandmarkPositionToObjective;
     [Tooltip("Angle from the objective to the landmark")]
     public float AngleToLandmark = 0f;
-    public float LandmarkObjectDistanceToObjective = 0;
+    public float LandmarkDistanceToSegment = 0;
     [Header("Segment Obstacle")]
-    [Tooltip("Whether the obstacle is shown in the segment")]
-    public bool ShowObstacle = true;
     [Tooltip("Position of the obstacle object relative the the objective")]
     public Vector3 RelativeObstaclePositionToObjective;
     [Tooltip("Rotation of the obstacle object")]

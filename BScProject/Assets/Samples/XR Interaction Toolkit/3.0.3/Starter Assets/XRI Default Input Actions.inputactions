@@ -2796,6 +2796,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Confirm1",
+                    "type": "Button",
+                    "id": "f5f99346-660f-4f3b-a896-3d69ef1617fa",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Debug",
                     "type": "Button",
                     "id": "827ce4d6-9f27-4bd7-844b-574382f098b2",
@@ -2836,6 +2845,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Confirm",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9decdd38-90ff-4050-8aab-f19f732a8b82",
+                    "path": "<Keyboard>/x",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Confirm1",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

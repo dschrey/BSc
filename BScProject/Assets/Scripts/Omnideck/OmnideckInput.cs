@@ -43,8 +43,12 @@ public class OmnideckInput : MonoBehaviour
         if (m_omnideckInput == null || m_omnideckInterface == null) return;
 
         Vector3 movementVector = m_omnideckInterface.GetCurrentOmnideckCharacterMovementVector();
-        var state = new OmnideckInputState { movement = new (movementVector.x, movementVector.z) };
-        InputSystem.QueueStateEvent(m_omnideckInput, state);
+        Vector2 movement = new(movementVector.x, movementVector.z);
+        if (!float.IsNaN(movement.x) && !float.IsNaN(movement.y))
+        {
+            var state = new OmnideckInputState { movement = movement };
+            InputSystem.QueueStateEvent(m_omnideckInput, state);
+        }
     }
 
     void OnDestroy()

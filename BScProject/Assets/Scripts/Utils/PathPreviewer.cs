@@ -119,9 +119,9 @@ public class PathPreviewer : MonoBehaviour
             direction = segment.transform.position - previousSegment.transform.position;
         }
         PathSegmentData pathSegmentData = pathData.GetSegmentData(segmentID);
-        pathSegmentData.DistanceFromPreviousSegment = distance;
+        pathSegmentData.DistanceToPreviousSegment = distance;
         
-        float angle = Mathf.Atan2(direction.z, direction.x) * Mathf.Rad2Deg;
+        float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
         if (angle < 0) angle += 360;
         pathSegmentData.AngleFromPreviousSegment = angle;
     }

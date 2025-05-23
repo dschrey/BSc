@@ -15,7 +15,8 @@ public class Trail
 public class ParticipantData
 {
     public int id = -1;
-    public Trail[] paths;
+    public List<string> pathSetOrder = new();
+    public List<string> locomotionOrder = new();
 }
 
 [Serializable]
@@ -45,9 +46,9 @@ public class ExperimentData
 
             return trail;
         }
-
         return null;
     }
+    
     public PathData GetPathData(string trailName)
     {
         foreach (var path in paths)
@@ -57,9 +58,7 @@ public class ExperimentData
 
             return path.Value;
         }
-
         return null;
     }
-
-    
+ 
 }

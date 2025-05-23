@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1639351202405942260}
   - component: {fileID: 7973017165192796271}
-  - component: {fileID: 8689274664302458369}
   m_Layer: 0
   m_Name: ExperimentManager
   m_TagString: Untagged
@@ -51,20 +50,5 @@ MonoBehaviour:
   PathCompletion:
     m_PersistentCalls:
       m_Calls: []
-  Timer: {fileID: 8689274664302458369}
-  CurrentExperiment:
-    id: -1
   _confirmAction: {fileID: 7038942526975679363, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   _debugAction: {fileID: 3603829134995453537, guid: c348712bda248c246b8c49b3db54643f, type: 3}
---- !u!114 &8689274664302458369
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6098852167622832500}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3afe0d53ce882d240a8cf42e48c84fad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

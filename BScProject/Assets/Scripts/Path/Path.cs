@@ -42,9 +42,9 @@ public class Path : MonoBehaviour
         {
             float angleInRadians = pathSegmentData.AngleFromPreviousSegment * Mathf.Deg2Rad;
             Vector3 relativePosition = new (
-                pathSegmentData.DistanceFromPreviousSegment * Mathf.Cos(angleInRadians),
+                pathSegmentData.DistanceToPreviousSegment * Mathf.Sin(angleInRadians),
                 0,
-                pathSegmentData.DistanceFromPreviousSegment * Mathf.Sin(angleInRadians)
+                pathSegmentData.DistanceToPreviousSegment * Mathf.Cos(angleInRadians)
             );
             Vector3 segmentSpawnpoint = lastSegmentPosition + relativePosition;
 
@@ -53,7 +53,11 @@ public class Path : MonoBehaviour
             Segments.Add(segment);
             lastSegmentPosition = segmentSpawnpoint;
 
-            segment.gameObject.SetActive(false);
+            if (pathData.PathDifficulty == PathDifficulty.Hard)
+            {
+                segment.SetParticleVisuals(1, false);
+                segment.SetObjectsVisuals(1, false);
+            }
         }
     }
 

@@ -15,7 +15,7 @@ public class UIPathSelectionHandler : MonoBehaviour
         _confirmButton.interactable = false;
 
         List<int> pathLayoutIDs = new();
-        pathLayoutIDs.AddRange(AssessmentManager.Instance.CurrentPath.PathLayoutSelectionOrder);
+        pathLayoutIDs.AddRange(AssessmentManager.Instance.CurrentPath.PathLayoutDisplayOrder);
         for (int i = 0; i < pathLayoutIDs.Count; i++)
         {
             _pathOptions[i].Initialize(pathLayoutIDs[i], PathLayoutManager.Instance.GetPathLayout(pathLayoutIDs[i]).LayoutRenderTexture);

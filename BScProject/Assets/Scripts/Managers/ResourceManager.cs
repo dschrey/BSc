@@ -1,15 +1,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class ResourceManager : MonoBehaviour
 {
+    #region Variables
     public static ResourceManager Instance { get; private set; }
     public List<RenderObject> HoverObjects = new();
     public List<RenderObject> LandmarkObjects = new();
-    public List<PathData> LoadedPaths = new();
-    public List<ParticipantData> ExperimentData = new();
+    public List<PathData> Paths = new();
+    public List<PathSet> PathSets = new();
+    public List<ParticipantData> ParticipantsData = new();
 
-    private List<Color> _colors= new ()
+    private List<Color> _colors = new()
     {
         Color.red,
         Color.green,
@@ -23,7 +26,8 @@ public class ResourceManager : MonoBehaviour
         Color.white
     };
 
-    // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
+    #endregion
+    #region Unity Methods
 
     private void Awake()
     {
@@ -38,25 +42,6 @@ public class ResourceManager : MonoBehaviour
         }
     }
 
-    private void OnDestroy()
-    {
-        HoverObjects.ForEach(x =>
-        {
-            if (x.RenderTexture != null)
-            {
-                x.RenderTexture.Release();
-            }
-        });
-
-        LandmarkObjects.ForEach(x =>
-        {
-            if (x.RenderTexture != null)
-            {
-                x.RenderTexture.Release();
-            }
-        });
-    }
-
 
     private void Start()
     {
@@ -64,14 +49,16 @@ public class ResourceManager : MonoBehaviour
         LoadObjectiveObjects();
         LoadLandmarkObjects();
         LoadPaths();
+        LoadSets();
     }
 
-    // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
+    #endregion
+    #region  Class Methods
 
     private void LoadParticipantSequences()
     {
-        ExperimentData.AddRange(LoadParticipantData("ParticipantData"));
-        Debug.Log($"Loaded {ExperimentData.Count} sequences.");
+        ParticipantsData.AddRange(LoadParticipantSchedule("ParticipantSchedule"));
+        Debug.Log($"Loaded {ParticipantsData.Count} participants.");
     }
 
     private void LoadObjectiveObjects()
@@ -99,8 +86,14 @@ public class ResourceManager : MonoBehaviour
             color++;
             count++;
         }
-        LoadedPaths.AddRange(paths);
-        Debug.Log($"Loaded {LoadedPaths.Count} path data.");
+        Paths.AddRange(paths);
+        Debug.Log($"Loaded {Paths.Count} path data.");
+    }
+
+    private void LoadSets()
+    {
+        PathSets.AddRange(Resources.LoadAll<PathSet>("PathData"));
+        Debug.Log($"Loaded {PathSets.Count} path sets.");
     }
 
     private List<RenderObject> LoadRenderObjects(string jsonFileName)
@@ -119,19 +112,6 @@ public class ResourceManager : MonoBehaviour
         }
 
         return renderObjects;
-    }
-
-    public void InitializeRenderObjects()
-    {
-        ObjectRenderManager objectRenderManager = FindObjectOfType<ObjectRenderManager>();
-        if (objectRenderManager == null)
-        {
-            Debug.LogError("Could not find ObjectRenderManager.");
-            return;
-        }
-
-        LandmarkObjects.ForEach(r => r.RenderTexture = objectRenderManager.CreateNewObjectRender(r.gameObject));
-        HoverObjects.ForEach(r => r.RenderTexture = objectRenderManager.CreateNewObjectRender(r.gameObject));
     }
 
     public void FreeRenderTextures()
@@ -203,7 +183,7 @@ public class ResourceManager : MonoBehaviour
     /// </summary>
     /// <param name="jsonFileName">Name of the JSON file without extension, e.g. "Participants"</param>
     /// <returns>List of ExperimentData with the settings loaded from JSON.</returns>
-    private List<ParticipantData> LoadParticipantData(string jsonFileName)
+    private List<ParticipantData> LoadParticipantSchedule(string jsonFileName)
     {
         TextAsset jsonTextAsset = Resources.Load<TextAsset>(jsonFileName);
         if (jsonTextAsset == null)
@@ -211,41 +191,29 @@ public class ResourceManager : MonoBehaviour
             Debug.LogError("Could not find " + jsonFileName + " in the Resources folder.");
             return null;
         }
-
         ParticipantDataWrapper wrapper = JsonUtility.FromJson<ParticipantDataWrapper>(jsonTextAsset.text);
         if (wrapper == null || wrapper.participants == null)
         {
             Debug.LogError("Failed to parse participants from JSON.");
             return null;
         }
-
-        foreach (ParticipantData experimentData in wrapper.participants)
-        {
-            if (experimentData.paths != null)
-            {
-                foreach (Trail trail in experimentData.paths)
-                {
-                    string floor = trail.floor == 0 ? "Reg" : "Omni";
-                    trail.selectionName = $"{experimentData.id}_{trail.name}_{floor}";
-                }
-            }
-            else
-            {
-                Debug.LogWarning("No trials found in the experiment data.");
-            }
-        }
         return wrapper.participants;
     }
 
-    public ParticipantData GetExperimentData(int ID)
+    public ParticipantData GetParticipantData(int participantNumber)
     {
-        return ExperimentData.Find(d => d.id == ID); ;
+        return ParticipantsData.Find(d => d.id == participantNumber); ;
     }
 
-    public PathData LoadPathData(string pathName)
+    public PathData GetPathData(string pathName)
     {
-        return LoadedPaths.Find(p => p.PathName == pathName);
+        return Paths.Find(p => p.PathName == pathName);
     }
 
+    public PathSet GetPathSet(string setName)
+    {
+        return PathSets.Find(set => set.SetName == setName);
+    }
 
+    #endregion
 }

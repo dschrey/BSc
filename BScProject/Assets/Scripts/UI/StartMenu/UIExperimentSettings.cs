@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class UIExperimentSettings : MonoBehaviour
 {
-    [SerializeField] private Settings _settings;
+    [SerializeField] private StudySettings _settings;
 
     [SerializeField] private Slider _sliderPlayerDetectionRadius;
     [SerializeField] private Slider _sliderDefaultSegmentLength;

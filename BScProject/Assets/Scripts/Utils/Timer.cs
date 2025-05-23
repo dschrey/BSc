@@ -1,12 +1,12 @@
 using System;
 using UnityEngine;
 
-public class Timer : MonoBehaviour
+public class Timer
 {
-    private float _startTime;
-    private float _endTime;
-    private bool _isActive;
-    
+    private float _startTime = 0.0f;
+    private float _endTime = 0.0f;
+    private bool _isActive = false;
+
     public void StartTimer()
     {
         if (!_isActive)
@@ -19,28 +19,29 @@ public class Timer : MonoBehaviour
             Debug.LogWarning($"Timer is already running.");
         }
     }
+    public void RestartTimer()
+    {
+        _isActive = true;
+        _startTime = Time.time;
+    }
     
-    public void Stop()
+    public void StopTimer()
     {
         if (_isActive)
         {
             _endTime = Time.time;
             _isActive = false;
         }
-        else
-        {
-            Debug.LogWarning("Timer has not been started yet.");
-        }
     }
 
-    public void Reset()
+    public void ResetTimer()
     {
         _isActive = false;
         _startTime = 0f;
         _endTime = 0f;
     }
 
-    public string GetElapsedTimeFormated()
+    public string GetTimeFormated()
     {
         float time;
         if (_isActive)
@@ -64,7 +65,7 @@ public class Timer : MonoBehaviour
             return  $"{minutes:D2}:{remainingSec:D2}";
     }
 
-    public float GetElapsedTime()
+    public float GetTime()
     {
         if (_isActive)
         {

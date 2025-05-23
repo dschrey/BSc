@@ -12,17 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 100f3ec79643803448528201b5ad4fc9, type: 3}
   m_Name: Settings
   m_EditorClassIdentifier: 
-  MovementArea: {x: 10, y: 6}
+  MovementArea: {x: 6, y: 10}
   PlayerDetectionRadius: 0.5
   DefaultPlayerDetectionRadius: 0.35
   ObjectiveRevealTime: 0.1
   DefaultObjectiveRevealTime: 1.5
+  PathGuidanceCooldown: 5
+  DefaultPathGuidanceCooldown: 5
   SegmentLength: 2
   DefaultSegmentLength: 2
   MovementSpeedStepSize: 0.25
   MovementSpeedMultiplier: 1
   MinMovementSpeedMultiplier: 0.25
   MaxMovementSpeedMultiplier: 3
-  CompletedExperiments: 999
+  CompletedExperiments: 222
   TransitionDuration: 0.5
   DefaultTransitionDuration: 0.75

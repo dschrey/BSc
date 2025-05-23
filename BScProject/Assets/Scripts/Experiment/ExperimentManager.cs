@@ -2,21 +2,25 @@ using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
-using UnityEngine.InputSystem;
+using System;
 
-public enum ExperimentState {Idle, Running, Assessment, Finished, Cancelled };
+public enum ExperimentState {Idle, Running, Assessment, Finished };
 
 public class ExperimentManager : MonoBehaviour
 {
+    # region Variables
+
     public static ExperimentManager Instance { get; private set; }
     public Transform PlayerTransform;
     [HideInInspector] public Transform _XROrigin;
     [HideInInspector] public Transform ExperimentSpawnpoint;
-    [HideInInspector] public UnityEvent PathCompletion = new();
-    public Timer Timer;
-    public ExperimentData CurrentExperiment;
+    [HideInInspector] 
+    public UnityEvent PathCompletion = new();
+    [SerializeField] private GameObject _pathEnvironment;
+    [SerializeField] private GameObject _assessmentEnvironment;
+    [SerializeField] private ReturnToCenterHandler returnToCenterHandler;
     private UnityEvent<ExperimentState> _experimentStateChanged = new();
-    private ExperimentState _experimentState = ExperimentState.Idle;
+    private ExperimentState _experimentState;
     public ExperimentState ExperimentState
     {
         get => _experimentState;
@@ -30,13 +34,8 @@ public class ExperimentManager : MonoBehaviour
     private Transform _assessmentSpawnPoint;
     private PathData _currentPath;
 
-    [SerializeField] private InputActionReference _confirmAction;
-    private int _hintCounter;
-
-    [Header("Debug"), SerializeField]
-    private InputActionReference _debugAction;
-
-    // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
+    #endregion
+    #region Unity Methods
 
     private void Awake()
     {
@@ -58,23 +57,16 @@ public class ExperimentManager : MonoBehaviour
         _experimentState = ExperimentState.Idle;
     }
 
-    private void Update()
+    void OnDestroy()
     {
-        if (_debugAction != null && _debugAction.action.WasPressedThisFrame())
-        {
-            OnPathCompletion();
-            StartAssessment();
-        }
-
-        if (_confirmAction != null && _confirmAction.action.WasPressedThisFrame())
-        {
-            CheckPlayerPosition();
-        }
+        PathCompletion.RemoveListener(OnPathCompletion);
+        _experimentStateChanged.RemoveListener(OnExperimentStateChanged);
     }
 
-    // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
+    #endregion
+    # region Listener Methods
 
-    private void OnDrawGizmos() 
+    private void OnDrawGizmos()
     {
         if (!Application.isPlaying) return;
         Gizmos.color = Color.yellow;
@@ -91,24 +83,43 @@ public class ExperimentManager : MonoBehaviour
                 break;
             case ExperimentState.Assessment:
                 FindObjectOfType<UIExperimentInfo>().ToggleAssessmentControl();
+                // if (!returnToCenterHandler.InCenter)
+                // {
+                returnToCenterHandler.PromptReturnToCenter();
+                returnToCenterHandler.PlayerInCenter.AddListener(OnPlayerReturnedToCenter);
+                // }
+                // else
+                // {
+                    // _pathEnvironment.SetActive(false);
+                    // _assessmentEnvironment.SetActive(true);
+                //     StartAssessment();
+                // }
                 break;
             case ExperimentState.Finished:
-                _experimentState = ExperimentState.Idle;
-                SceneManager.Instance.LoadStartScene(ExperimentState);
+                // if (!returnToCenterHandler.InCenter)
+                // {
+                returnToCenterHandler.PromptReturnToCenter();
+                returnToCenterHandler.PlayerInCenter.AddListener(OnPlayerReturnedToCenter);
+                // }
+                // else
+                // {
+                //     StudyManager.Instance.TrialTimer.StopTimer();
+                //     StudyManager.Instance.CompleteTrial();
+                // }
                 break;
         }
     }
 
     private void OnPathCompletion()
     {
-        Timer.Stop();
+        BacktrackingCompleted();
         ExperimentState = ExperimentState.Assessment;
     }
 
+    #endregion
+    #region Class Methods
 
-    // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
-
-    public bool SetupExperiment(ExperimentData experiment, PathData path, FloorType floor)
+    public bool SetupExperiment(PathData path)
     {
         SpawnPoint[] spawnpoints = FindObjectsOfType<SpawnPoint>();
         foreach (SpawnPoint spawnPoint in spawnpoints)
@@ -126,12 +137,11 @@ public class ExperimentManager : MonoBehaviour
         FindOrigin();
         if (_XROrigin == null) return false;
 
-        CurrentExperiment = experiment;
         _currentPath = path;
-        _hintCounter = 0;
 
-        return _XROrigin.GetComponentInChildren<LocomotionManager>().HandleFloorBasedMovement(floor);
+        return _XROrigin.GetComponentInChildren<LocomotionManager>().SetLocomotionMethod();
     }
+
 
     public void StartExperiment()
     {
@@ -140,28 +150,29 @@ public class ExperimentManager : MonoBehaviour
             return;
         }
 
+        DataManager.Instance.SetTrackedObject(PlayerTransform);
         PathManager.Instance.StartNewPath(_currentPath, ExperimentSpawnpoint);
         ExperimentState = ExperimentState.Running;
+        AudioManager.Instance.ToggleBackgroundLoop();
+        // AudioManager.Instance.PlayAudio(SoundType.InstructionUnlockSegmentEasy);
+        // if (_currentPath.PathDifficulty == PathDifficulty.Hard)
+        // {
+        //     AudioManager.Instance.PlayAudio(SoundType.InstructionUnlockSegmentHard);
+        // }
     }
 
     public void StartAssessment()
     {
-        Debug.Log($"Starting assessment for path ID: {_currentPath.PathID}");
-        AssessmentManager.Instance.StartAssessment(_hintCounter);
-        MoveXROrigin(_assessmentSpawnPoint);
+        AssessmentManager.Instance.StartAssessment();
+        // MoveXROrigin(_assessmentSpawnPoint);
     }
 
     public void StopExperiment()
     {
-        Timer.Reset();
+        StudyManager.Instance.TrialTimer.ResetTimer();
         AssessmentManager.Instance.ResetAssessment();
-        SceneManager.Instance.LoadStartScene(ExperimentState.Cancelled);
+        StudyManager.Instance.LoadStartScene();
         ExperimentState = ExperimentState.Idle;
-    }
-
-    public void PathAssessmentCompleted()
-    {
-        ExperimentState = ExperimentState.Finished;
     }
 
     public void MoveXROrigin(Transform destination)
@@ -200,14 +211,54 @@ public class ExperimentManager : MonoBehaviour
 
         m_TeleportationProvider.QueueTeleportRequest(request);
     }
-    
-    private void CheckPlayerPosition()
+
+    private void BacktrackingCompleted()
     {
-        if (PathManager.Instance.VerifyPlayerPosition(PlayerTransform))
+        Vector3 originPosition = ExperimentSpawnpoint.position;
+        originPosition.y = 0;
+        Vector3 selectedBacktrackingPosition = PlayerTransform.position;
+        selectedBacktrackingPosition.y = 0;
+        Vector3 backtrackStartPosition = PathManager.Instance.LastSegment.transform.position;
+        backtrackStartPosition.y = 0;
+
+        float actualDistanceToOrigin = Vector3.Distance(originPosition, backtrackStartPosition);
+        float selectedDistanceToOrigin = Vector3.Distance(selectedBacktrackingPosition, backtrackStartPosition);
+        float absDistanceOffsetToOrigin = Math.Abs(Vector3.Distance(selectedBacktrackingPosition, originPosition));
+
+        Vector3 trueDirectionToOrigin = (originPosition - backtrackStartPosition).normalized;
+        Vector3 selectedDirectionToOrigin = (selectedBacktrackingPosition - backtrackStartPosition).normalized;
+        float trueBearingToOrigin = Mathf.Atan2(trueDirectionToOrigin.x, trueDirectionToOrigin.z) * Mathf.Rad2Deg;
+        float estimatedBearingToOrigin = Mathf.Atan2(selectedDirectionToOrigin.x, selectedDirectionToOrigin.z) * Mathf.Rad2Deg;
+
+        trueBearingToOrigin = (trueBearingToOrigin + 360f) % 360f;
+        estimatedBearingToOrigin = (estimatedBearingToOrigin + 360f) % 360f;
+
+        float signedBearingErrorToOrigin = Mathf.DeltaAngle(estimatedBearingToOrigin, trueBearingToOrigin);
+        float absBearingErrorToOrigin = Mathf.Abs(signedBearingErrorToOrigin);
+
+        float backTrackTimeSec = PathManager.Instance.BacktrackTimer.GetTime();
+        float navigationTimeSec = PathManager.Instance.NavigationTimer.GetTime();
+        AssessmentManager.Instance.SetBacktrackingMetrics(actualDistanceToOrigin, selectedDistanceToOrigin,
+            absDistanceOffsetToOrigin, signedBearingErrorToOrigin, absBearingErrorToOrigin, backTrackTimeSec, navigationTimeSec);
+    }
+
+    private void OnPlayerReturnedToCenter()
+    {
+        returnToCenterHandler.PlayerInCenter.RemoveListener(OnPlayerReturnedToCenter);
+
+        switch (_experimentState)
         {
-            _hintCounter++;
-            Debug.Log($"Displayig guidance - Counter: {_hintCounter}");
+            case ExperimentState.Assessment:
+                _pathEnvironment.SetActive(false);
+                _assessmentEnvironment.SetActive(true);
+                StartAssessment();
+                break;
+            case ExperimentState.Finished:
+                StudyManager.Instance.TrialTimer.StopTimer();
+                StudyManager.Instance.CompleteTrial();
+                break;
         }
     }
 
+    #endregion
 }

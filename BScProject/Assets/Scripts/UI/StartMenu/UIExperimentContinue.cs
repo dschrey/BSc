@@ -70,7 +70,7 @@ public class UIExperimentContinue : MonoBehaviour
     private void OnContinueExperimentClicked()
     {
         _experiment.paths.Remove(_selectedTrail);
-        SceneManager.Instance.LoadExperimentScene(_experiment, _selectedPath, _selectedTrail, _assessment);
+        // StudyManager.Instance.LoadStudyScene(_experiment, _selectedPath, _selectedTrail, _assessment);
         gameObject.SetActive(false);
     }
 

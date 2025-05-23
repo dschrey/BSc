@@ -4,6 +4,7 @@ public class CharacterControllerSync : MonoBehaviour
 {
     [SerializeField] private CharacterController _characterController;
     [SerializeField] private Transform _XRCamera;
+    [SerializeField] private GameObject _characterVisual;
 
     private void Update()
     {
@@ -11,6 +12,9 @@ public class CharacterControllerSync : MonoBehaviour
             return;
 
         Vector3 cameraPosition = _XRCamera.localPosition;
-        _characterController.center = new Vector3(cameraPosition.x, _characterController.center.y, cameraPosition.z);
+        Vector3 position = new(cameraPosition.x, _characterController.center.y, cameraPosition.z);
+        _characterController.center = position;
+        position.y = 0.2f;
+        _characterVisual.transform.position = position;
     }
 }

@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 0
-  _startPositionHighlights: {fileID: 2899174443001302908}
+  _startHighlights: {fileID: 2899174443001302908}
   _showHighlight: 0
   _addMovementDetection: 0
 --- !u!135 &7641578082736793874
@@ -122,6 +122,10 @@ PrefabInstance:
     - target: {fileID: 6911620273203725201, guid: 986028f3e5ab83346826b5b9b2ffb9e1, type: 3}
       propertyPath: m_Name
       value: MarkScaler
+      objectReference: {fileID: 0}
+    - target: {fileID: 6911620273203725201, guid: 986028f3e5ab83346826b5b9b2ffb9e1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

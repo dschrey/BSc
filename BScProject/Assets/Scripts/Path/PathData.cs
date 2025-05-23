@@ -7,26 +7,34 @@ using UnityEngine;
 public enum PathObjects
 {
     None = 0,
-    Hovering = 1 << 0,
+    Hover = 1 << 0,
     Landmarks = 1 << 1,
     Obstacles = 1 << 2
 }
 
-[CreateAssetMenu(fileName = "Path", menuName = "PathData", order = 0)]
+public enum PathDifficulty
+{
+    Easy,    // Current segment highlights stay visible
+    Hard    // Current segment highlights stay disappears on move
+}
+
+
+[CreateAssetMenu(fileName = "Path", menuName = "Path/PathData", order = 0)]
 public class PathData : ScriptableObject
 {
     public int PathID = -1;
     public string PathName;
     public PathObjects PathObjects;
+    public PathDifficulty PathDifficulty;
     [HideInInspector] public Color PathColor;
-    public List<int> PathLayoutSelectionOrder = new();
+    public List<int> PathLayoutDisplayOrder = new();
     [HideInInspector] public int CorrectPathLayoutID = 0;
-
-    public GameObject ObstaclePrefab = null;
+    [HideInInspector] public GameObject ObstaclePrefab = null;
     [Header("Fake Paths")]
     public List<float> FakePathAngles1 = new();
     public List<float> FakePathAngles2 = new();
     public List<float> FakePathAngles3 = new();
+    [Header("Path Segments")]
     public List<PathSegmentData> SegmentsData = new();
     public event Action Update;
     public PathSegmentData GetSegmentData(int id)
@@ -65,14 +73,15 @@ public class PathData : ScriptableObject
 
     private void OnEnable()
     {
-        if (PathLayoutSelectionOrder.Count == 0)
+        // Initialze path layout display order randomly on creation
+        if (PathLayoutDisplayOrder.Count == 0)
         {
-            PathLayoutSelectionOrder = Enumerable.Range(0, 4).ToList();
+            PathLayoutDisplayOrder = Enumerable.Range(0, 4).ToList();
             var random = new System.Random();
-            PathLayoutSelectionOrder = PathLayoutSelectionOrder.OrderBy(x => random.Next()).ToList();
+            PathLayoutDisplayOrder = PathLayoutDisplayOrder.OrderBy(x => random.Next()).ToList();
         }
 
-        if (ObstaclePrefab == null)
+        if (PathDifficulty == PathDifficulty.Hard && ((PathObjects & PathObjects.Obstacles) != 0) && ObstaclePrefab == null)
         {
             ObstaclePrefab = Resources.Load<GameObject>("Obstacle");
         }

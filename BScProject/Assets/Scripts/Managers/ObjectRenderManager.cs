@@ -7,12 +7,38 @@ public class ObjectRenderManager : MonoBehaviour
     [SerializeField] private GameObject _objectRendererPrefab;
 
 
-    // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
+    void OnDestroy()
+    {
+        foreach (GameObject renderObject in _activeObjectRenderings)
+        {
+            Destroy(renderObject);
+        }
+        _activeObjectRenderings.Clear();
+    }
 
-    public RenderTexture CreateNewObjectRender(GameObject objectPrefab)
+    public void InitializeRenderObjects(PathObjects pathObjects)
+    {
+        if ((pathObjects & PathObjects.Hover) != 0)
+        {
+            foreach (var renderObject in ResourceManager.Instance.HoverObjects)
+            {
+                renderObject.RenderTexture = CreateObjectToRender(renderObject.gameObject);
+            }
+        }
+
+        if ((pathObjects & PathObjects.Landmarks) != 0)
+        {
+            foreach (var renderObject in ResourceManager.Instance.LandmarkObjects)
+            {
+                renderObject.RenderTexture = CreateObjectToRender(renderObject.gameObject);
+            }
+        }
+    }
+
+    public RenderTexture CreateObjectToRender(GameObject objectPrefab)
     {
         RenderTexture renderTexture = new(256, 256, 24);
-        
+
         Vector3 position = new(0, 0, 0)
         {
             x = _activeObjectRenderings.Count
@@ -22,7 +48,7 @@ public class ObjectRenderManager : MonoBehaviour
         objectRender.transform.localPosition = position;
         Utils.SetLayerRecursively(objectRender, LayerMask.NameToLayer("ObjectRendering"));
         _activeObjectRenderings.Add(objectRender);
-    
+
         if (objectRender.TryGetComponent<ObjectRenderer>(out var objectRenderer))
         {
             objectRenderer.Initialize(objectPrefab, renderTexture);
@@ -34,14 +60,5 @@ public class ObjectRenderManager : MonoBehaviour
 
         return renderTexture;
     }
-
-    public void ClearRenderObjects()
-    {
-        foreach (GameObject renderObject in _activeObjectRenderings)
-        {
-            Destroy(renderObject);
-        }
-        _activeObjectRenderings.Clear();
-    }
-
+    
 }

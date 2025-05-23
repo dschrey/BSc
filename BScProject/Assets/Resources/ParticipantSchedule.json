@@ -1,0 +1,20 @@
+
+{
+    "participants": [
+        {
+            "id": 111,
+            "pathSetOrder": ["SetX","SetX"],
+            "locomotionOrder": ["Walking","Walking"]
+        },
+        {
+            "id": 1,
+            "pathSetOrder": ["SetA","SetB"],
+            "locomotionOrder": ["Walking","Walking"]
+        },
+        {
+            "id": 2,
+            "pathSetOrder": ["SetA","SetB"],
+            "locomotionOrder": ["Walking","Omnideck"]
+        }
+    ]
+}

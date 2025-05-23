@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 
+[Obsolete]
 public class UINewExperiment : MonoBehaviour
 {
     [Header("UI Elements"), SerializeField] private TMP_InputField _inputExperimentID;
@@ -13,11 +14,7 @@ public class UINewExperiment : MonoBehaviour
     [SerializeField] private Button _buttonStartExperiment;
     [SerializeField] private Toggle _toggleResetExperimentCount;
     [SerializeField] private Toggle _toggleResetAssessmentData;
-    [SerializeField] private Button _buttonOmnideckStatus;
-    [SerializeField] private TMP_Text _textOmnideckStatusButton;
-    [SerializeField] private TMP_Text _textOmnideckStatus;
-    [SerializeField] private Transform _interfaceParent;
-    [SerializeField] private GameObject _omnideckInterfacePrefab;
+    [SerializeField] private TMP_Text _textInstructions;
     private Trail _selectedTrail;
     private PathData _selectedPath;
     private int _experimentID;
@@ -101,11 +98,11 @@ public class UINewExperiment : MonoBehaviour
 
         if (_overwriteAssessmentData || _currentAssessment == null)
         {
-            SceneManager.Instance.LoadExperimentScene(_experiment, _selectedPath, _selectedTrail, new(_experimentID, DateTime.Now));
+            // StudyManager.Instance.LoadStudyScene(_experiment, _selectedPath, _selectedTrail, new(_experimentID, DateTime.Now));
         }
         else
         {
-            SceneManager.Instance.LoadExperimentScene(_experiment, _selectedPath, _selectedTrail, _currentAssessment);
+            // StudyManager.Instance.LoadStudyScene(_experiment, _selectedPath, _selectedTrail, _currentAssessment);
         }
 
         gameObject.SetActive(false);
@@ -151,7 +148,7 @@ public class UINewExperiment : MonoBehaviour
     {
         _pathDropdown.ClearOptions();
         List<string> options = new();
-        ParticipantData data = ResourceManager.Instance.GetExperimentData(_experimentID);
+        ParticipantData data = ResourceManager.Instance.GetParticipantData(_experimentID);
         if (data == null)
         {
             Debug.LogError($"Failed to load experiment data for id: {_experimentID}.");
@@ -174,23 +171,23 @@ public class UINewExperiment : MonoBehaviour
         }
 
         List<string> completedPaths = new();
-        _currentAssessment?.Paths.ForEach(path =>
-        {
-            string floor = path.FloorType == 0 ? "Reg" : "Omni";
-            string selectionName = $"{_currentAssessment.AssessmentID}_{path.Name}_{floor}";
-            completedPaths.Add(selectionName);
-        });
+        // _currentAssessment?.Paths.ForEach(path =>
+        // {
+        //     // string floor = path.FloorType == 0 ? "Reg" : "Omni";
+        //     // string selectionName = $"{_currentAssessment.AssessmentID}_{path.Name}_{floor}";
+        //     completedPaths.Add(selectionName);
+        // });
 
-        foreach (Trail trail in data.paths)
-        {
-            string completedPath = completedPaths.Find(name => name == trail.selectionName);
-            if (_overwriteAssessmentData || completedPath == null)
-            {
-                options.Add(trail.selectionName);
-                PathData path = ResourceManager.Instance.LoadPathData(trail.name);
-                _experiment.paths.Add(trail, path);
-            }
-        }
+        // foreach (Trail trail in data.paths)
+        // {
+        //     string completedPath = completedPaths.Find(name => name == trail.selectionName);
+        //     if (_overwriteAssessmentData || completedPath == null)
+        //     {
+        //         options.Add(trail.selectionName);
+        //         PathData path = ResourceManager.Instance.LoadPathData(trail.name);
+        //         _experiment.paths.Add(trail, path);
+        //     }
+        // }
         _pathDropdown.AddOptions(options);
         _buttonStartExperiment.interactable = true;
         OnPathSelectionChanged(0);

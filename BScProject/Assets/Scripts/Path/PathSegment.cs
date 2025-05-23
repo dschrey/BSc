@@ -5,6 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class PathSegment : MonoBehaviour
 {
+    #region Variables
     public PathSegmentData PathSegmentData;
     public event Action SegmentCompleted;
     private MovementDetection _playerMovementDetection;
@@ -18,7 +19,7 @@ public class PathSegment : MonoBehaviour
     private GameObject _obstaclePrefab = null;
 
     [Header("Particles")]
-    public GameObject ObjectiveObject;
+    public GameObject HoverObject;
     public GameObject CapturedParticles;
     public GameObject HintParticles;
     public GameObject LockedParticles;
@@ -28,8 +29,10 @@ public class PathSegment : MonoBehaviour
     [SerializeField] private AudioClip Hint;
     [SerializeField] private AudioClip Captured;
 
+    private bool _isCapturing = false;
 
-    // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------------
+    #endregion
+    #region Unity Methods
 
     private void OnEnable()
     {
@@ -56,7 +59,8 @@ public class PathSegment : MonoBehaviour
         _playerMovementDetection.PlayerExitedDectectionZone -= OnPlayerExitObjective;
     }
 
-    // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------------
+    #endregion
+    #region Listener Methods
 
     private void OnObjectiveCaptured()
     {
@@ -69,6 +73,11 @@ public class PathSegment : MonoBehaviour
 
     private void OnPlayerEnterObjective()
     {
+        if (PathManager.Instance.GetCurrentSegmentID() -1 != PathSegmentData.SegmentID)
+        {
+            return;
+        }
+
         if (_objectiveCaptured)
         {
             return;
@@ -85,7 +94,8 @@ public class PathSegment : MonoBehaviour
         StopCapturingObjective();
     }
 
-    // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------------
+    #endregion
+    #region Class Methods
 
     public void Initialize(PathSegmentData pathSegmentData, GameObject obstaclePrefab, PathObjects pathObjects)
     {
@@ -100,6 +110,7 @@ public class PathSegment : MonoBehaviour
         {
             return;
         }
+        _isCapturing = true;
         _collectionCoroutine = StartCoroutine(CaptureObjective());
     }
 
@@ -108,6 +119,7 @@ public class PathSegment : MonoBehaviour
         if (_collectionCoroutine != null)
         {
             StopCoroutine(_collectionCoroutine);
+            _isCapturing = false;
             _collectionCoroutine = null;
         }
     }
@@ -120,44 +132,48 @@ public class PathSegment : MonoBehaviour
 
     private void SetObjectiveCaptured()
     {
-        Debug.Log($"Captured Segment {PathSegmentData.SegmentID}!");
         _objectiveCaptured = true;
+        _isCapturing = false;
         LockedParticles.SetActive(false);
+        HintParticles.SetActive(false);
         CapturedParticles.SetActive(true);
-        PlayAudio(Captured);
+        AudioManager.Instance.PlayAudio(SoundType.SoundSegmentUnlocked, _audioSource);
         OnObjectiveCaptured();
     }
 
-    public void SetObjectiveInvisible()
+    public void SetSegmentInvisible()
     {
+        HintParticles.SetActive(false);
         LockedParticles.SetActive(false);
-        if (ObjectiveObject != null)
-            ObjectiveObject.SetActive(false);
+        if (HoverObject != null)
+            HoverObject.SetActive(false);
     }
 
     public void ShowSegmentObjective()
     {
         LockedParticles.SetActive(true);
-        if (ObjectiveObject != null)
-            ObjectiveObject.SetActive(true); ;
+        if (HoverObject != null)
+            HoverObject.SetActive(true);
     }
 
-    public void PlaySegmentObjectiveHint()
+    public void ShowSegmentHint()
     {
+        if (_objectiveCaptured) return;
+        if (_isCapturing) return;
         StartCoroutine(CoroutineObjectiveHint());
     }
 
     private IEnumerator CoroutineObjectiveHint()
     {
         HintParticles.SetActive(true);
-        PlayAudio(Hint);
+        AudioManager.Instance.PlayAudio(SoundType.SoundSegmentHint, _audioSource);
         yield return new WaitForSeconds(2f);
         HintParticles.SetActive(false);
     }
 
     private void SpawnSegmentObjects(PathObjects pathObjects)
     {
-        if ((pathObjects & PathObjects.Hovering) != 0)
+        if ((pathObjects & PathObjects.Hover) != 0)
         {
             SpawnHoverObject();
         }
@@ -179,10 +195,10 @@ public class PathSegment : MonoBehaviour
         GameObject prefab = ResourceManager.Instance.GetHoverObject(PathSegmentData.ObjectiveObjectID);
         if (prefab == null)
         {
-            Debug.LogWarning($"Objective object found.");
+            Debug.LogWarning($"Hover object not found.");
             return;
         }
-        ObjectiveObject = Instantiate(prefab, _objectiveObjectSpawnpoint);
+        HoverObject = Instantiate(prefab, _objectiveObjectSpawnpoint);
     }
 
     private void SpawnLandmarkObject()
@@ -190,16 +206,16 @@ public class PathSegment : MonoBehaviour
 
         float angleInRadians = PathSegmentData.AngleToLandmark * Mathf.Deg2Rad;
         Vector3 relativePosition = new(
-            PathSegmentData.LandmarkObjectDistanceToObjective * Mathf.Cos(angleInRadians),
+            PathSegmentData.LandmarkDistanceToSegment * Mathf.Sin(angleInRadians),
             0,
-            PathSegmentData.LandmarkObjectDistanceToObjective * Mathf.Sin(angleInRadians)
+            PathSegmentData.LandmarkDistanceToSegment * Mathf.Cos(angleInRadians)
         );
         Vector3 objectSpawnpoint = transform.position + relativePosition;
 
         GameObject prefab = ResourceManager.Instance.GetLandmarkObject(PathSegmentData.LandmarkObjectID);
         if (prefab == null)
         {
-            Debug.LogWarning($"Landmark object found.");
+            Debug.LogWarning($"Landmark object not found.");
             return;
         }
 
@@ -208,7 +224,6 @@ public class PathSegment : MonoBehaviour
 
     private void SpawnSegmentObstacle()
     {
-        if (!PathSegmentData.ShowObstacle) return;
         if (_obstaclePrefab == null)
         {
             Debug.LogError($"Obstacle prefab is null.");
@@ -221,16 +236,71 @@ public class PathSegment : MonoBehaviour
         SegmentObstacle.transform.localScale = PathSegmentData.Scale;
     }
 
-    private void PlayAudio(AudioClip clip)
+    /// <summary>
+    /// Set segment visual based on type.
+    /// 1: Locked Visual;
+    /// 2: Hint Visual;
+    /// 3: Unlocked Visual;
+    /// Any: All
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="state"></param>
+    public void SetParticleVisuals(int type, bool state)
     {
-        if (_audioSource == null)
+        switch (type)
         {
-            Debug.LogError($"Audio source for segment {PathSegmentData.SegmentID} was not found.");
-            return;
+            case 1:
+                LockedParticles.SetActive(state);
+                break;
+            case 2:
+                HintParticles.SetActive(state);
+                break;
+            case 3:
+                CapturedParticles.SetActive(state);
+                break;
+            default:
+                CapturedParticles.SetActive(state);
+                HintParticles.SetActive(state);
+                LockedParticles.SetActive(state);
+                break;
         }
-        _audioSource.PlayOneShot(clip);
     }
 
-    public void PlayHintAudio() => PlayAudio(Hint);
-
+    /// <summary>
+    /// Set segment visual based on type.
+    /// 1: Landmark;
+    /// 2: Hover;
+    /// 3: Obstacle;
+    /// Any: All
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="state"></param>
+    public void SetObjectsVisuals(int type, bool state)
+    {
+        switch (type)
+        {
+            case 1:
+                if (LandmarkObject != null)
+                    LandmarkObject.SetActive(state);
+                break;
+            case 2:
+                if (HoverObject != null)
+                    HoverObject.SetActive(state);
+                break;
+            case 3:
+                if (SegmentObstacle != null)
+                    SegmentObstacle.SetActive(state);
+                break;
+            default:
+                if (HoverObject != null)
+                    HoverObject.SetActive(state);
+                if (LandmarkObject != null)
+                    LandmarkObject.SetActive(state);
+                if (SegmentObstacle != null)
+                    SegmentObstacle.SetActive(state);
+                break;
+        }
+    }
+    
+    #endregion
 }

@@ -4,7 +4,7 @@ public enum SpawnPointType { Experiment, Assessment };
 public class SpawnPoint : MonoBehaviour
 {
     public SpawnPointType type;
-    [SerializeField] private GameObject _startPositionHighlights;
+    [SerializeField] private GameObject _startHighlights;
     [SerializeField] private bool _showHighlight;
     [SerializeField] private bool _addMovementDetection;
     private MovementDetection _movementDetection;
@@ -13,15 +13,15 @@ public class SpawnPoint : MonoBehaviour
     {
         if (_addMovementDetection)
         {
-            if (!gameObject.TryGetComponent<MovementDetection>(out _movementDetection))
+            if (!gameObject.TryGetComponent(out _movementDetection))
                 _movementDetection = gameObject.AddComponent<MovementDetection>();
         }
-        _startPositionHighlights.SetActive(_showHighlight);
+        _startHighlights.SetActive(_showHighlight);
     }
 
-    public void ToggleStartPositionHighlight(bool state)
+    public void ToggleHighlight(bool state)
     {
-        _startPositionHighlights.SetActive(state);
+        _startHighlights.SetActive(state);
     }
 
     public MovementDetection GetMovementDetection() => _movementDetection;

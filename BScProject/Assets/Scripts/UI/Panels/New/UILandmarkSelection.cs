@@ -33,13 +33,14 @@ public class LandmarkPlacementData
 
 public class UILandmarkSelection : MonoBehaviour
 {
+    #region Variables
     [Header("Path")]
     [SerializeField] private PathLayoutCreator _pathPreviewCreator;
     private CanvasCameraHandler _canvasCamera;
 
     [Header("Inputs")]
-    public NearFarInteractor UIInteractor;
-    public InputActionReference PlaceAction;
+    [SerializeField] private NearFarInteractor _primaryHandInteractor;
+    [SerializeField] private InputActionReference _placeAction;
 
     [Header("Canvas Landmark Socket")]
     [SerializeField] private GameObject _segmentSelectorPrefab;
@@ -75,22 +76,23 @@ public class UILandmarkSelection : MonoBehaviour
     private readonly List<GridObjectSelection> _landmarkObjectSelection = new();
     private readonly List<LandmarkPlacementData> _canvasLandmarkObjectData = new();
     private readonly List<CanvasSegmentSelector> _landmarkSegmentSelectors = new();
-    public int _selectedLandmarkSegmentID = -1;
-    public int _selectedLandmarkObjectID = -1;
+    private int _selectedSegmentID = -1;
+    private int _selectedLandmarkObjectID = -1;
     private bool _isValidPlacementPosition;
-    private LandmarkPlacementData _currentSegmentLandmarkData => _canvasLandmarkObjectData.Find(s => s.SegmentID == _selectedLandmarkSegmentID);
+    private LandmarkPlacementData _currentSegmentLandmarkData => _canvasLandmarkObjectData.Find(s => s.SegmentID == _selectedSegmentID);
     private GameObject _placementCrosshair = null;
     private GameObject _placementWorldObject = null;
     private Vector2 _lastPointerPosition = Vector2.negativeInfinity;
     private LineController _lineRender;
-    private GameObject _currentLandmarkObjective =>
-        _pathPreviewCreator.SpawnedSegments.Find(segment => segment.SegmentID == _selectedLandmarkSegmentID).gameObject;
+    private GameObject _landmarkReferenceSegment =>
+        _pathPreviewCreator.SpawnedSegments.Find(segment => segment.SegmentID == _selectedSegmentID).gameObject;
 
-    // ---------- Unity Methods ------------------------------------------------------------------------------------------------------------------------
+    #endregion
     #region Unity Methods
 
     void OnEnable()
     {
+        LoadPrimaryHand();
         _completed = false;
         _isValidPlacementPosition = false;
         _buttonPreviousSegment.onClick.AddListener(OnPreviousSegmentClick);
@@ -116,9 +118,9 @@ public class UILandmarkSelection : MonoBehaviour
         CreateLandmarkObjectSelectionGrid();
         CreateLandmarkSegmentSelectors();
 
-        _selectedLandmarkSegmentID = 0;
-        _landmarkSegmentSelectors.Find(selector => selector.BelongsToSegmentID == _selectedLandmarkSegmentID).Select();
-        _landmarkSegmentIndicators[_selectedLandmarkSegmentID].Toggle(true);
+        _selectedSegmentID = 0;
+        _landmarkSegmentSelectors.Find(selector => selector.BelongsToSegmentID == _selectedSegmentID).Select();
+        _landmarkSegmentIndicators[_selectedSegmentID].Toggle(true);
         UpdateSegmentText();
 
         CreateLandmarkPositionObjects();
@@ -126,13 +128,7 @@ public class UILandmarkSelection : MonoBehaviour
         _textObjectName.text = "None";
         _finishButton.interactable = false;
 
-        // XRInteractionToggle interactionToggle = FindObjectOfType<XRInteractionToggle>();
-        // if (interactionToggle != null)
-        // {
-        //     interactionToggle.UpdateUIInteractor();
-        // }
     }
-
 
     void Update()
     {
@@ -151,7 +147,7 @@ public class UILandmarkSelection : MonoBehaviour
                 worldPosition.y = 0;
                 _placementWorldObject.transform.position = worldPosition;
                 _lastPointerPosition = roundedResult;
-                float distance = Vector3.Distance(_currentLandmarkObjective.transform.position, _placementWorldObject.transform.position);
+                float distance = Vector3.Distance(_landmarkReferenceSegment.transform.position, _placementWorldObject.transform.position);
                 _textPreviewDistance.text = distance.ToString("F2", CultureInfo.InvariantCulture) + " m";
                 _isValidPlacementPosition = true;
             }
@@ -167,14 +163,13 @@ public class UILandmarkSelection : MonoBehaviour
             }
         }
 
-        if (PlaceAction != null && _isValidPlacementPosition && PlaceAction.action.WasPressedThisFrame())
+        if (_placeAction != null && _isValidPlacementPosition && _placeAction.action.WasPressedThisFrame())
         {
             HandleLandmarkPlacement(_lastPointerPosition);
         }
     }
 
     #endregion
-    // ---------- Listener Methods ------------------------------------------------------------------------------------------------------------------------
     #region Listener Methods
 
     private void OnNextSegmentModeClick()
@@ -188,12 +183,12 @@ public class UILandmarkSelection : MonoBehaviour
         {
             oldLandmarkData.Socket.ToggleSocketVisual(false);
         }
-        _landmarkSegmentIndicators[_selectedLandmarkSegmentID].Toggle(false);
+        _landmarkSegmentIndicators[_selectedSegmentID].Toggle(false);
 
-        _selectedLandmarkSegmentID = (_selectedLandmarkSegmentID + 1) % (_pathPreviewCreator.SpawnedSegments.Count - 1);
-        _landmarkSegmentIndicators[_selectedLandmarkSegmentID].Toggle(true);
+        _selectedSegmentID = (_selectedSegmentID + 1) % (_pathPreviewCreator.SpawnedSegments.Count - 1);
+        _landmarkSegmentIndicators[_selectedSegmentID].Toggle(true);
 
-        _landmarkSegmentSelectors.Find(selector => selector.BelongsToSegmentID == _selectedLandmarkSegmentID).Select();
+        _landmarkSegmentSelectors.Find(selector => selector.BelongsToSegmentID == _selectedSegmentID).Select();
         UpdateSegmentText();
         HandleLandmarkSegmentChange();
     }
@@ -207,10 +202,10 @@ public class UILandmarkSelection : MonoBehaviour
             oldLandmarkData.LineRender.gameObject.SetActive(false);
         if (oldLandmarkData.Socket != null)
             oldLandmarkData.Socket.ToggleSocketVisual(false);
-        _landmarkSegmentIndicators[_selectedLandmarkSegmentID].Toggle(false);
+        _landmarkSegmentIndicators[_selectedSegmentID].Toggle(false);
 
-        _selectedLandmarkSegmentID = (_selectedLandmarkSegmentID - 1 + (_pathPreviewCreator.SpawnedSegments.Count - 1)) % (_pathPreviewCreator.SpawnedSegments.Count - 1);
-        _landmarkSegmentIndicators[_selectedLandmarkSegmentID].Toggle(true);
+        _selectedSegmentID = (_selectedSegmentID - 1 + (_pathPreviewCreator.SpawnedSegments.Count - 1)) % (_pathPreviewCreator.SpawnedSegments.Count - 1);
+        _landmarkSegmentIndicators[_selectedSegmentID].Toggle(true);
         UpdateSegmentText();
         HandleLandmarkSegmentChange();
     }
@@ -219,7 +214,6 @@ public class UILandmarkSelection : MonoBehaviour
     {
         _selectedLandmarkObjectID = selectedObjectID;
         GameObject landmarkObject = null;
-        Debug.Log(selectedObjectID);
         if (selectedObjectID != -1)
         {
             landmarkObject = ResourceManager.Instance.GetLandmarkObject(_selectedLandmarkObjectID);
@@ -229,7 +223,7 @@ public class UILandmarkSelection : MonoBehaviour
         {
             _textObjectName.text = "None";
         }
-        if (_selectedLandmarkSegmentID == -1) return;
+        if (_selectedSegmentID == -1) return;
 
         LandmarkPlacementData landmarkData = _currentSegmentLandmarkData;
         landmarkData.SelectedObjectID = selectedObjectID;
@@ -237,7 +231,6 @@ public class UILandmarkSelection : MonoBehaviour
         LandmarkObjectSocket landmarkSocket = landmarkData.Socket;
         if (landmarkSocket == null)
         {
-            Debug.Log($"Socke tnull");
             return;
         }
 
@@ -250,7 +243,7 @@ public class UILandmarkSelection : MonoBehaviour
         else
         {
             landmarkSocket.RemoveSocketObject();
-            _landmarkSegmentIndicators[_selectedLandmarkSegmentID].SetState(false);
+            _landmarkSegmentIndicators[_selectedSegmentID].SetState(false);
         }
 
         UpdateObjectAssignment();
@@ -268,7 +261,7 @@ public class UILandmarkSelection : MonoBehaviour
 
     private void HandleSelectionPreview(int previewObjectID)
     {
-        if (_selectedLandmarkSegmentID == -1) return;
+        if (_selectedSegmentID == -1) return;
 
         LandmarkPlacementData landmarkData = _currentSegmentLandmarkData;
         if (landmarkData == null) return;
@@ -300,15 +293,26 @@ public class UILandmarkSelection : MonoBehaviour
 
 
     #endregion
-    // ---------- Class Methods ------------------------------------------------------------------------------------------------------------------------
     #region Class Methods
+
+    private void LoadPrimaryHand()
+    {
+        XRControllerManager controllerManager = FindObjectOfType<XRControllerManager>();
+        if (controllerManager == null)
+        {
+            Debug.LogError($"Could not find XR controller manager.");
+            return;
+        }
+        _primaryHandInteractor = controllerManager.ActiveXRInteractor;
+        _placeAction = controllerManager.ActiveActivateAction;
+    }
 
     private void HandleLandmarkSegmentChange()
     {
         _lineRender.SetLinePoints(new()
         {
             _placementWorldObject.transform,
-            _currentLandmarkObjective.transform
+            _landmarkReferenceSegment.transform
         });
 
         LandmarkPlacementData landmarkData = _currentSegmentLandmarkData;
@@ -348,25 +352,35 @@ public class UILandmarkSelection : MonoBehaviour
     {
 
         _finishButton.interactable = VerifyLandmarkObjects();
-        if (_selectedLandmarkSegmentID == -1) return;
+        if (_selectedSegmentID == -1) return;
 
         LandmarkPlacementData landmarkData = _currentSegmentLandmarkData;
 
         if (landmarkData.Socket == null) return;
         if (landmarkData.SelectedObjectID == -1) return;
 
-        Debug.Log($"Landmark: Segment {_selectedLandmarkSegmentID} - Object - {landmarkData.SelectedObjectID}");
+        Debug.Log($"Landmark: Segment {_selectedSegmentID} - Object - {landmarkData.SelectedObjectID}");
 
-        AssessmentManager.Instance.AssignSegmentLandmarkObject(_selectedLandmarkSegmentID, landmarkData.SelectedObjectID);
-        _textObjectName.text = landmarkData.Socket.SocketObject.name.Replace("(Clone)", "").Trim();
+        string landmarkObjectName = landmarkData.Socket.SocketObject.name.Replace("(Clone)", "").Trim();
+        _textObjectName.text = landmarkObjectName;
 
-        Vector3 realSpawnpoint = _currentLandmarkObjective.transform.position + AssessmentManager.Instance.CurrentPath.GetSegmentData(_selectedLandmarkSegmentID).RelativeLandmarkPositionToObjective;
+        Vector3 realSpawnpoint = _landmarkReferenceSegment.transform.position +
+            AssessmentManager.Instance.CurrentPath.GetSegmentData(_selectedSegmentID).RelativeLandmarkPositionToObjective;
+        realSpawnpoint.y = 0;
         Vector3 objectPosition = landmarkData.WorldPositionObject.transform.position;
         objectPosition.y = 0;
-        float differenceToRealPosition = Vector3.Distance(realSpawnpoint, objectPosition);
-        AssessmentManager.Instance.SetSegmentLandmarkObjectDistance(_selectedLandmarkSegmentID, landmarkData.Distance, differenceToRealPosition);
 
-        _landmarkSegmentIndicators[_selectedLandmarkSegmentID].SetState(true);
+        float distanceOffsetToLandmark = Vector3.Distance(realSpawnpoint, objectPosition);
+        float absDistanceOffsetToLandmark = Math.Abs(Vector3.Distance(realSpawnpoint, objectPosition));
+
+        Vector3 directionToPlacedLandmark = objectPosition - _landmarkReferenceSegment.transform.position;
+        float estimatedBearing = Mathf.Atan2(directionToPlacedLandmark.x, directionToPlacedLandmark.z) * Mathf.Rad2Deg;
+        estimatedBearing = (estimatedBearing + 360f) % 360f;
+
+        AssessmentManager.Instance.SetSegmentLandmarkData(_selectedSegmentID, landmarkObjectName, landmarkData.Distance,
+            distanceOffsetToLandmark, absDistanceOffsetToLandmark, estimatedBearing);
+
+        _landmarkSegmentIndicators[_selectedSegmentID].SetState(true);
         // SkipToNextUnsetLandmark();
         // OnNextSegmentModeClick();
     }
@@ -395,12 +409,12 @@ public class UILandmarkSelection : MonoBehaviour
             {
                 oldLandmarkData.Socket.ToggleSocketVisual(false);
             }
-            _landmarkSegmentIndicators[_selectedLandmarkSegmentID].Toggle(false);
+            _landmarkSegmentIndicators[_selectedSegmentID].Toggle(false);
 
-            _selectedLandmarkSegmentID = count;
-            _landmarkSegmentIndicators[_selectedLandmarkSegmentID].Toggle(true);
+            _selectedSegmentID = count;
+            _landmarkSegmentIndicators[_selectedSegmentID].Toggle(true);
 
-            _landmarkSegmentSelectors.Find(selector => selector.BelongsToSegmentID == _selectedLandmarkSegmentID).Select();
+            _landmarkSegmentSelectors.Find(selector => selector.BelongsToSegmentID == _selectedSegmentID).Select();
             UpdateSegmentText();
             HandleLandmarkSegmentChange();
             return;
@@ -409,7 +423,7 @@ public class UILandmarkSelection : MonoBehaviour
 
     private void HandleLandmarkPlacement(Vector2 canvasPosition)
     {
-        if (_selectedLandmarkSegmentID == -1) return;
+        if (_selectedSegmentID == -1) return;
 
         Vector3 worldPosition = _canvasCamera.ScreenCoordinatesToWorldSpace(canvasPosition);
         worldPosition.y = 0;
@@ -444,12 +458,12 @@ public class UILandmarkSelection : MonoBehaviour
         landmarkData.LineRender.SetColor(landmarkData.SegmentColor);
         landmarkData.LineRender.SetLinePoints(new()
             {
-                _currentLandmarkObjective.transform,
+                _landmarkReferenceSegment.transform,
                 landmarkData.WorldPositionObject.transform
             }
         );
 
-        float distance = Vector3.Distance(_currentLandmarkObjective.transform.position, landmarkData.WorldPositionObject.transform.position);
+        float distance = Vector3.Distance(_landmarkReferenceSegment.transform.position, landmarkData.WorldPositionObject.transform.position);
         landmarkData.Distance = distance;
         _textDistanceValue.text = distance.ToString("F2", CultureInfo.InvariantCulture) + " m";
         UpdateObjectAssignment();
@@ -463,10 +477,10 @@ public class UILandmarkSelection : MonoBehaviour
         _lineRender.SetLinePoints(new()
         {
             _placementWorldObject.transform,
-            _currentLandmarkObjective.transform
+            _landmarkReferenceSegment.transform
         });
 
-        _placementWorldObject.transform.position = _currentLandmarkObjective.transform.position;
+        _placementWorldObject.transform.position = _landmarkReferenceSegment.transform.position;
     }
 
     private bool VerifyLandmarkObjects()
@@ -521,16 +535,16 @@ public class UILandmarkSelection : MonoBehaviour
 
     private void UpdateSegmentText()
     {
-        if (_selectedLandmarkSegmentID == -1)
+        if (_selectedSegmentID == -1)
             _textSelectedSegment.text = "Unset";
         else
-            _textSelectedSegment.text = _selectedLandmarkSegmentID.ToString();
+            _textSelectedSegment.text = _selectedSegmentID.ToString();
     }
 
     private bool GetInteractorPositionOnCanvas(out Vector2 canvasPosition)
     {
         canvasPosition = Vector2.zero;
-        if (UIInteractor.TryGetCurrentUIRaycastResult(out RaycastResult result))
+        if (_primaryHandInteractor.TryGetCurrentUIRaycastResult(out RaycastResult result))
         {
             if (result.gameObject != null && result.gameObject == _movementArea.gameObject)
             {

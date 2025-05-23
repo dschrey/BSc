@@ -18,9 +18,9 @@ public class AssessmentData
         Completed = false;
     }
 
-    public void AddPath(PathData pathData, FloorType floor)
+    public void AddPath(PathData pathData)
     {
-        PathAssessmentData pathAssessmentData = new(pathData, floor);
+        PathAssessmentData pathAssessmentData = new(pathData);
         Paths.Add(pathAssessmentData);
         Debug.Log($"Added path (ID: {pathData.PathID}) to assessment {AssessmentID}\n\tPath count: {Paths.Count}");
     }
@@ -49,28 +49,27 @@ public class PathAssessmentData
 {
     public int PathID;
     public string Name;
-    public FloorType FloorType;
     public int Length;
     public string Time;
     public int SelectedPathLayout;
     public int ActualPathLayout;
     public bool CorrentPathLayoutSelected;
     public int NumHints;
+    public float DistanceToStartPosition;
     public List<SegmentAssessmentData> PathSegments;
 
-    public PathAssessmentData(PathData pathData, FloorType floor)
+    public PathAssessmentData(PathData pathData)
     {
         PathSegments = new();
         Name = pathData.PathName;
         PathID = pathData.PathID;
-        FloorType = floor;
         Length = pathData.SegmentsData.Count;
         ActualPathLayout = pathData.CorrectPathLayoutID;
 
         foreach (PathSegmentData pathSegment in pathData.SegmentsData)
         {
-            PathSegments.Add(new(pathSegment.SegmentID, pathSegment.DistanceFromPreviousSegment,
-                pathSegment.LandmarkObjectDistanceToObjective, pathSegment.ObjectiveObjectID, pathSegment.LandmarkObjectID));
+            PathSegments.Add(new(pathSegment.SegmentID, pathSegment.DistanceToPreviousSegment,
+                pathSegment.LandmarkDistanceToSegment, pathSegment.ObjectiveObjectID, pathSegment.LandmarkObjectID));
         }
     }
 

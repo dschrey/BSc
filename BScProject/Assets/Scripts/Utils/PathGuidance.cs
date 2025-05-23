@@ -1,6 +1,7 @@
+using System;
 using UnityEngine;
 
-[RequireComponent(typeof(LineRenderer))]
+[Obsolete, RequireComponent(typeof(LineRenderer))]
 public class PathGuidance : MonoBehaviour
 {
     [SerializeField] private int _numPoints = 20;
